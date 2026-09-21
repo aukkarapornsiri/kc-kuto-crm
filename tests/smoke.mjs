@@ -28,17 +28,21 @@ async function clickExactVisible(page, label) {
   for (let i = 0; i < count; i++) {
     const node = exact.nth(i);
     if (await node.isVisible().catch(() => false)) {
-      await node.click({ timeout: 5000 }).catch(async () => {
-        await node.locator('..').click({ timeout: 5000 });
-      });
+      await node.click({ timeout: 5000 });
       return true;
     }
   }
   return false;
 }
 
+function sidebar(page, viewportName) {
+  return viewportName === 'mobile'
+    ? page.locator('div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden').first()
+    : page.locator('div.hidden.lg\\:flex.w-64').first();
+}
+
 async function ensureMobileDrawerOpen(page) {
-  const drawer = page.locator('div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden').first();
+  const drawer = sidebar(page, 'mobile');
   if (await drawer.count()) {
     const cls = await drawer.getAttribute('class');
     if (cls && cls.includes('translate-x-0') && !cls.includes('-translate-x-full')) return true;
@@ -48,6 +52,31 @@ async function ensureMobileDrawerOpen(page) {
   await drawerToggle.click({ timeout: 5000 });
   await page.waitForTimeout(220);
   return true;
+}
+
+async function sidebarHas(page, viewportName, label) {
+  const root = sidebar(page, viewportName);
+  const nodes = root.getByText(label, { exact: true });
+  const count = await nodes.count();
+  for (let i = 0; i < count; i++) {
+    if (await nodes.nth(i).isVisible().catch(() => false)) return true;
+  }
+  return false;
+}
+
+async function clickSidebar(page, viewportName, label) {
+  if (viewportName === 'mobile') await ensureMobileDrawerOpen(page);
+  const root = sidebar(page, viewportName);
+  const nodes = root.getByText(label, { exact: true });
+  const count = await nodes.count();
+  for (let i = 0; i < count; i++) {
+    const node = nodes.nth(i);
+    if (await node.isVisible().catch(() => false)) {
+      await node.click({ timeout: 5000 });
+      return true;
+    }
+  }
+  return false;
 }
 
 async function assertHealthy(page, label) {
@@ -99,32 +128,41 @@ for (const viewport of [
     for (const group of groups) {
       if (viewport.name === 'mobile') await ensureMobileDrawerOpen(page);
 
-      const parentOk = await clickExactVisible(page, group.parent);
+      let parentOk = await sidebarHas(page, viewport.name, group.parent);
       if (!parentOk) {
         failures.push(`${viewport.name}: menu not found: ${group.parent}`);
         continue;
       }
-      await assertHealthy(page, `${viewport.name}: ${group.parent}`);
 
       if (!group.children.length) {
+        parentOk = await clickSidebar(page, viewport.name, group.parent);
+        if (!parentOk) failures.push(`${viewport.name}: cannot open menu: ${group.parent}`);
+        await assertHealthy(page, `${viewport.name}: ${group.parent}`);
         results.push(`${viewport.name}: ${group.parent} OK`);
         continue;
       }
 
-      for (let index = 0; index < group.children.length; index++) {
-        const child = group.children[index];
+      // Expand once if the first child is not currently visible.
+      if (!(await sidebarHas(page, viewport.name, group.children[0]))) {
+        await clickSidebar(page, viewport.name, group.parent);
+        await page.waitForTimeout(140);
+      }
 
-        if (viewport.name === 'mobile' && index > 0) {
-          await ensureMobileDrawerOpen(page);
-          const reopened = await clickExactVisible(page, group.parent);
+      for (const child of group.children) {
+        if (viewport.name === 'mobile') await ensureMobileDrawerOpen(page);
+
+        // Expanded state persists after navigation. Only toggle parent if this child
+        // is not visible in the sidebar.
+        if (!(await sidebarHas(page, viewport.name, child))) {
+          const reopened = await clickSidebar(page, viewport.name, group.parent);
           if (!reopened) {
-            failures.push(`${viewport.name}: cannot reopen menu: ${group.parent}`);
-            break;
+            failures.push(`${viewport.name}: cannot expand menu: ${group.parent}`);
+            continue;
           }
-          await page.waitForTimeout(120);
+          await page.waitForTimeout(140);
         }
 
-        const childOk = await clickExactVisible(page, child);
+        const childOk = await clickSidebar(page, viewport.name, child);
         if (!childOk) {
           failures.push(`${viewport.name}: submenu not found: ${group.parent} > ${child}`);
           continue;
