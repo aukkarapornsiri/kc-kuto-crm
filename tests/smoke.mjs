@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const base = process.env.SITE_URL || 'http://127.0.0.1:4173/';
+const base = process.env.SITE_URL || 'http://127.0.0.1:4173/kc-kuto-crm/';
 const browser = await chromium.launch({ headless: true });
 const failures = [];
 const results = [];
@@ -81,6 +81,9 @@ for (const viewport of [
       if (!/favicon|ResizeObserver loop/i.test(txt)) runtimeErrors.push('console: ' + txt);
     }
   });
+  page.on('response', res => {
+    if (res.status() >= 400) runtimeErrors.push('http ' + res.status() + ': ' + res.url());
+  });
 
   try {
     await page.goto(base, { waitUntil: 'networkidle', timeout: 30000 });
@@ -92,20 +95,14 @@ for (const viewport of [
     await page.screenshot({ path: `test-artifacts/${viewport.name}-home.png`, fullPage: true });
 
     for (const [parent, child] of targets) {
-      let ok = await clickText(page, parent, thai.get(parent));
-      if (!ok && viewport.name === 'mobile') {
-        const menuButtons = page.locator('button');
-        const menuCount = await menuButtons.count();
-        for (let i = 0; i < menuCount; i++) {
-          const aria = await menuButtons.nth(i).getAttribute('aria-label');
-          const title = await menuButtons.nth(i).getAttribute('title');
-          if (/menu|เมนู/i.test((aria || '') + ' ' + (title || ''))) {
-            await menuButtons.nth(i).click().catch(() => {});
-            break;
-          }
+      if (viewport.name === 'mobile') {
+        const drawerToggle = page.locator('button.lg\\:hidden').first();
+        if (await drawerToggle.count()) {
+          await drawerToggle.click({ timeout: 5000 });
+          await page.waitForTimeout(250);
         }
-        ok = await clickText(page, parent, thai.get(parent));
       }
+      let ok = await clickText(page, parent, thai.get(parent));
       if (!ok) {
         failures.push(`${viewport.name}: menu not found: ${parent}`);
         continue;
