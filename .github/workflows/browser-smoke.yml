@@ -1,0 +1,37 @@
+name: KC KuTo Browser Smoke
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --save-dev playwright
+          npx playwright install --with-deps chromium
+      - name: Start static development site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/kuto-http.log 2>&1 &
+          echo $! > /tmp/kuto-http.pid
+          sleep 2
+      - name: Run desktop and mobile smoke tests
+        run: |
+          mkdir -p test-artifacts
+          node tests/smoke.mjs
+      - name: Upload smoke screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kc-kuto-smoke-screenshots
+          path: test-artifacts/
+          if-no-files-found: ignore
