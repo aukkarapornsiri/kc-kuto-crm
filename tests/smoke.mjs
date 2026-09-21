@@ -37,11 +37,16 @@ async function clickExactVisible(page, label) {
   return false;
 }
 
-async function openMobileDrawer(page) {
+async function ensureMobileDrawerOpen(page) {
+  const drawer = page.locator('div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden').first();
+  if (await drawer.count()) {
+    const cls = await drawer.getAttribute('class');
+    if (cls && cls.includes('translate-x-0') && !cls.includes('-translate-x-full')) return true;
+  }
   const drawerToggle = page.locator('button.lg\\:hidden').first();
   if (!(await drawerToggle.count())) return false;
   await drawerToggle.click({ timeout: 5000 });
-  await page.waitForTimeout(180);
+  await page.waitForTimeout(220);
   return true;
 }
 
@@ -92,7 +97,7 @@ for (const viewport of [
     await page.screenshot({ path: `test-artifacts/${viewport.name}-home.png`, fullPage: true });
 
     for (const group of groups) {
-      if (viewport.name === 'mobile') await openMobileDrawer(page);
+      if (viewport.name === 'mobile') await ensureMobileDrawerOpen(page);
 
       const parentOk = await clickExactVisible(page, group.parent);
       if (!parentOk) {
@@ -110,7 +115,7 @@ for (const viewport of [
         const child = group.children[index];
 
         if (viewport.name === 'mobile' && index > 0) {
-          await openMobileDrawer(page);
+          await ensureMobileDrawerOpen(page);
           const reopened = await clickExactVisible(page, group.parent);
           if (!reopened) {
             failures.push(`${viewport.name}: cannot reopen menu: ${group.parent}`);
