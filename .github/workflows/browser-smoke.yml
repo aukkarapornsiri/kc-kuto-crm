@@ -21,13 +21,13 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Start static development site
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/kuto-http.log 2>&1 &
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory .. > /tmp/kuto-http.log 2>&1 &
           echo $! > /tmp/kuto-http.pid
           sleep 2
       - name: Run desktop and mobile smoke tests
         run: |
           mkdir -p test-artifacts
-          node tests/smoke.mjs
+          SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/smoke.mjs
       - name: Upload smoke screenshots
         if: always()
         uses: actions/upload-artifact@v4
