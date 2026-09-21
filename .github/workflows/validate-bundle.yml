@@ -1,0 +1,24 @@
+name: Validate KC KuTo Bundle
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: node --check app-C2ITSffc.js
+      - name: Verify required site assets
+        run: |
+          test -f index.html
+          test -f app-Dou2_7PY.css
+          test -f app-C2ITSffc.js
+          grep -q "app-C2ITSffc.js" index.html
