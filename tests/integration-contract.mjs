@@ -35,12 +35,12 @@ for (const provider of [
 
 requireText(bundle, 'Stripe Webhook URL', 'Stripe webhook UI');
 requireText(bundle, 'webhook_url', 'Stripe webhook backend field');
-requireText(server, 'DeviceManagementManagedDevices', 'Intune permission/endpoint');
+requireText(server, 'deviceManagement/managedDevices', 'Intune Graph endpoint');
 requireText(bundle, 'Microsoft Intune credentials are not configured', 'Intune no-false-success guard');
 requireText(bundle, '/inventory/push', 'Inventory push UI');
 requireText(server, 'calendarView', 'Microsoft Calendar pull');
 requireText(server, '/calendar/pull', 'Calendar pull route');
-requireText(server, 'Calendars', 'Microsoft Calendar integration');
+requireText(server, '/calendar/events', 'Microsoft Calendar create endpoint');
 requireText(server, 'www.googleapis.com/calendar/v3', 'Google Calendar API');
 requireText(server, 'Inventory system is not configured', 'Inventory configuration guard');
 requireText(server, 'webhookVerified', 'Stripe verified-webhook gate');
