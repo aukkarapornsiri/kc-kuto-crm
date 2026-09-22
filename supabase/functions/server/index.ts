@@ -135,7 +135,10 @@ async function checkProvider(provider:string){
       const price=await priceResp.json();
       if(price.active!==true)throw new Error(`Stripe Price ${priceId} is not active`);
     }
-    const acc=await accountResp.json();return{configured:true,connected:true,account:acc.id??null,country:acc.country??null};
+    const acc=await accountResp.json();
+    const {count:webhookCount}=await adminClient.from("billing_webhook_events").select("*",{count:"exact",head:true}).eq("status","processed");
+    const webhookVerified=(webhookCount??0)>0;
+    return{configured:true,connected:webhookVerified,webhook_verified:webhookVerified,account:acc.id??null,country:acc.country??null,message:webhookVerified?"Stripe API, Prices, and webhook signature verified":"Stripe API and Prices verified; waiting for the first signature-verified webhook event"};
   }
   throw new Error("Unknown provider");
 }
@@ -175,7 +178,16 @@ async function handleStatus(req:Request){
   const {data}=await adminClient.from("integration_connections").select("provider,display_name,category,enabled,status,config,required_secrets,last_checked_at,last_success_at,last_error").order("category").order("provider");
   const {data:presence}=await adminClient.rpc("kc_integration_secret_presence");
   const present=new Set((presence??[]).filter((x:any)=>x.present).map((x:any)=>x.secret_name));
-  return json({integrations:(data??[]).map((x:any)=>({...x,credentials_present:(x.required_secrets??[]).every((n:string)=>present.has(n)||Boolean(env(n)))}))});
+  return json({integrations:(data??[]).map((x:any)=>{
+    const credentials_present=(x.required_secrets??[]).every((n:string)=>present.has(n)||Boolean(env(n)));
+    return{
+      ...x,
+      status:credentials_present?x.status:"not_configured",
+      enabled:credentials_present?x.enabled:false,
+      config:x.provider==="stripe"?{...(x.config??{}),webhook_url:`${supabaseUrl}/functions/v1/stripe-webhook`}:x.config,
+      credentials_present
+    };
+  })});
 }
 async function handleCheck(req:Request){
   const admin=await requireAdmin(req);if("error"in admin)return admin.error;
@@ -265,7 +277,7 @@ async function handleCheckout(req:Request){
   const admin=await requireAdmin(req);if("error"in admin)return admin.error;const body=await req.json().catch(()=>({})),planKey=String(body.plan_key??"professional_yearly"),{data:plan}=await adminClient.from("billing_plans").select("*").eq("plan_key",planKey).eq("active",true).maybeSingle();if(!plan)return json({error:"Plan not found"},404);
   const c=await config("stripe"),priceId=String(planKey==="enterprise_yearly"?c.enterprise_price_id??"":c.professional_price_id??"")||env(plan.stripe_price_env_key||"");
   if(!(await secret("STRIPE_SECRET_KEY"))||!priceId){await setStatus("stripe","not_configured","Stripe key or price ID missing");return json({error:"Stripe Billing is not configured",configured:false},409);}
-  try{const customerId=await ensureStripeCustomer(admin.user,admin.profile),p=new URLSearchParams();p.set("mode","subscription");p.set("customer",customerId);p.set("line_items[0][price]",priceId);p.set("line_items[0][quantity]","1");p.set("success_url",`${siteUrl}?billing=success`);p.set("cancel_url",`${siteUrl}?billing=cancelled`);p.set("client_reference_id",admin.user.id);p.set("metadata[plan_key]",planKey);const session=await stripe("/checkout/sessions",p);await setStatus("stripe","connected",null);return json({ok:true,url:session.url,session_id:session.id});}
+  try{const customerId=await ensureStripeCustomer(admin.user,admin.profile),p=new URLSearchParams();p.set("mode","subscription");p.set("customer",customerId);p.set("line_items[0][price]",priceId);p.set("line_items[0][quantity]","1");p.set("success_url",`${siteUrl}?billing=success`);p.set("cancel_url",`${siteUrl}?billing=cancelled`);p.set("client_reference_id",admin.user.id);p.set("metadata[plan_key]",planKey);const session=await stripe("/checkout/sessions",p);await setStatus("stripe","configured","Checkout created; waiting for a signature-verified Stripe webhook before Connected");return json({ok:true,url:session.url,session_id:session.id,status:"configured"});}
   catch(e){const message=e instanceof Error?e.message:"Stripe checkout failed";await setStatus("stripe","error",message);return json({error:message},502);}
 }
 async function handlePortal(req:Request){
@@ -294,7 +306,7 @@ Deno.serve(async(req:Request)=>{
     if(path.endsWith("/ai-insight"))return await handleAi(req);
     if(path.endsWith("/admin/invite-user"))return await handleInvite(req);
     if(path.endsWith("/admin/reset-password"))return await handleReset(req);
-    if(path.endsWith("/health")||path.endsWith("/server"))return json({ok:true,service:"kc-kuto-server",version:4});
+    if(path.endsWith("/health")||path.endsWith("/server"))return json({ok:true,service:"kc-kuto-server",version:8});
     return json({error:"Not found",path},404);
   }catch(e){return json({error:e instanceof Error?e.message:"Unexpected server error"},500);}
 });
