@@ -181,6 +181,12 @@ for (const viewport of [
         continue;
       }
       await page.waitForTimeout(180);
+      const categoryOk = await clickExactVisible(page, 'Integration & AI');
+      if (!categoryOk) {
+        failures.push(`${viewport.name}: Settings category not found: Integration & AI`);
+        continue;
+      }
+      await page.waitForTimeout(120);
       const pageOk = await clickExactVisible(page, settingsPage);
       if (!pageOk) {
         failures.push(`${viewport.name}: Settings page not found: ${settingsPage}`);
