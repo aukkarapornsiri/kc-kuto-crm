@@ -203,6 +203,48 @@ async function handleIntune(req:Request){
   while(next&&pages<5){const r=await fetch(next,{headers:{Authorization:`Bearer ${token}`,Accept:"application/json"}});if(!r.ok)return json({error:`Microsoft Graph failed (${r.status})`},502);const d=await r.json();devices.push(...(d.value??[]));next=d["@odata.nextLink"]??null;pages++;}
   await setStatus("microsoft_intune","connected",null);return json({devices,truncated:Boolean(next),configured:true,status:"connected"});
 }
+async function pullMicrosoftCalendar(start:string,end:string){
+  const c=await msConfig(),token=await msToken();if(!token||!c.calendarUser)throw new Error("Microsoft Calendar is not configured");
+  const params=new URLSearchParams({startDateTime:start,endDateTime:end,"$top":"500","$select":"id,subject,bodyPreview,start,end,organizer,location,isOnlineMeeting,onlineMeeting,webLink,isCancelled,lastModifiedDateTime"});
+  let next:string|null=`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(c.calendarUser)}/calendarView?${params.toString()}`;
+  const rows:any[]=[];let pages=0;
+  while(next&&pages<5){const r=await fetch(next,{headers:{Authorization:`Bearer ${token}`,Accept:"application/json"}});if(!r.ok)throw new Error(`Microsoft Calendar pull failed (${r.status})`);const d=await r.json();rows.push(...(d.value??[]));next=d["@odata.nextLink"]??null;pages++;}
+  return rows;
+}
+async function pullGoogleCalendar(start:string,end:string){
+  const token=await googleToken();if(!token)throw new Error("Google Calendar is not configured");
+  const c=await config("google_calendar"),calendarId=String(c.calendar_id??"primary"),params=new URLSearchParams({timeMin:start,timeMax:end,singleEvents:"true",orderBy:"startTime",maxResults:"500"});
+  const rows:any[]=[];let pageToken="",pages=0;
+  do{if(pageToken)params.set("pageToken",pageToken);else params.delete("pageToken");const r=await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?${params.toString()}`,{headers:{Authorization:`Bearer ${token}`,Accept:"application/json"}});if(!r.ok)throw new Error(`Google Calendar pull failed (${r.status})`);const d=await r.json();rows.push(...(d.items??[]));pageToken=d.nextPageToken??"";pages++;}while(pageToken&&pages<5);
+  return{calendarId,rows};
+}
+function externalCalendarActivity(provider:string,event:any,calendarId:string){
+  const now=new Date().toISOString();
+  if(provider==="microsoft_calendar"){
+    const start=event.start?.dateTime;if(!event.id||!start)return null;
+    return{external_provider:provider,external_id:String(event.id),external_url:event.webLink??event.onlineMeeting?.joinUrl??null,external_synced_at:now,external_payload:event,calendar_provider:provider,external_event_id:String(event.id),external_calendar_id:calendarId,meeting_url:event.onlineMeeting?.joinUrl??null,sync_status:"synced",sync_error:null,type:event.isOnlineMeeting?"Online Meeting":"Meeting",subject:String(event.subject??"Microsoft 365 Meeting"),owner_name:String(event.organizer?.emailAddress?.name??event.organizer?.emailAddress?.address??""),scheduled_at:start,status:event.isCancelled?"cancelled":"planned",priority:"medium",description:[event.bodyPreview,event.location?.displayName,event.onlineMeeting?.joinUrl].filter(Boolean).join(" — ")||null,has_attachment:false,updated_at:now};
+  }
+  const start=event.start?.dateTime??event.start?.date;if(!event.id||!start)return null;
+  return{external_provider:provider,external_id:String(event.id),external_url:event.htmlLink??event.hangoutLink??null,external_synced_at:now,external_payload:event,calendar_provider:provider,external_event_id:String(event.id),external_calendar_id:calendarId,meeting_url:event.hangoutLink??null,sync_status:"synced",sync_error:null,type:event.hangoutLink||event.conferenceData?"Online Meeting":"Meeting",subject:String(event.summary??"Google Calendar Meeting"),owner_name:String(event.organizer?.displayName??event.organizer?.email??""),scheduled_at:start,status:event.status==="cancelled"?"cancelled":"planned",priority:"medium",description:[event.description,event.location,event.hangoutLink].filter(Boolean).join(" — ")||null,has_attachment:false,updated_at:now};
+}
+async function handleCalendarPull(req:Request){
+  const access=await requirePermission(req,"activities","create");if("error"in access)return access.error;
+  const body=await req.json().catch(()=>({})),provider=String(body.provider??"");
+  if(!["microsoft_calendar","google_calendar"].includes(provider))return json({error:"Unsupported calendar provider"},400);
+  const now=new Date(),start=String(body.start??new Date(now.getTime()-30*86400000).toISOString()),end=String(body.end??new Date(now.getTime()+90*86400000).toISOString()),run=await startRun(provider,"calendar_events","pull",access.user.id);
+  try{
+    let events:any[]=[],calendarId="primary";
+    if(provider==="microsoft_calendar"){events=await pullMicrosoftCalendar(start,end);}
+    else{const result=await pullGoogleCalendar(start,end);events=result.rows;calendarId=result.calendarId;}
+    const mapped=events.map((x:any)=>externalCalendarActivity(provider,x,calendarId)).filter(Boolean);
+    const ids=mapped.map((x:any)=>x.external_id);
+    const {data:existing}=ids.length?await adminClient.from("activities").select("external_id").eq("external_provider",provider).in("external_id",ids):{data:[] as any[]};
+    const existingSet=new Set((existing??[]).map((x:any)=>x.external_id)),created=mapped.filter((x:any)=>!existingSet.has(x.external_id)).length,updated=mapped.length-created;
+    if(mapped.length){const {error}=await adminClient.from("activities").upsert(mapped,{onConflict:"external_provider,external_id"});if(error)throw new Error(error.message);}
+    await setStatus(provider,"connected",null);await finishRun(run,"success",{seen:events.length,created,updated},{start,end});
+    return json({ok:true,provider,seen:events.length,created,updated});
+  }catch(e){const message=e instanceof Error?e.message:"Calendar pull failed";await setStatus(provider,message.includes("not configured")?"not_configured":"error",message);await finishRun(run,"failed",{}, {},message);return json({error:message,provider},message.includes("not configured")?409:502);}
+}
 function times(a:any){const start=new Date(a.scheduled_at),end=new Date(start.getTime()+3600000);return{start,end};}
 async function pushMicrosoft(a:any){
   const c=await msConfig(),token=await msToken();if(!token||!c.calendarUser)throw new Error("Microsoft Calendar is not configured");
@@ -231,7 +273,7 @@ async function handleCalendarPush(req:Request){
   try{
     const event=provider==="microsoft_calendar"?await pushMicrosoft(a):await pushGoogle(a);
     await adminClient.from("calendar_event_links").upsert({activity_id:activityId,provider,external_event_id:event.id,external_calendar_id:event.calendarId,web_url:event.webUrl,sync_status:"synced",last_error:null,last_synced_at:new Date().toISOString()},{onConflict:"activity_id,provider"});
-    await adminClient.from("activities").update({calendar_provider:provider,external_event_id:event.id,external_calendar_id:event.calendarId,meeting_url:event.meetingUrl,sync_status:"synced",sync_error:null,updated_at:new Date().toISOString()}).eq("id",activityId);
+    await adminClient.from("activities").update({calendar_provider:provider,external_event_id:event.id,external_calendar_id:event.calendarId,meeting_url:event.meetingUrl,sync_status:"synced",sync_error:null,external_provider:provider,external_id:event.id,external_url:event.webUrl,external_synced_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("id",activityId);
     await setStatus(provider,"connected",null);await finishRun(run,"success",{seen:1,updated:1},{external_event_id:event.id});
     return json({ok:true,provider,activity_id:activityId,...event});
   }catch(e){
@@ -298,6 +340,7 @@ Deno.serve(async(req:Request)=>{
     if(path.endsWith("/integrations/configure"))return await handleConfigure(req);
     if(path.endsWith("/integrations/check"))return await handleCheck(req);
     if(path.endsWith("/intune-devices"))return await handleIntune(req);
+    if(path.endsWith("/calendar/pull"))return await handleCalendarPull(req);
     if(path.endsWith("/calendar/push"))return await handleCalendarPush(req);
     if(path.endsWith("/inventory/pull"))return await handleInventoryPull(req);
     if(path.endsWith("/inventory/push"))return await handleInventoryPush(req);
@@ -306,7 +349,7 @@ Deno.serve(async(req:Request)=>{
     if(path.endsWith("/ai-insight"))return await handleAi(req);
     if(path.endsWith("/admin/invite-user"))return await handleInvite(req);
     if(path.endsWith("/admin/reset-password"))return await handleReset(req);
-    if(path.endsWith("/health")||path.endsWith("/server"))return json({ok:true,service:"kc-kuto-server",version:8});
+    if(path.endsWith("/health")||path.endsWith("/server"))return json({ok:true,service:"kc-kuto-server",version:9});
     return json({error:"Not found",path},404);
   }catch(e){return json({error:e instanceof Error?e.message:"Unexpected server error"},500);}
 });
