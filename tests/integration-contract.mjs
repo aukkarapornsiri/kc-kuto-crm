@@ -17,6 +17,7 @@ for (const endpoint of [
   '/calendar/pull',
   '/calendar/push',
   '/inventory/pull',
+  '/inventory/push',
   '/billing/checkout',
   '/billing/portal',
 ]) requireText(bundle, endpoint, 'frontend endpoint');
@@ -35,6 +36,8 @@ for (const provider of [
 requireText(bundle, 'Stripe Webhook URL', 'Stripe webhook UI');
 requireText(bundle, 'webhook_url', 'Stripe webhook backend field');
 requireText(server, 'DeviceManagementManagedDevices', 'Intune permission/endpoint');
+requireText(bundle, 'Microsoft Intune credentials are not configured', 'Intune no-false-success guard');
+requireText(bundle, '/inventory/push', 'Inventory push UI');
 requireText(server, 'calendarView', 'Microsoft Calendar pull');
 requireText(server, '/calendar/pull', 'Calendar pull route');
 requireText(server, 'Calendars', 'Microsoft Calendar integration');
