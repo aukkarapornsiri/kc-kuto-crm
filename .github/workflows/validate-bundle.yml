@@ -15,7 +15,27 @@ jobs:
         with:
           node-version: '22'
       - name: Check JavaScript syntax
-        run: node --check app-C2ITSffc.js
+        run: |
+          if ! node --check app-C2ITSffc.js 2> /tmp/js-check.err; then
+            python3 - <<'PY'
+          from pathlib import Path
+          e = Path('/tmp/js-check.err').read_text(errors='replace').splitlines()
+          print('JS_CHECK_ERROR')
+          for i,line in enumerate(e):
+              if '^' in line:
+                  print('caret_column=', line.find('^') + 1)
+                  if i > 0:
+                      src=e[i-1]
+                      c=line.find('^')
+                      print('context=', src[max(0,c-240):c+240])
+                  for x in e[i:i+4]:
+                      print(x[:1000])
+                  break
+          else:
+              print('\n'.join(x[:1000] for x in e[-8:]))
+          PY
+            exit 1
+          fi
       - name: Verify required site assets
         run: |
           test -f index.html
