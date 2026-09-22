@@ -172,6 +172,24 @@ for (const viewport of [
       }
     }
 
+    // Integration-specific pages live under the Settings hub instead of the sidebar.
+    for (const settingsPage of ['API & Integration', 'Package']) {
+      if (viewport.name === 'mobile') await ensureMobileDrawerOpen(page);
+      const settingsOk = await clickSidebar(page, viewport.name, 'Settings');
+      if (!settingsOk) {
+        failures.push(`${viewport.name}: cannot open Settings hub for ${settingsPage}`);
+        continue;
+      }
+      await page.waitForTimeout(180);
+      const pageOk = await clickExactVisible(page, settingsPage);
+      if (!pageOk) {
+        failures.push(`${viewport.name}: Settings page not found: ${settingsPage}`);
+        continue;
+      }
+      await assertHealthy(page, `${viewport.name}: Settings > ${settingsPage}`);
+      results.push(`${viewport.name}: Settings > ${settingsPage} OK`);
+    }
+
     const th = page.getByRole('button', { name: 'TH', exact: true });
     if (await th.count()) {
       await th.first().click();
