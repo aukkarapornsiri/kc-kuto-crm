@@ -1,4 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap');
+/* Shared typography, including login screens and dialogs rendered in portals.
+   Override legacy utility/inline weights; only main headings stay bold. */
+body, body * {font-weight:400!important}
+body h1, body h1 *, body [role="heading"][aria-level="1"], body [role="heading"][aria-level="1"] * {font-weight:700!important}
 .crm-settings{max-width:1120px;margin:auto;color:#172033;font-family:var(--crm-font,'Anuphan',sans-serif)}
 .crm-intro{margin-bottom:20px}.crm-intro h1{font-size:24px;font-weight:700;margin:0 0 6px}.crm-intro p{color:#64748b;margin:0;line-height:1.6}
 .crm-search{width:100%;background:#fff;border:1px solid #dce6e7;border-radius:12px;padding:12px 16px;min-height:44px}
