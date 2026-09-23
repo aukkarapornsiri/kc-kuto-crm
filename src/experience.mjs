@@ -52,7 +52,7 @@ export function createExperience({React,client,useApp,palette}) {
       let active=true;
       if(demoMode){publish(demoDesign);return;}
       if(!profile?.id){publish(null);return;}
-      client.from('company_settings').select('ui_design').eq('id',1).maybeSingle().then(({data,error})=>{if(active){try{publish(!error?data?.ui_design:null);}catch{publish(null);}}});
+      client.functions.invoke('crm-experience',{method:'GET'}).then(({data,error})=>{if(active){try{publish(!error?data?.ui_design:null);}catch{publish(null);}}}).catch(()=>{if(active)publish(null);});
       return()=>{active=false;};
     },[demoMode,profile?.id]);
     return null;
@@ -109,7 +109,7 @@ export function createExperience({React,client,useApp,palette}) {
       finally{setBusy(false);}
     }
     const dirty=JSON.stringify(value)!==JSON.stringify(saved);
-    const label=(text,control)=>h('label',{className:'crm-field'},h('span',null,text),control);
+    const label=(text,control)=>h('label',{className:'crm-field',key:text},h('span',null,text),React.cloneElement(control,{'aria-label':text}));
     const select=(key,options)=>h('select',{value:value[key],disabled:!canEdit||busy,onChange:e=>update(key,e.target.value)},options.map(option=>h('option',{key:option,value:option},option)));
     return h('section',{className:'crm-settings'},
       h('div',{className:'crm-intro'},h('h1',null,scopeMode?tr('การเชื่อมโยง KC Ecosystem','KC Ecosystem references'):tr('Design, Font และ UX/UI','Design, Font & UX/UI')),h('p',null,scopeMode?tr('ระบุ UUID จริงจาก KC Account 360 และ KC EAM เพื่อเตรียมการจับคู่บริษัท ไม่ใช่การเปิดใช้ Sync','Use real KC Account 360 and KC EAM UUIDs to prepare company mapping. This does not enable sync.'):tr('ปรับสี ฟอนต์ ขนาด และระยะห่าง ตามแนวทาง KC Account 360','Customize colors, typography and spacing using the KC Account 360 design approach'))),

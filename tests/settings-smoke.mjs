@@ -14,6 +14,7 @@ try {
   await openSettings();
   await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('font');
   await page.getByRole('button',{name:'Design, Font และ UX/UI',exact:false}).click();
+  await page.screenshot({path:`test-artifacts/design-${width}.png`,fullPage:true});
   await page.getByLabel('ขนาดตัวอักษร',{exact:true}).selectOption('18');
   await page.getByRole('button',{name:'บันทึก',exact:true}).click();
   await page.getByRole('status').filter({hasText:'บันทึกเฉพาะโหมดทดลอง'}).waitFor();
