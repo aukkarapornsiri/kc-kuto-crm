@@ -117,7 +117,7 @@ for (const viewport of [
       await page.waitForTimeout(700);
     }
 
-    const en = page.getByRole('button', { name: 'EN', exact: true });
+    const en = page.getByRole('button', { name: 'เปลี่ยนเป็นภาษาอังกฤษ', exact: true });
     if (await en.count()) {
       await en.first().click();
       await page.waitForTimeout(180);
@@ -196,7 +196,7 @@ for (const viewport of [
       results.push(`${viewport.name}: Settings > ${settingsPage} OK`);
     }
 
-    const th = page.getByRole('button', { name: 'TH', exact: true });
+    const th = page.getByRole('button', { name: 'Switch to Thai', exact: true });
     if (await th.count()) {
       await th.first().click();
       await page.waitForTimeout(180);
