@@ -3,6 +3,8 @@ name: KC KuTo Browser Smoke
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -28,6 +30,7 @@ jobs:
         run: |
           mkdir -p test-artifacts
           SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/smoke.mjs
+          SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/settings-smoke.mjs
       - name: Upload smoke screenshots
         if: always()
         uses: actions/upload-artifact@v4
