@@ -1,0 +1,120 @@
+diff --git a/KC KuTo CRM/src/app/modules/ai.tsx b/KC KuTo CRM/src/app/modules/ai.tsx
+index f1f645d..e7500c8 100644
+--- a/KC KuTo CRM/src/app/modules/ai.tsx	
++++ b/KC KuTo CRM/src/app/modules/ai.tsx	
+@@ -296,7 +296,7 @@ export const AICustomerSummaryPage = ({ lang }: { lang: Lang }) => {
+             return (
+               <button key={c.id} onClick={() => setSelectedId(c.id)}
+                 className={`w-full rounded-xl border bg-white p-4 text-left hover:shadow-md transition-all ${selected?.id === c.id ? "ring-2 shadow-md" : "border-gray-100 shadow-sm"}`}
+-                style={selected?.id === c.id ? { ringColor: C.teal, borderColor: C.teal } : {}}>
++                style={selected?.id === c.id ? { boxShadow: `0 0 0 2px ${C.teal}`, borderColor: C.teal } : {}}>
+                 <div className="flex items-center gap-3 mb-3">
+                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shrink-0" style={{ background: `${C.teal}18`, color: C.tealDark }}>{avatarInitials(c.name)}</div>
+                   <div className="min-w-0 flex-1">
+diff --git a/KC KuTo CRM/src/app/modules/dashboard.tsx b/KC KuTo CRM/src/app/modules/dashboard.tsx
+index b619c7e..20c9e9e 100644
+--- a/KC KuTo CRM/src/app/modules/dashboard.tsx	
++++ b/KC KuTo CRM/src/app/modules/dashboard.tsx	
+@@ -452,7 +452,7 @@ export const SalesDashboardPage=({lang}:{lang:Lang})=>{
+                         <td className="px-3 py-2.5"><div className="font-semibold text-gray-900 max-w-36 truncate">{d.name}</div><div className="text-[10px] font-mono text-gray-400">{d.id}</div></td>
+                         <td className="px-3 py-2.5 text-gray-600">{d.customer}</td>
+                         <td className="px-3 py-2.5"><div className="flex items-center gap-1.5"><AvatarBadge av={d.av}/><span className="text-gray-600">{d.owner}</span></div></td>
+-                        <td className="px-3 py-2.5"><span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white whitespace-nowrap" style={{background:stageCols[d.stage]??C.slate}}>{d.stage}</span></td>
++                        <td className="px-3 py-2.5"><span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white whitespace-nowrap" style={{background:stageCols[d.stage]??"var(--muted-foreground)"}}>{d.stage}</span></td>
+                         <td className="px-3 py-2.5 font-semibold text-gray-900 whitespace-nowrap">{d.amount}</td>
+                         <td className="px-3 py-2.5"><ProbBar p={d.prob}/></td>
+                         <td className="px-3 py-2.5 text-gray-500 whitespace-nowrap">{d.closeDate}</td>
+diff --git a/KC KuTo CRM/src/app/modules/documents.tsx b/KC KuTo CRM/src/app/modules/documents.tsx
+index aad52d4..5c1d867 100644
+--- a/KC KuTo CRM/src/app/modules/documents.tsx	
++++ b/KC KuTo CRM/src/app/modules/documents.tsx	
+@@ -422,7 +422,7 @@ export const AllDocumentsPage=({lang}:{lang:Lang})=>{
+     {icon:Clock,value:String(cRecent),label:t("เอกสารล่าสุด","Recent (7 days)"),accent:C.teal},
+     {icon:Share2,value:String(cShared),label:t("เอกสารที่แชร์","Shared Documents"),accent:C.blue},
+     {icon:AlertTriangle,value:String(cPending),label:t("เอกสารที่รออนุมัติ","Pending Approval"),accent:C.red},
+-    {icon:Archive,value:String(cArchived),label:t("เอกสารที่จัดเก็บ","Archived"),accent:C.slate},
++    {icon:Archive,value:String(cArchived),label:t("เอกสารที่จัดเก็บ","Archived"),accent:"var(--muted-foreground)"},
+   ];
+   const tabs=lang==="th"
+     ?[{id:"all",label:"เอกสารทั้งหมด",count:docs.length},{id:"recent",label:"เอกสารล่าสุด",count:cRecent},{id:"shared",label:"เอกสารที่แชร์",count:cShared},{id:"pending",label:"รออนุมัติ",count:cPending},{id:"expired",label:"เอกสารหมดอายุ",count:cExpired},{id:"archived",label:"จัดเก็บแล้ว",count:cArchived}]
+diff --git a/KC KuTo CRM/src/app/modules/opportunities.tsx b/KC KuTo CRM/src/app/modules/opportunities.tsx
+index 681b0c8..69d0774 100644
+--- a/KC KuTo CRM/src/app/modules/opportunities.tsx	
++++ b/KC KuTo CRM/src/app/modules/opportunities.tsx	
+@@ -326,7 +326,7 @@ export const OppKanbanPage=({lang,onOpenDetail}:{lang:Lang;onOpenDetail?:(id:str
+                 {total>0&&<div className="text-[10px] font-semibold mb-2 px-1" style={{color:col}}>฿{(total/1000000).toFixed(1)}M</div>}
+                 <div className="space-y-2">
+                   {stageOpps.map(o=>(
+-                    <div key={o.id} onClick={()=>setSel(o===sel?null:o)} className={`bg-white rounded-xl border p-3 cursor-pointer hover:shadow-md transition-shadow space-y-2 ${sel?.id===o.id?"ring-2":"border-gray-100"}`} style={sel?.id===o.id?{ringColor:col}:{}}>
++                    <div key={o.id} onClick={()=>setSel(o===sel?null:o)} className={`bg-white rounded-xl border p-3 cursor-pointer hover:shadow-md transition-shadow space-y-2 ${sel?.id===o.id?"ring-2":"border-gray-100"}`} style={sel?.id===o.id?{boxShadow:`0 0 0 2px ${col}`}:{}}>
+                       <div className="font-semibold text-xs text-gray-900 leading-snug">{o.name}</div>
+                       <div className="text-[10px] text-gray-500">{o.customer}</div>
+                       <div className="flex items-center justify-between"><Badge tone="navy">{o.product}</Badge><PriorityBadge p={o.priority} lang={lang}/></div>
+diff --git a/KC KuTo CRM/src/app/modules/reports.tsx b/KC KuTo CRM/src/app/modules/reports.tsx
+index 59da469..4136b34 100644
+--- a/KC KuTo CRM/src/app/modules/reports.tsx	
++++ b/KC KuTo CRM/src/app/modules/reports.tsx	
+@@ -433,7 +433,7 @@ const DrillDrawer=({data,lang,onClose,onExcel,onPDF,aiWinRate,aiHighRiskCount}:{
+           {/* mini chart */}
+           <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+             <p className="text-xs font-bold text-gray-700 mb-3">{tl("แนวโน้ม","Trend")}</p>
+-            <BarChart data={[["กฤตภาส","70","฿8.4M"],["วรินทร์","51","฿6.1M"],["มนทิพย์","43","฿5.2M"],["ธนภัทร","35","฿4.2M"],["นันทิกร","32","฿3.8M"]]} color={C.teal}/>
++            <BarChart data={[["กฤตภาส",70,"฿8.4M"],["วรินทร์",51,"฿6.1M"],["มนทิพย์",43,"฿5.2M"],["ธนภัทร",35,"฿4.2M"],["นันทิกร",32,"฿3.8M"]]} color={C.teal}/>
+           </div>
+           {/* drill table */}
+           <div>
+diff --git a/KC KuTo CRM/src/lib/api.ts b/KC KuTo CRM/src/lib/api.ts
+index 5212022..bd0e33e 100644
+--- a/KC KuTo CRM/src/lib/api.ts	
++++ b/KC KuTo CRM/src/lib/api.ts	
+@@ -401,10 +401,12 @@ export const contractsApi = {
+     return result;
+   },
+   renew: async (id: string, newEndDate: string, newValue: number) => {
+-    const { data: orig } = await supabase.from("contracts").select("*").eq("id", id).single();
++    const { data: orig, error: originalError } = await supabase.from("contracts").select("*").eq("id", id).single();
++    handleError(originalError);
++    if (!orig) throw new Error("Contract not found");
+     const [markOld, createNew] = await Promise.all([
+       supabase.from("contracts").update({ status: "renewed", updated_at: new Date().toISOString() }).eq("id", id),
+-      supabase.from("contracts").insert({ ...(orig as Contract), id: undefined, status: "active", end_date: newEndDate, value: newValue, start_date: orig?.end_date, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }).select().single(),
++      supabase.from("contracts").insert({ ...(orig as Contract), id: undefined, status: "active", end_date: newEndDate, value: newValue, start_date: orig.end_date, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }).select().single(),
+     ]);
+     handleError(markOld.error);
+     handleError(createNew.error);
+@@ -414,8 +416,8 @@ export const contractsApi = {
+        second fetch. Two tables mutated (old contract marked renewed + new
+        contract created), so log one row per affected record, same
+        multi-table convention used by winAndCreateContract above. */
+-    await auditApi.log({ ...(await currentAuditUser()), action: "update", module: "contracts", record_id: id, changes: { status: "renewed" }, before_state: (orig as Contract) ?? undefined });
+-    await auditApi.log({ ...(await currentAuditUser()), action: "create", module: "contracts", record_id: result.id, changes: { end_date: newEndDate, value: newValue, start_date: orig?.end_date }, after_state: result });
++    await auditApi.log({ ...(await currentAuditUser()), action: "update", module: "contracts", record_id: id, changes: { status: "renewed" }, before_state: { ...orig } });
++    await auditApi.log({ ...(await currentAuditUser()), action: "create", module: "contracts", record_id: result.id, changes: { end_date: newEndDate, value: newValue, start_date: orig.end_date }, after_state: { ...result } });
+     return result;
+   },
+   getStats: async (companyId: string) => {
+diff --git a/KC KuTo CRM/src/lib/fallbackData.ts b/KC KuTo CRM/src/lib/fallbackData.ts
+index 8013056..5311dc4 100644
+--- a/KC KuTo CRM/src/lib/fallbackData.ts	
++++ b/KC KuTo CRM/src/lib/fallbackData.ts	
+@@ -11,13 +11,13 @@ export const FALLBACK_LEADS: Lead[] = [
+ ];
+ 
+ export const FALLBACK_CUSTOMERS: Customer[] = [
+-  { id:"c1", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1024", name:"กลุ่มซิเมนต์ไทย", name_en:"SCG Group", type:"Company", industry:"Manufacturing", tier:"Platinum", tax_id:null, phone:"02-586-3333", email:"contact@scg.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"นิชา", revenue:"฿28.4M", pipeline:"฿14.2M", health_score:88, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
+-  { id:"c2", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1098", name:"Bangkok Technology Co., Ltd.", name_en:"Bangkok Technology", type:"Company", industry:"Technology", tier:"Gold", tax_id:null, phone:"02-345-6789", email:"info@bangkoktech.com", website:null, address:null, province:null, owner_id:null, owner_name:"ภาคิน", revenue:"฿12.1M", pipeline:"฿8.5M", health_score:72, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
+-  { id:"c3", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1187", name:"กรุงเทพดุสิตเวชการ", name_en:"BDMS", type:"Company", industry:"Healthcare", tier:"Platinum", tax_id:null, phone:"02-310-3000", email:"contact@bdms.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"มินตรา", revenue:"฿19.8M", pipeline:"฿6.2M", health_score:81, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
+-  { id:"c4", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1215", name:"บริษัท เอเชีย ฟู้ดส์ จำกัด", name_en:"Asia Foods Co., Ltd.", type:"Company", industry:"Food & Beverage", tier:"Silver", tax_id:null, phone:"02-412-5555", email:"info@asiafoods.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"ธันวา", revenue:"฿6.4M", pipeline:"฿4.1M", health_score:65, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
+-  { id:"c5", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1248", name:"ไทยยูเนี่ยน กรุ๊ป", name_en:"Thai Union Group", type:"Company", industry:"Food Manufacturing", tier:"Gold", tax_id:null, phone:"034-840-457", email:"contact@thaiunion.com", website:null, address:null, province:null, owner_id:null, owner_name:"นิชา", revenue:"฿15.2M", pipeline:"฿3.8M", health_score:74, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
+-  { id:"c6", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1272", name:"Metro Construction Co., Ltd.", name_en:"Metro Construction", type:"Company", industry:"Construction", tier:"Standard", tax_id:null, phone:"02-777-8888", email:"info@metrocon.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"วรินทร์", revenue:"฿3.2M", pipeline:"฿2.4M", health_score:55, status:"At Risk", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
+-  { id:"c7", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1301", name:"Lifestyle Retail Group", name_en:"Lifestyle Retail", type:"Company", industry:"Retail", tier:"Silver", tax_id:null, phone:"02-888-9999", email:"contact@lifestyleretail.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"มนทิพย์", revenue:"฿4.8M", pipeline:"฿1.2M", health_score:68, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
++  { id:"c1", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1024", name:"กลุ่มซิเมนต์ไทย", name_en:"SCG Group", type:"Company", industry:"Manufacturing", tier:"Platinum", branch_no:null, credit_limit:null, credit_term:null, payment_status:null, tax_id:null, phone:"02-586-3333", email:"contact@scg.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"นิชา", revenue:"฿28.4M", pipeline:"฿14.2M", health_score:88, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
++  { id:"c2", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1098", name:"Bangkok Technology Co., Ltd.", name_en:"Bangkok Technology", type:"Company", industry:"Technology", tier:"Gold", branch_no:null, credit_limit:null, credit_term:null, payment_status:null, tax_id:null, phone:"02-345-6789", email:"info@bangkoktech.com", website:null, address:null, province:null, owner_id:null, owner_name:"ภาคิน", revenue:"฿12.1M", pipeline:"฿8.5M", health_score:72, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
++  { id:"c3", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1187", name:"กรุงเทพดุสิตเวชการ", name_en:"BDMS", type:"Company", industry:"Healthcare", tier:"Platinum", branch_no:null, credit_limit:null, credit_term:null, payment_status:null, tax_id:null, phone:"02-310-3000", email:"contact@bdms.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"มินตรา", revenue:"฿19.8M", pipeline:"฿6.2M", health_score:81, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
++  { id:"c4", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1215", name:"บริษัท เอเชีย ฟู้ดส์ จำกัด", name_en:"Asia Foods Co., Ltd.", type:"Company", industry:"Food & Beverage", tier:"Silver", branch_no:null, credit_limit:null, credit_term:null, payment_status:null, tax_id:null, phone:"02-412-5555", email:"info@asiafoods.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"ธันวา", revenue:"฿6.4M", pipeline:"฿4.1M", health_score:65, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
++  { id:"c5", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1248", name:"ไทยยูเนี่ยน กรุ๊ป", name_en:"Thai Union Group", type:"Company", industry:"Food Manufacturing", tier:"Gold", branch_no:null, credit_limit:null, credit_term:null, payment_status:null, tax_id:null, phone:"034-840-457", email:"contact@thaiunion.com", website:null, address:null, province:null, owner_id:null, owner_name:"นิชา", revenue:"฿15.2M", pipeline:"฿3.8M", health_score:74, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
++  { id:"c6", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1272", name:"Metro Construction Co., Ltd.", name_en:"Metro Construction", type:"Company", industry:"Construction", tier:"Standard", branch_no:null, credit_limit:null, credit_term:null, payment_status:null, tax_id:null, phone:"02-777-8888", email:"info@metrocon.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"วรินทร์", revenue:"฿3.2M", pipeline:"฿2.4M", health_score:55, status:"At Risk", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
++  { id:"c7", company_id:"00000000-0000-0000-0000-000000000001", code:"CUS-1301", name:"Lifestyle Retail Group", name_en:"Lifestyle Retail", type:"Company", industry:"Retail", tier:"Silver", branch_no:null, credit_limit:null, credit_term:null, payment_status:null, tax_id:null, phone:"02-888-9999", email:"contact@lifestyleretail.co.th", website:null, address:null, province:null, owner_id:null, owner_name:"มนทิพย์", revenue:"฿4.8M", pipeline:"฿1.2M", health_score:68, status:"Active", created_at:"2026-01-01T00:00:00Z", updated_at:"2026-06-20T00:00:00Z" },
+ ];
+ 
+ export const FALLBACK_OPPORTUNITIES: Opportunity[] = [
