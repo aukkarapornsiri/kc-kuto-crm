@@ -9,6 +9,10 @@ on:
 
 jobs:
   smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        round: [1, 2, 3]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -31,10 +35,11 @@ jobs:
           mkdir -p test-artifacts
           SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/smoke.mjs
           SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/settings-smoke.mjs
+          SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/master-data-smoke.mjs
       - name: Upload smoke screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kc-kuto-smoke-screenshots
+          name: kc-kuto-smoke-screenshots-${{ matrix.round }}
           path: test-artifacts/
           if-no-files-found: ignore
