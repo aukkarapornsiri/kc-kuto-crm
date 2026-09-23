@@ -45,6 +45,8 @@ jobs:
           node --check src/experience.mjs
           node --test tests/experience.test.mjs
           node --test tests/experience-access.test.mjs
+          node --check src/master-data.mjs
+          node --test tests/master-data.test.mjs
       - name: Parse Edge Function TypeScript
         run: |
           npx -y esbuild supabase/functions/server/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/kuto-server.js
