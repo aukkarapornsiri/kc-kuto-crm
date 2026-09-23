@@ -40,6 +40,11 @@ jobs:
           grep -q "app-C2ITSffc.js" index.html
       - name: Validate integration contracts
         run: node tests/integration-contract.mjs
+      - name: Validate settings source and input boundaries
+        run: |
+          node --check src/experience.mjs
+          node --test tests/experience.test.mjs
+          node --test tests/experience-access.test.mjs
       - name: Parse Edge Function TypeScript
         run: |
           npx -y esbuild supabase/functions/server/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/kuto-server.js
