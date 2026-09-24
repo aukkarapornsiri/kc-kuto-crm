@@ -12,6 +12,17 @@ try {
    await page.getByRole('button',{name:'ตั้งค่าระบบ',exact:true}).filter({visible:true}).click();
   };
   await openSettings();
+  assert.equal(await page.locator('.crm-hub-categories').getByRole('button').count(),6);
+  const columns=await page.locator('.crm-hub-categories').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
+  assert.equal(columns,width===1440?4:1);
+  await page.screenshot({path:`test-artifacts/settings-hub-${width}.png`,fullPage:true});
+  const groupNames=await page.locator('.crm-hub-categories').getByRole('button').allTextContents();
+  for(let index=0;index<groupNames.length;index++){
+   await page.locator('.crm-hub-categories').getByRole('button').nth(index).click();
+   assert.equal(await page.locator('.crm-settings-hub').getAttribute('data-category'),String(index));
+   assert.ok(await page.locator('.crm-settings-card').count()>0);
+   await page.getByRole('button',{name:'‹ การตั้งค่าทั้งหมด',exact:true}).click();
+  }
   await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('font');
   await page.getByRole('button',{name:'Design, Font และ UX/UI',exact:false}).click();
   await page.screenshot({path:`test-artifacts/design-${width}.png`,fullPage:true});
@@ -20,6 +31,7 @@ try {
   await page.getByRole('status').filter({hasText:'บันทึกเฉพาะโหมดทดลอง'}).waitFor();
   assert.equal(await page.locator('html').evaluate(el=>el.style.getPropertyValue('--crm-font-size')),'18px');
   await openSettings();
+  await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('font');
   await page.getByRole('button',{name:'Design, Font และ UX/UI',exact:false}).click();
   assert.equal(await page.getByLabel('ขนาดตัวอักษร',{exact:true}).inputValue(),'18');
   await page.getByLabel('ขนาดตัวอักษร',{exact:true}).selectOption('14');

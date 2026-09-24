@@ -23,7 +23,7 @@ try{for(const width of [1440,390]){
     await page.getByRole('group',{name:'Pages in this module',exact:true}).getByRole('button',{name:target,exact:true}).click();
     assert.equal((await nav.locator('[aria-current="page"]').textContent()).trim(),target);
     const parent=nav.getByRole('button',{name:/^Go to category /});
-    if(await parent.count()){await parent.click();if(name==='Settings')assert.equal(await page.locator('.crm-tabs button[aria-pressed="true"]').count(),1);}
+    if(await parent.count()){await parent.click();if(name==='Settings')assert.notEqual(await page.locator('.crm-settings-hub').getAttribute('data-category'),'all');}
     await nav.getByRole('button',{name:'Go to '+name,exact:true}).click();
     assert.equal((await nav.locator('[aria-current="page"]').textContent()).trim(),initial);checked++;
    }
