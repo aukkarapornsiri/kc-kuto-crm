@@ -1,6 +1,6 @@
 import {createSettingsWorkspace} from "./src/settings-workspace.mjs";
 import {createMasterData} from "./src/master-data.mjs";
-import {createExperience} from "./src/experience.mjs?v=20260924-workspace";
+import {createExperience} from "./src/experience.mjs?v=20260924-workspace-final";
 (function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))a(n);new MutationObserver(n=>{for(const i of n)if(i.type==="childList")for(const o of i.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&a(o)}).observe(document,{childList:!0,subtree:!0});function s(n){const i={};return n.integrity&&(i.integrity=n.integrity),n.referrerPolicy&&(i.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?i.credentials="include":n.crossOrigin==="anonymous"?i.credentials="omit":i.credentials="same-origin",i}function a(n){if(n.ep)return;n.ep=!0;const i=s(n);fetch(n.href,i)}})();function Q_(t){return t&&t.__esModule&&Object.prototype.hasOwnProperty.call(t,"default")?t.default:t}var Jx={exports:{}},xc={},Zx={exports:{}},Dt={};/**
  * @license React
  * react.production.min.js
