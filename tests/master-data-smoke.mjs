@@ -11,7 +11,7 @@ try {
   await page.getByRole('button',{name:'ตั้งค่าระบบ',exact:true}).filter({visible:true}).click();
   await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('ข้อมูลหลัก');
   await page.getByRole('button',{name:'ข้อมูลหลัก',exact:false}).filter({visible:true}).click();
-  const categories=['ประเภทลูกค้า','ประเภทธุรกิจ','แหล่งที่มาของลูกค้า','ขั้นตอนการขาย','หมวดหมู่สินค้า','ภูมิภาค','ระดับ','หน่วย','แท็ก','เหตุผลที่แพ้'];
+  const categories=['ประเภทลูกค้า','ประเภทธุรกิจ','แหล่งที่มาของลูกค้า','ขั้นตอนการขาย','หมวดหมู่สินค้า','ภูมิภาค','ระดับ','หน่วย','แท็ก','เหตุผลที่แพ้','ประเภทสินทรัพย์','ยี่ห้อสินทรัพย์','รุ่นสินทรัพย์','สถานะสินทรัพย์','สถานะประกัน','สถานะไลเซนส์','ที่ตั้งสินทรัพย์'];
   for(const [index,category] of categories.entries()){
    await page.getByRole('button',{name:category,exact:true}).click();
    await page.getByRole('button',{name:'เพิ่มรายการ',exact:true}).click();

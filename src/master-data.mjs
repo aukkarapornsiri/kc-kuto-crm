@@ -2,7 +2,8 @@ export const CATEGORIES = [
  ['customer_type','ประเภทลูกค้า','Customer Type'],['industry','ประเภทธุรกิจ','Industry'],
  ['lead_source','แหล่งที่มาของลูกค้า','Lead Source'],['sales_stage','ขั้นตอนการขาย','Sales Stage'],
  ['product_category','หมวดหมู่สินค้า','Product Category'],['region','ภูมิภาค','Region'],
- ['tier','ระดับ','Tier'],['unit','หน่วย','Unit'],['tag','แท็ก','Tag'],['loss_reason','เหตุผลที่แพ้','Loss Reason']
+ ['tier','ระดับ','Tier'],['unit','หน่วย','Unit'],['tag','แท็ก','Tag'],['loss_reason','เหตุผลที่แพ้','Loss Reason'],
+ ['asset_type','ประเภทสินทรัพย์','Asset type'],['asset_brand','ยี่ห้อสินทรัพย์','Asset brand'],['asset_model','รุ่นสินทรัพย์','Asset model'],['asset_status','สถานะสินทรัพย์','Asset status'],['warranty_status','สถานะประกัน','Warranty status'],['license_status','สถานะไลเซนส์','License status'],['asset_location','ที่ตั้งสินทรัพย์','Asset location']
 ];
 export function validateMaster(input) {
  const out={category:String(input.category??''),code:String(input.code??'').trim().toUpperCase(),name_th:String(input.name_th??'').trim(),name_en:String(input.name_en??'').trim(),sort_order:Number(input.sort_order),status:input.status};
@@ -16,11 +17,11 @@ export function validateMaster(input) {
 export function createMasterData({React,client,useApp}) {
  const h=React.createElement;
  let demoRows=[];
- return function MasterDataPage({lang}) {
+ return function MasterDataPage({lang,scope}) {
   const tr=(th,en)=>lang==='th'?th:en;
   const {demoMode,profile}=useApp();
   const canEdit=demoMode||profile?.role==='admin';
-  const [category,setCategory]=React.useState('customer_type'),[rows,setRows]=React.useState([]),[query,setQuery]=React.useState('');
+  const [category,setCategory]=React.useState(scope==='assets'?'asset_type':scope==='stages'?'sales_stage':'customer_type'),[rows,setRows]=React.useState([]),[query,setQuery]=React.useState('');
   const [loading,setLoading]=React.useState(true),[busy,setBusy]=React.useState(false),[error,setError]=React.useState(''),[message,setMessage]=React.useState('');
   const [editing,setEditing]=React.useState(null);
   const [reload,setReload]=React.useState(0);
@@ -53,10 +54,11 @@ export function createMasterData({React,client,useApp}) {
   }
   const visible=rows.filter(row=>`${row.code} ${row.name_th} ${row.name_en}`.toLowerCase().includes(query.trim().toLowerCase()));
   const field=(key,label,type='text')=>h('label',{className:'crm-field',key},h('span',null,label),h('input',{type,'aria-label':label,value:editing[key],required:true,maxLength:key==='code'?40:200,min:type==='number'?0:undefined,max:type==='number'?9999:undefined,disabled:busy,onChange:e=>setEditing(old=>({...old,[key]:e.target.value}))}));
-  return h('section',{className:'crm-settings'},h('h1',null,tr('ข้อมูลหลัก','Master Data')),
+  return h('section',{className:'crm-settings'},h('h1',null,scope==='assets'?tr('ตั้งค่าสินทรัพย์','Asset settings'):scope==='stages'?tr('ตั้งค่า Sales Stage','Sales stage settings'):tr('ข้อมูลหลัก','Master Data')),
    h('p',null,tr('จัดการรายการอ้างอิงแยกตามหมวดหมู่ การเปลี่ยนแปลงนี้ไม่แก้ข้อมูลในเอกสารเดิม','Manage reference records by category. Changes do not rewrite existing documents.')),
+   scope&&h('p',{className:'crm-notice'},tr('รายการอ้างอิงนี้บันทึกลงฐานข้อมูลได้ แต่ยังไม่เปลี่ยนตัวเลือกและกฎในฟอร์มธุรกิจเดิมโดยอัตโนมัติ','These reference records persist in the database; existing business-form options and rules are not automatically changed.')),
    demoMode&&h('p',{className:'crm-notice'},tr('โหมดทดลอง • ข้อมูลเก็บเฉพาะระหว่างทดลองใช้งาน','Demo mode • Data is stored in memory for this session only')),
-   h('div',{className:'crm-tabs'},CATEGORIES.map(([id,th,en])=>h('button',{key:id,type:'button',disabled:busy,'aria-pressed':category===id,onClick:()=>{setCategory(id);setEditing(null);setMessage('');setQuery('');}},tr(th,en)))),
+   h('div',{className:'crm-tabs'},CATEGORIES.filter(([id])=>!scope||(scope==='stages'?id==='sales_stage':['asset_type','asset_brand','asset_model','asset_status','warranty_status','license_status','asset_location'].includes(id))).map(([id,th,en])=>h('button',{key:id,type:'button',disabled:busy,'aria-pressed':category===id,onClick:()=>{setCategory(id);setEditing(null);setMessage('');setQuery('');}},tr(th,en)))),
    h('div',{className:'crm-actions'},h('input',{type:'search',className:'crm-search','aria-label':tr('ค้นหาข้อมูลหลัก','Search master data'),value:query,onChange:e=>setQuery(e.target.value)}),h('button',{onClick:()=>setReload(v=>v+1),disabled:busy||loading},tr('โหลดใหม่','Reload')),canEdit&&h('button',{className:'crm-save',disabled:busy||loading,onClick:()=>open(null)},tr('เพิ่มรายการ','Add Item'))),
    error&&h('p',{role:'alert',className:'crm-error'},error),message&&h('p',{role:'status',className:'crm-notice'},message),
    loading?h('p',{role:'status'},tr('กำลังโหลด…','Loading…')):h('div',{style:{overflowX:'auto'}},h('table',{className:'crm-master-table'},h('thead',null,h('tr',null,['Code',tr('ชื่อ (ไทย)','Name (TH)'),tr('ชื่อ (EN)','Name (EN)'),tr('ลำดับ','Order'),tr('สถานะ','Status'),''].map((v,i)=>h('th',{key:i},v)))),h('tbody',null,visible.map(row=>h('tr',{key:row.id},h('td',null,row.code),h('td',null,row.name_th),h('td',null,row.name_en),h('td',null,row.sort_order),h('td',null,row.status==='active'?tr('ใช้งานอยู่','Active'):tr('ปิดใช้งาน','Inactive')),h('td',null,canEdit&&h('button',{onClick:()=>open(row),disabled:busy,'aria-label':tr('แก้ไข ','Edit ')+row.code},tr('แก้ไข','Edit'))))),!visible.length&&h('tr',null,h('td',{colSpan:6},tr('ไม่พบรายการ','No records found')))))),
