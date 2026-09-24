@@ -15,7 +15,7 @@ try{for(const width of [1440,390]){
  await page.getByRole('button',{name:'Indigo',exact:true}).click();await page.getByRole('button',{name:'ยกเลิกสีส่วนตัวที่แก้ไข',exact:true}).click();assert.equal(await page.getByLabel('สีหลักและปุ่ม',{exact:true}).inputValue(),'#6E9DBD');
  await page.getByLabel('เส้นกรอบ',{exact:true}).fill('bad');await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.getByRole('alert').waitFor();assert.deepEqual(await snapshot(),saved);
  await page.getByRole('button',{name:'ยกเลิกสีส่วนตัวที่แก้ไข',exact:true}).click();await page.screenshot({path:`test-artifacts/workspace-theme-${width}.png`,fullPage:true});
- await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
+ await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'hidden'});assert.equal(await page.getByRole('dialog').count(),0);
  await page.reload();await open();assert.equal(await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).isChecked(),true);assert.equal(await page.getByLabel('พื้นกล่อง',{exact:true}).inputValue(),'#FFF4E8');assert.deepEqual(await snapshot(),saved);
  await page.getByRole('button',{name:'คืนค่าตามบริษัท',exact:true}).click();await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.getByRole('status').filter({hasText:'บันทึกสีส่วนตัว'}).waitFor();assert.equal(await page.locator('html').getAttribute('data-crm-personal'),null);
  await page.reload();await open();assert.equal(await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).isChecked(),false);assert.equal(await page.locator('html').getAttribute('data-crm-personal'),null);
