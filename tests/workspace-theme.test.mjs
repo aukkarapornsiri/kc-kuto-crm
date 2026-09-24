@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {WORKSPACE_DEFAULTS,WORKSPACE_PRESETS,validateWorkspace} from '../src/workspace-theme.mjs';
+test('all eleven presets are valid and only workspace fields are persisted',()=>{assert.equal(WORKSPACE_PRESETS.length,11);for(const p of WORKSPACE_PRESETS){const v=validateWorkspace({...WORKSPACE_DEFAULTS,...p,enabled:true,user_id:'other',role:'admin'});assert.equal(v.enabled,true);assert.equal(v.primary,p.primary);assert.equal(v.user_id,undefined);assert.equal(v.role,undefined);assert.equal(v.name,undefined);}});
+test('color injection, invalid dimensions and nonboolean enable flags are rejected',()=>{for(const patch of [{surface:'url(x)'},{border:'#fff'},{radius:'1000'},{shadow:'toString'},{enabled:'true'}])assert.throws(()=>validateWorkspace({...WORKSPACE_DEFAULTS,...patch}));});
