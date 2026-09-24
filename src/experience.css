@@ -44,3 +44,21 @@ body h1, body h1 *, body [role="heading"][aria-level="1"], body [role="heading"]
 }
 @media(max-width:640px){.crm-workspace-overlay{padding:8px}.crm-workspace-dialog{padding:10px;max-height:95vh}.crm-personal-workspace{padding:16px}.crm-personal-preview{grid-template-columns:1fr;gap:12px;padding:12px}.crm-preset-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media screen{html[data-crm-personal=true] .kc-app .text-gray-900{color:var(--crm-background-ink)!important}html[data-crm-personal=true] .kc-app :is(.bg-white.rounded-xl,.bg-white.rounded-2xl,.bg-white.rounded-lg) .text-gray-900{color:var(--crm-surface-ink)!important}html[data-crm-personal=true] .crm-tabs button[aria-pressed=true]{background:var(--crm-primary);color:var(--crm-primary-ink);border-color:var(--crm-primary)}html[data-crm-personal=true] .crm-settings-card svg{color:var(--crm-primary)}}
+
+/* Account 360-style category overview; scoped to the settings landing page. */
+.crm-settings-hub{max-width:1440px;width:100%;padding:8px 0 24px}
+.crm-hub-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}
+.crm-hub-header .crm-intro{margin:0}.crm-hub-header h1{font-size:30px;margin-bottom:12px}.crm-hub-header p{font-size:14px}
+.crm-hub-role{border:1px solid var(--crm-border,#dce6e7);border-radius:24px;padding:10px 16px;font-size:13px;white-space:nowrap;color:inherit}
+.crm-hub-search{display:flex;align-items:center;gap:12px;max-width:760px;padding:8px 16px;border:1px solid var(--crm-border,#dce6e7);border-radius:12px;background:var(--crm-surface,#fff);color:var(--crm-surface-ink,#64748b);margin-bottom:24px}
+.crm-hub-search svg{flex-shrink:0}.crm-hub-search .crm-search{border:0;min-width:0;padding:8px 0;background:transparent;color:inherit;font-size:14px}
+.crm-hub-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.crm-category-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:0;min-height:228px;padding:22px;border:1px solid var(--crm-border,#dce6e7);border-radius:var(--crm-radius,14px);background:var(--crm-surface,#fff);color:var(--crm-surface-ink,#172033);box-shadow:var(--crm-shadow,none);cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.crm-category-card:hover{border-color:var(--crm-primary,#0AADA9);box-shadow:0 4px 16px #1720330a}
+.crm-category-icon{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:13px;margin-bottom:16px;background:#e6f7f7;color:#087f7c}
+.crm-category-icon[data-tone="0"],.crm-category-icon[data-tone="3"]{background:#eff6ff;color:#2563eb}.crm-category-icon[data-tone="2"],.crm-category-icon[data-tone="5"]{background:#f5f3ff;color:#7c3aed}.crm-category-icon[data-tone="4"]{background:#fffbeb;color:#a16207}
+.crm-category-title{font-size:16px;line-height:1.6;margin-bottom:8px;overflow-wrap:anywhere}
+.crm-category-description{font-size:14px;line-height:1.7;color:var(--crm-surface-ink,#64748b);margin-bottom:24px;overflow-wrap:anywhere}
+.crm-category-action{display:flex;align-items:center;gap:12px;margin-top:auto;color:var(--crm-primary,#087f7c);font-size:14px;line-height:1.6}.crm-category-action>span{font-size:22px;line-height:1}
+@media(max-width:1199px){.crm-hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.crm-hub-grid{grid-template-columns:1fr}.crm-category-card{min-height:210px;padding:20px}.crm-hub-header h1{font-size:26px}.crm-hub-role{padding:8px 10px}.crm-hub-header{gap:10px}.crm-hub-search{padding:8px 12px}}

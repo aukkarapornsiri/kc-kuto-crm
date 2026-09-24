@@ -1,6 +1,6 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
 try {
  for(const width of [1440,390]) {
   const page=await browser.newPage({viewport:{width,height:1000}});
@@ -20,6 +20,7 @@ try {
   await page.getByRole('status').filter({hasText:'บันทึกเฉพาะโหมดทดลอง'}).waitFor();
   assert.equal(await page.locator('html').evaluate(el=>el.style.getPropertyValue('--crm-font-size')),'18px');
   await openSettings();
+  await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('font');
   await page.getByRole('button',{name:'Design, Font และ UX/UI',exact:false}).click();
   assert.equal(await page.getByLabel('ขนาดตัวอักษร',{exact:true}).inputValue(),'18');
   await page.getByLabel('ขนาดตัวอักษร',{exact:true}).selectOption('14');
