@@ -21,7 +21,8 @@ try {
    await page.locator('.crm-hub-categories').getByRole('button').nth(index).click();
    assert.equal(await page.locator('.crm-settings-hub').getAttribute('data-category'),String(index));
    assert.ok(await page.locator('.crm-settings-card').count()>0);
-   await page.getByRole('button',{name:'‹ การตั้งค่าทั้งหมด',exact:true}).click();
+   if(index%2===0)await page.getByRole('navigation',{name:'เส้นทางนำทาง',exact:true}).getByRole('button',{name:'ไปที่ ตั้งค่าระบบ',exact:true}).click();
+   else await page.getByRole('button',{name:'‹ การตั้งค่าทั้งหมด',exact:true}).click();
   }
   await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('font');
   await page.getByRole('button',{name:'Design, Font และ UX/UI',exact:false}).click();

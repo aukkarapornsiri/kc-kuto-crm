@@ -110,10 +110,11 @@ export function createExperience({React,client,useApp,palette}) {
         module==='settings'&&h('button',{type:'button',onClick:()=>go(module,'set-hub')},tr('ศูนย์ตั้งค่า','Settings center')),
         pages.filter(x=>x.id!==page&&x.id!=='set-func').map(item=>h('button',{key:item.id,type:'button',onClick:()=>go(module,item.id)},label(item)))));
   }
-  function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null}) {
+  function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null,navigationState}) {
     const {profile,demoMode}=useApp();
     const [query,setQuery]=React.useState('');
     const [category,setCategory]=React.useState(()=>Number.isInteger(initialCategory)&&initialCategory>=0&&initialCategory<categories.length?initialCategory:null);
+    React.useEffect(()=>{setCategory(Number.isInteger(initialCategory)&&initialCategory>=0&&initialCategory<categories.length?initialCategory:null);setQuery('');},[navigationState]);
     const tr=(th,en)=>lang==='th'?th:en;
     const descriptions=[
       ['สี ฟอนต์ และพื้นที่ทำงานส่วนตัวของคุณ','Colors, fonts and your personal workspace'],
