@@ -11,6 +11,7 @@ try{for(const width of [1440,390]){
  await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.getByRole('status').filter({hasText:'บันทึกสีส่วนตัว'}).waitFor();
  const snapshot=()=>page.locator('html').evaluate(el=>Object.fromEntries(['primary','surface','border','radius','shadow'].map(k=>[k,el.style.getPropertyValue('--crm-'+k)])));
  const saved=await snapshot();assert.equal(saved.primary,'#6E9DBD');assert.equal(saved.surface,'#FFF4E8');assert.equal(saved.border,'#CC8844');assert.equal(saved.radius,'24px');assert.match(saved.shadow,/24px/);
+ await page.waitForFunction(()=>Array.from(document.querySelectorAll('button')).some(el=>el.textContent.trim()==='+ สร้าง'&&getComputedStyle(el).backgroundColor==='rgb(110, 157, 189)'));
  assert.equal(await page.getByRole('button',{name:'+ สร้าง',exact:true}).evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(110, 157, 189)');
  const card=await page.locator('.crm-personal-workspace').evaluate(el=>({bg:getComputedStyle(el).backgroundColor,radius:getComputedStyle(el).borderRadius,shadow:getComputedStyle(el).boxShadow}));assert.equal(card.bg,'rgb(255, 244, 232)');assert.equal(card.radius,'24px');assert.notEqual(card.shadow,'none');
  await page.getByRole('button',{name:'Indigo',exact:true}).click();await page.getByRole('button',{name:'ยกเลิกสีส่วนตัวที่แก้ไข',exact:true}).click();assert.equal(await page.getByLabel('สีหลักและปุ่ม',{exact:true}).inputValue(),'#6E9DBD');
