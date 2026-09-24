@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateCompany,parseCSV,validateImport,toCSV} from '../src/settings-model.mjs';
+const company={company_name:'Test',company_name_en:'Test',tax_id:'',default_language:'th',timezone:'Asia/Bangkok',currency:'THB',fiscal_year_start_month:1,date_format:'DD/MM/YYYY',time_format:'24h',company_details:{address_th:'กรุงเทพ'}};
+test('company validation preserves bilingual details and drops unknown properties',()=>{const value=validateCompany({...company,role:'admin'});assert.equal(value.company_details.address_th,'กรุงเทพ');assert.ok(!('role' in value));});
+test('invalid tax, email, timezone, logo script and fiscal month are rejected',()=>{for(const patch of [{tax_id:'123'},{email:'bad'},{timezone:'Invalid/Zone'},{logo_url:'javascript:alert(1)'},{fiscal_year_start_month:13},{company_details:{line:'javascript:alert(1)'}}])assert.throws(()=>validateCompany({...company,...patch}));});
+test('CSV supports BOM, escaped quotes, embedded newlines and CRLF',()=>{assert.deepEqual(parseCSV('\ufeffname,note\r\n"a,b","line1\nline2 ""quoted"""\r\n'),[['name','note'],['a,b','line1\nline2 "quoted"']]);});
+test('CSV rejects malformed files and unknown columns before any writes',()=>{for(const value of ['name\n"open','name,id\na,uuid','name,name\na,b','email\na@b.com','name,email\na,no','name\na\na'])assert.throws(()=>validateImport('customers',value));});
+test('master import normalizes and rejects duplicate category/code',()=>{assert.equal(validateImport('master_data_items','category,code,name_th,name_en\nunit,pcs,ชิ้น,Piece')[0].code,'PCS');assert.throws(()=>validateImport('master_data_items','category,code,name_th,name_en\nunit,pcs,ชิ้น,Piece\nunit,PCS,ชิ้น,Piece'));});
+test('export prevents spreadsheet formula execution and quotes commas',()=>{assert.match(toCSV([{name:'=SUM(1,2)'}],['name']),/"'=SUM\(1,2\)"/);});
