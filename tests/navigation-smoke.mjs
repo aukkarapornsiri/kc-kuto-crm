@@ -1,5 +1,6 @@
 import {chromium} from 'playwright';import assert from 'node:assert/strict';
 const modules=['Dashboard','Leads','Customers','Contacts','Opportunities','Quotations','Contracts & Renewal','Assets / Installed Base','Tickets / Service Desk','Activities','Documents','Reports & Analytics','AI Insights','Settings'];
+const entryPages={'Leads':'Lead Inbox','Customers':'Customer List','Contacts':'Contact List','Opportunities':'Pipeline Kanban','Quotations':'Quotation List','Contracts & Renewal':'All Contracts','Assets / Installed Base':'All Assets','Tickets / Service Desk':'All Tickets','Activities':'My Activities','Documents':'All Documents','AI Insights':'AI Customer Summary'};
 const browser=await chromium.launch({headless:true});
 try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -9,6 +10,7 @@ try{for(const width of [1440,390]){
   if(width<1024)await page.locator('button.lg\\:hidden').first().click();
   const sidebar=page.locator(width<1024?'div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden':'div.hidden.lg\\:flex.w-64').first();
   await sidebar.getByText(name,{exact:true}).click();
+  if(entryPages[name])await sidebar.getByText(entryPages[name],{exact:true}).click();
   assert.equal(await nav.isVisible(),true);
   await nav.getByRole('button',{name:'Go to '+name,exact:true}).click();
   const initial=(await nav.locator('[aria-current="page"]').textContent()).trim();
