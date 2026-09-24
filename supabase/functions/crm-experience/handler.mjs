@@ -16,10 +16,10 @@ export async function handleExperience(request,env,requestFetch=fetch) {
   if(!profileResponse.ok)return json({error:'CRM access required'},403);
   const profiles=await profileResponse.json();
   if(profiles.length!==1||profiles[0].is_active!==true)return json({error:'Active CRM profile required'},403);
-  // Return appearance only. Company details and ecosystem reference IDs stay behind admin RLS.
-  const response=await requestFetch(base+'/rest/v1/company_settings?select=ui_design&id=eq.1',{headers:{apikey:service,Authorization:'Bearer '+service}});
+  // Return appearance and locale only. Company details and ecosystem reference IDs stay behind admin RLS.
+  const response=await requestFetch(base+'/rest/v1/company_settings?select=ui_design,default_language&id=eq.1',{headers:{apikey:service,Authorization:'Bearer '+service}});
   if(!response.ok)return json({error:'Unable to load appearance'},502);
   const rows=await response.json();
-  return json({ui_design:rows[0]?.ui_design??null});
+  return json({ui_design:rows[0]?.ui_design??null,default_language:rows[0]?.default_language==='en'?'en':'th'});
  }catch{return json({error:'Appearance service unavailable'},502);}
 }

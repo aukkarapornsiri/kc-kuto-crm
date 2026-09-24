@@ -47,12 +47,12 @@ export function createExperience({React,client,useApp,palette}) {
   }
   function publish(value) {applyDesign(value);window.dispatchEvent(new Event(eventName));}
   function ExperienceSync() {
-    const {demoMode,profile}=useApp();
+    const {demoMode,profile,setLang}=useApp();
     React.useEffect(()=>{
       let active=true;
       if(demoMode){publish(demoDesign);return;}
       if(!profile?.id){publish(null);return;}
-      client.functions.invoke('crm-experience',{method:'GET'}).then(({data,error})=>{if(active){try{publish(!error?data?.ui_design:null);}catch{publish(null);}}}).catch(()=>{if(active)publish(null);});
+      client.functions.invoke('crm-experience',{method:'GET'}).then(({data,error})=>{if(active){try{publish(!error?data?.ui_design:null);if(!error&&data?.default_language){try{if(!localStorage.getItem('kc_language'))setLang(data.default_language);}catch{}}}catch{publish(null);}}}).catch(()=>{if(active)publish(null);});
       return()=>{active=false;};
     },[demoMode,profile?.id]);
     return null;

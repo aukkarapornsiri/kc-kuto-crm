@@ -1,0 +1,2 @@
+ALTER TABLE public.master_data_items DROP CONSTRAINT master_data_items_category_check;
+ALTER TABLE public.master_data_items ADD CONSTRAINT master_data_items_category_check CHECK(category IN ('customer_type','industry','lead_source','sales_stage','product_category','region','tier','unit','tag','loss_reason','asset_type','asset_brand','asset_model','asset_status','warranty_status','license_status','asset_location'));
