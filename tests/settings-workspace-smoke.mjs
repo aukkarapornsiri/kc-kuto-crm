@@ -5,17 +5,18 @@ try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');
  await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
- const open=async name=>{if(width<1024)await page.locator('button.lg\\:hidden').first().click();await page.getByRole('button',{name:'ตั้งค่าระบบ',exact:true}).filter({visible:true}).click();await page.getByRole('button',{name,exact:true}).click();};
+ const open=async name=>{if(width<1024)await page.locator('button.lg\\:hidden').first().click();await page.getByRole('button',{name:'ตั้งค่าระบบ',exact:true}).filter({visible:true}).click();await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill(name);await page.getByRole('button',{name,exact:true}).click();};
  await open('ข้อมูลบริษัท');
  if(width>=640){
   const breadcrumb=page.getByRole('navigation',{name:'เส้นทางนำทาง',exact:true});
   assert.equal(await breadcrumb.locator('[aria-current="page"]').textContent(),'ข้อมูลบริษัท');
   await breadcrumb.getByRole('button',{name:'ไปที่หมวด องค์กร',exact:true}).click();
-  assert.equal(await page.locator('.crm-tabs').getByRole('button',{name:'องค์กร',exact:true}).getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('.crm-settings-hub').getAttribute('data-category'),'1');
   assert.equal(await page.locator('.crm-settings').getByRole('button',{name:'ข้อมูลบริษัท',exact:true}).count(),1);
   assert.equal(await page.locator('.crm-settings').getByRole('button',{name:'ผู้ใช้งาน',exact:true}).count(),0);
   await breadcrumb.getByRole('button',{name:'ไปที่ ตั้งค่าระบบ',exact:true}).focus();await page.keyboard.press('Enter');
-  assert.equal(await page.locator('.crm-tabs').getByRole('button',{name:'ทั้งหมด',exact:true}).getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('.crm-settings-hub').getAttribute('data-category'),'all');
+  await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('ข้อมูลบริษัท');
   await page.locator('.crm-settings').getByRole('button',{name:'ข้อมูลบริษัท',exact:true}).click();
  }
  await page.getByLabel('ชื่อบริษัท',{exact:true}).fill('บริษัททดสอบ QA');

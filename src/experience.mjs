@@ -87,17 +87,60 @@ export function createExperience({React,client,useApp,palette}) {
     },[demoMode,profile?.id]);
     return null;
   }
-  function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null}) {
+  function Breadcrumb({lang,module,page,onNavigate,modules,categories,groups}){
+    const h=React.createElement,tr=(th,en)=>lang==='th'?th:en;
+    const [open,setOpen]=React.useState(false),root=React.useRef(null),toggle=React.useRef(null);
+    const mod=modules.find(x=>x.id===module),pages=mod?.subs??[];
+    const label=item=>item?.label?.[lang]??item?.id??'';
+    const current=page==='set-hub'?tr('ตั้งค่าระบบ','Settings'):label(pages.find(x=>x.id===page))||label(mod);
+    const category=module==='settings'?categories.findIndex(x=>x.items.includes(page)):-1;
+    const group=module==='settings'?null:Object.values(groups).find(x=>x.module===module&&x.members.includes(page)&&x.members[0]!==page&&x.members.length>1);
+    const parent=group?pages.find(x=>x.id===group.members[0]):null;
+    React.useEffect(()=>{setOpen(false);},[module,page,lang]);
+    React.useEffect(()=>{if(!open)return;const outside=e=>{if(!root.current?.contains(e.target))setOpen(false);};const escape=e=>{if(e.key==='Escape'){setOpen(false);toggle.current?.focus();}};document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape);};},[open]);
+    const go=(m,p,params)=>{setOpen(false);onNavigate(m,p,params);};
+    const separator=()=>h('span',{'aria-hidden':true,className:'crm-crumb-separator'},'›');
+    return h('nav',{ref:root,className:'crm-breadcrumb','aria-label':tr('เส้นทางนำทาง','Breadcrumb')},
+      h('button',{type:'button','aria-label':tr('ไปที่ ','Go to ')+label(mod),onClick:()=>go(module,module==='settings'?'set-hub':pages[0]?.id??module)},label(mod)),
+      category>=0&&h(React.Fragment,null,separator(),h('button',{type:'button','aria-label':tr('ไปที่หมวด ','Go to category ')+categories[category].label[lang],onClick:()=>go('settings','set-hub',{category})},categories[category].label[lang])),
+      parent&&h(React.Fragment,null,separator(),h('button',{type:'button','aria-label':tr('ไปที่หมวด ','Go to category ')+label(parent),onClick:()=>go(module,parent.id)},label(parent))),
+      pages.length>0&&h(React.Fragment,null,separator(),h('button',{ref:toggle,type:'button','aria-current':'page','aria-label':tr('เลือกหน้า: ','Choose page: ')+current,'aria-expanded':open,onClick:()=>setOpen(v=>!v),className:'crm-crumb-current'},current,h('svg',{width:12,height:12,viewBox:'0 0 12 12','aria-hidden':true},h('path',{d:'M2 4l4 4 4-4',fill:'none',stroke:'currentColor',strokeWidth:1.5})))),
+      !pages.length&&h('span',{'aria-current':'page',className:'sr-only'},current),
+      open&&h('div',{className:'crm-crumb-pages',role:'group','aria-label':tr('หน้าในโมดูลนี้','Pages in this module')},
+        module==='settings'&&h('button',{type:'button',onClick:()=>go(module,'set-hub')},tr('ศูนย์ตั้งค่า','Settings center')),
+        pages.filter(x=>x.id!==page&&x.id!=='set-func').map(item=>h('button',{key:item.id,type:'button',onClick:()=>go(module,item.id)},label(item)))));
+  }
+  function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null,navigationState}) {
+    const {profile,demoMode}=useApp();
     const [query,setQuery]=React.useState('');
     const [category,setCategory]=React.useState(()=>Number.isInteger(initialCategory)&&initialCategory>=0&&initialCategory<categories.length?initialCategory:null);
+    React.useEffect(()=>{setCategory(Number.isInteger(initialCategory)&&initialCategory>=0&&initialCategory<categories.length?initialCategory:null);setQuery('');},[navigationState]);
     const tr=(th,en)=>lang==='th'?th:en;
+    const descriptions=[
+      ['สี ฟอนต์ และพื้นที่ทำงานส่วนตัวของคุณ','Colors, fonts and your personal workspace'],
+      ['ข้อมูลบริษัท ทีมงาน และแผนก','Company information, teams and departments'],
+      ['ผู้ใช้งาน บทบาท สิทธิ์ และความปลอดภัย','Users, roles, permissions and security'],
+      ['ภาษา การแจ้งเตือน ประวัติ และการนำเข้าข้อมูล','Language, notifications, history and data transfer'],
+      ['ข้อมูลหลัก ขั้นตอนการขาย สินทรัพย์ และการอนุมัติ','Master data, sales stages, assets and approvals'],
+      ['API ระบบ KC บริการ AI และแพ็กเกจ','APIs, KC applications, AI services and package']
+    ];
+    const tones=['blue','teal','violet','sky','amber','pink'];
     const normalized=query.trim().toLowerCase();
     const groups=categories.map((group,index)=>({...group,index,items:group.items.map(findItem).filter(Boolean).filter(item=>!normalized||`${item.label.th} ${item.label.en} ${group.label.th} ${group.label.en}`.toLowerCase().includes(normalized))})).filter(group=>group.items.length&&(normalized||category===null||category===group.index));
-    return h('section',{className:'crm-settings'},
-      h('div',{className:'crm-intro'},h('h1',null,tr('ศูนย์ตั้งค่า','Settings center')),h('p',null,tr('ค้นหาและจัดการการตั้งค่าทั้งหมดในที่เดียว','Find and manage all settings in one place'))),
-      h('input',{className:'crm-search',type:'search','aria-label':tr('ค้นหาเมนูตั้งค่า','Search settings'),placeholder:tr('ค้นหา เช่น ฟอนต์ บริษัท สิทธิ์ การเชื่อมต่อ','Search fonts, company, permissions, integrations'),value:query,onChange:e=>setQuery(e.target.value)}),
-      h('div',{className:'crm-tabs'},h('button',{type:'button','aria-pressed':category===null,onClick:()=>setCategory(null)},tr('ทั้งหมด','All')),categories.map((group,index)=>h('button',{key:index,type:'button','aria-pressed':category===index,onClick:()=>{setCategory(index);setQuery('');}},group.label[lang]))),
-      groups.length?groups.map(group=>h('section',{key:group.index},h('h2',null,group.label[lang]),h('div',{className:'crm-grid'},group.items.map(item=>h('button',{key:item.id,className:'crm-settings-card',onClick:()=>onNavigate(item.id.startsWith('opp-')?'opportunities':item.id.startsWith('asset-')?'assets':'settings',item.id)},h(item.icon,{size:22,'aria-hidden':true}),h('span',null,item.label[lang]),h('span',{'aria-hidden':true},'›')))))):h('p',{role:'status'},tr('ไม่พบเมนูที่ตรงกับคำค้นหา','No matching settings')));
+    const overview=category===null&&!normalized;
+    const navigate=item=>onNavigate(item.id.startsWith('opp-')?'opportunities':item.id.startsWith('asset-')?'assets':'settings',item.id);
+    return h('section',{className:'crm-settings crm-settings-hub','data-category':category===null?'all':category},
+      h('div',{className:'crm-hub-heading'},h('div',{className:'crm-intro'},h('h1',null,tr('การตั้งค่า','Settings')),h('p',null,tr('จัดการข้อมูลธุรกิจและการใช้งานของคุณ','Manage your business information and preferences'))),h('span',{className:'crm-role-badge'},h('svg',{width:17,height:17,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.6,'aria-hidden':true},h('path',{d:'M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z M8 12l3 3 5-6'})),demoMode?'Demo Admin':profile?.role??tr('ผู้ใช้งาน','User'))),
+      h('div',{className:'crm-hub-search'},h('svg',{width:21,height:21,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,'aria-hidden':true},h('circle',{cx:10,cy:10,r:7}),h('path',{d:'m15 15 6 6'})),h('input',{type:'search','aria-label':tr('ค้นหาเมนูตั้งค่า','Search settings'),placeholder:tr('ค้นหา เช่น บริษัท ผู้ใช้งาน ฟอนต์ การเชื่อมต่อ','Search company, users, fonts, integrations'),value:query,onChange:e=>setQuery(e.target.value)})),
+      !overview&&h('div',{className:'crm-hub-back'},h('button',{type:'button',onClick:()=>{setCategory(null);setQuery('');}},tr('‹ การตั้งค่าทั้งหมด','‹ All settings')),normalized&&h('p',{role:'status'},tr('ผลการค้นหา','Search results'))),
+      overview?h('div',{className:'crm-hub-categories'},groups.map(group=>{
+        const Icon=group.items[0]?.icon;
+        return h('button',{key:group.index,type:'button',className:'crm-category-card','aria-label':group.label[lang],onClick:()=>{setCategory(group.index);setQuery('');}},
+          h('span',{className:'crm-category-icon crm-tone-'+tones[group.index%tones.length]},Icon?h(Icon,{size:22,'aria-hidden':true}):'⚙'),
+          h('span',{className:'crm-category-title'},group.label[lang]),
+          h('span',{className:'crm-category-description'},descriptions[group.index]?.[lang==='th'?0:1]??''),
+          h('span',{className:'crm-category-open'},tr('เปิดการตั้งค่า','Open settings'),h('span',{'aria-hidden':true},'›')));
+      })):groups.length?groups.map(group=>h('section',{key:group.index},h('h2',null,group.label[lang]),h('div',{className:'crm-grid'},group.items.map(item=>h('button',{key:item.id,type:'button',className:'crm-settings-card',onClick:()=>navigate(item)},h(item.icon,{size:22,'aria-hidden':true}),h('span',null,item.label[lang]),h('span',{'aria-hidden':true},'›')))))):h('p',{role:'status'},tr('ไม่พบเมนูที่ตรงกับคำค้นหา','No matching settings')));
   }
   function DesignPage({lang,scopeMode=false}) {
     const {demoMode,profile}=useApp();
@@ -157,5 +200,5 @@ export function createExperience({React,client,useApp,palette}) {
         message&&h('p',{role:failed?'alert':'status',className:failed?'crm-error':'crm-notice'},message),
         h('div',{className:'crm-actions'},h('button',{disabled:busy,onClick:load},tr('โหลดใหม่','Reload')),h('button',{disabled:!dirty||busy,onClick:()=>{setValue({...saved});setMessage('');}},tr('ยกเลิกการแก้ไข','Discard changes')),h('button',{className:'crm-save',disabled:!canEdit||version===null||busy||!dirty,onClick:save},busy?tr('กำลังบันทึก…','Saving…'):tr('บันทึก','Save')))));
   }
-  return {DesignPage,ExperienceSync,SettingsHub,useThemeRefresh,WorkspaceLauncher};
+  return {DesignPage,ExperienceSync,SettingsHub,useThemeRefresh,WorkspaceLauncher,Breadcrumb};
 }
