@@ -1,3 +1,4 @@
+import {createWorkspaceTheme,WORKSPACE_SHADOWS} from './workspace-theme.mjs';
 // Editable source for the Settings extension. The original frontend is distributed as a bundle.
 export const DEFAULT_DESIGN = Object.freeze({primary:'#0AADA9',sidebar:'#172033',background:'#F7FAFA',font:'IBM Plex Sans Thai',fontSize:'14',radius:'12',density:'comfortable'});
 export const FONTS = ['IBM Plex Sans Thai','Anuphan','Inter','system'];
@@ -30,11 +31,12 @@ export function createExperience({React,client,useApp,palette}) {
   const eventName='kc-crm-design-saved';
   let demoDesign=null;
   let demoScope={};
+  let companyDesign=null,personalDesign=null;
   function applyDesign(input) {
     const root=document.documentElement;
     if(!input) {
-      for(const name of ['primary','sidebar','sidebar-ink','background','font','font-size','radius','row-padding'])root.style.removeProperty('--crm-'+name);
-      palette.teal='#0EA5A0';return;
+      for(const name of ['primary','sidebar','sidebar-ink','background','font','font-size','radius','row-padding','surface','surface-ink','background-ink','primary-ink','border','shadow'])root.style.removeProperty('--crm-'+name);
+      delete root.dataset.crmPersonal;palette.teal='#0EA5A0';return;
     }
     const value=validateDesign(input);
     palette.teal=value.primary;
@@ -45,15 +47,42 @@ export function createExperience({React,client,useApp,palette}) {
     const [,setVersion]=React.useState(0);
     React.useEffect(()=>{const fn=()=>setVersion(v=>v+1);window.addEventListener(eventName,fn);return()=>window.removeEventListener(eventName,fn);},[]);
   }
-  function publish(value) {applyDesign(value);window.dispatchEvent(new Event(eventName));}
+  function repaint(){
+    applyDesign(companyDesign);
+    const root=document.documentElement;
+    for(const name of ['surface','surface-ink','background-ink','primary-ink','border','shadow'])root.style.removeProperty('--crm-'+name);
+    delete root.dataset.crmPersonal;
+    document.getElementById('crm-personal-actions')?.remove();
+    if(personalDesign?.enabled){
+      const companyPrimary=palette.teal;
+      applyDesign({...DEFAULT_DESIGN,...companyDesign,primary:personalDesign.primary,sidebar:personalDesign.sidebar,background:personalDesign.background,radius:personalDesign.radius==='0'||personalDesign.radius==='24'?'12':personalDesign.radius});
+      const vars={surface:personalDesign.surface,'surface-ink':readableInk(personalDesign.surface),'background-ink':readableInk(personalDesign.background),'primary-ink':readableInk(personalDesign.primary),border:personalDesign.border,shadow:WORKSPACE_SHADOWS[personalDesign.shadow],radius:personalDesign.radius+'px'};
+      for(const [key,value] of Object.entries(vars))root.style.setProperty('--crm-'+key,value);
+      root.dataset.crmPersonal='true';
+      // Personal colors are a screen-only layer; retain company palette for document generation.
+      palette.teal=companyPrimary;
+      const rgb=[1,3,5].map(i=>parseInt(companyPrimary.slice(i,i+2),16)).join(', ');
+      const sheet=document.createElement('style');sheet.id='crm-personal-actions';
+      sheet.textContent=`@media screen{html[data-crm-personal=true] .kc-app button[style*="background-color: rgb(${rgb})"]{background-color:var(--crm-primary)!important;color:var(--crm-primary-ink)!important}}`;
+      document.head.appendChild(sheet);
+    }
+    window.dispatchEvent(new Event(eventName));
+  }
+  function publish(value) {companyDesign=value;repaint();}
+  const {read:readWorkspace,PersonalWorkspace,WorkspaceLauncher}=createWorkspaceTheme({React,client,useApp,readableInk,onChange:value=>{personalDesign=value;repaint();}});
   function ExperienceSync() {
     const {demoMode,profile,setLang}=useApp();
     React.useEffect(()=>{
       let active=true;
-      if(demoMode){publish(demoDesign);return;}
-      if(!profile?.id){publish(null);return;}
-      client.functions.invoke('crm-experience',{method:'GET'}).then(({data,error})=>{if(active){try{publish(!error?data?.ui_design:null);if(!error&&data?.default_language){try{if(!localStorage.getItem('kc_language'))setLang(data.default_language);}catch{}}}catch{publish(null);}}}).catch(()=>{if(active)publish(null);});
-      return()=>{active=false;};
+      personalDesign=null;publish(null);
+      if(!demoMode&&!profile?.id)return;
+      Promise.all([demoMode?Promise.resolve({data:{ui_design:demoDesign}}):client.functions.invoke('crm-experience',{method:'GET'}),readWorkspace(profile,demoMode).catch(()=>null)]).then(([{data,error},personal])=>{
+        if(!active)return;
+        personalDesign=personal?.value??null;
+        try{publish(!error?data?.ui_design:null);}catch{publish(null);}
+        if(!error&&data?.default_language){try{if(!localStorage.getItem('kc_language'))setLang(data.default_language);}catch{}}
+      }).catch(()=>{if(active)publish(null);});
+      return()=>{active=false;personalDesign=null;publish(null);};
     },[demoMode,profile?.id]);
     return null;
   }
@@ -113,6 +142,7 @@ export function createExperience({React,client,useApp,palette}) {
     const select=(key,options)=>h('select',{value:value[key],disabled:!canEdit||busy,onChange:e=>update(key,e.target.value)},options.map(option=>h('option',{key:option,value:option},option)));
     return h('section',{className:'crm-settings'},
       h('div',{className:'crm-intro'},h('h1',null,scopeMode?tr('การเชื่อมโยง KC Ecosystem','KC Ecosystem references'):tr('Design, Font และ UX/UI','Design, Font & UX/UI')),h('p',null,scopeMode?tr('ระบุ UUID จริงจาก KC Account 360 และ KC EAM เพื่อเตรียมการจับคู่บริษัท ไม่ใช่การเปิดใช้ Sync','Use real KC Account 360 and KC EAM UUIDs to prepare company mapping. This does not enable sync.'):tr('ปรับสี ฟอนต์ ขนาด และระยะห่าง ตามแนวทาง KC Account 360','Customize colors, typography and spacing using the KC Account 360 design approach'))),
+      !scopeMode&&h(PersonalWorkspace,{lang}),
       demoMode&&h('p',{className:'crm-notice'},tr('โหมดทดลอง • ไม่มีการบันทึกลงฐานข้อมูลจริง','Demo mode • No production database writes')),
       !canEdit&&h('p',{className:'crm-notice'},tr('อ่านอย่างเดียว ต้องเป็น Admin เพื่อแก้ไข','Read only. An admin is required to edit.')),
       loading?h('p',{role:'status'},tr('กำลังโหลด…','Loading…')):h(React.Fragment,null,
@@ -126,5 +156,5 @@ export function createExperience({React,client,useApp,palette}) {
         message&&h('p',{role:failed?'alert':'status',className:failed?'crm-error':'crm-notice'},message),
         h('div',{className:'crm-actions'},h('button',{disabled:busy,onClick:load},tr('โหลดใหม่','Reload')),h('button',{disabled:!dirty||busy,onClick:()=>{setValue({...saved});setMessage('');}},tr('ยกเลิกการแก้ไข','Discard changes')),h('button',{className:'crm-save',disabled:!canEdit||version===null||busy||!dirty,onClick:save},busy?tr('กำลังบันทึก…','Saving…'):tr('บันทึก','Save')))));
   }
-  return {DesignPage,ExperienceSync,SettingsHub,useThemeRefresh};
+  return {DesignPage,ExperienceSync,SettingsHub,useThemeRefresh,WorkspaceLauncher};
 }
