@@ -63,7 +63,8 @@ export function createExperience({React,client,useApp,palette}) {
       palette.teal=companyPrimary;
       const rgb=[1,3,5].map(i=>parseInt(companyPrimary.slice(i,i+2),16)).join(', ');
       const sheet=document.createElement('style');sheet.id='crm-personal-actions';
-      sheet.textContent=`@media screen{html[data-crm-personal=true] .kc-app button[style*="background-color: rgb(${rgb})"]{background-color:var(--crm-primary)!important;color:var(--crm-primary-ink)!important}}`;
+      const selectors=[rgb,'14, 165, 160'].flatMap(color=>['background-color: rgb('+color+')','background: rgb('+color+')','background: linear-gradient(135deg, rgb('+color+')'].map(value=>'html[data-crm-personal=true] .kc-app button[style*="'+value+'"]'));
+      sheet.textContent=`@media screen{${selectors.join(',')}{background:var(--crm-primary)!important;color:var(--crm-primary-ink)!important}}`;
       document.head.appendChild(sheet);
     }
     window.dispatchEvent(new Event(eventName));
