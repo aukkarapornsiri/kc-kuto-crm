@@ -57,9 +57,9 @@ export function createExperience({React,client,useApp,palette}) {
     },[demoMode,profile?.id]);
     return null;
   }
-  function SettingsHub({lang,onNavigate,categories,findItem}) {
+  function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null}) {
     const [query,setQuery]=React.useState('');
-    const [category,setCategory]=React.useState(null);
+    const [category,setCategory]=React.useState(()=>Number.isInteger(initialCategory)&&initialCategory>=0&&initialCategory<categories.length?initialCategory:null);
     const tr=(th,en)=>lang==='th'?th:en;
     const normalized=query.trim().toLowerCase();
     const groups=categories.map((group,index)=>({...group,index,items:group.items.map(findItem).filter(Boolean).filter(item=>!normalized||`${item.label.th} ${item.label.en} ${group.label.th} ${group.label.en}`.toLowerCase().includes(normalized))})).filter(group=>group.items.length&&(normalized||category===null||category===group.index));
