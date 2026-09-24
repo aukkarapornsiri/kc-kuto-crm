@@ -31,11 +31,21 @@ DO $$BEGIN
  IF EXISTS(SELECT 1 FROM public.role_permissions WHERE role_key=current_setting('test.role') AND module='customers' AND can_create) THEN RAISE EXCEPTION 'Permission save not atomic'; END IF;
  BEGIN PERFORM public.crm_save_permissions('admin','[]');RAISE EXCEPTION 'Admin matrix writable';EXCEPTION WHEN raise_exception THEN IF SQLERRM='Admin matrix writable' THEN RAISE; END IF;END;
 END $$;
+DO $$DECLARE payload jsonb; BEGIN
+ SELECT jsonb_agg(jsonb_build_object('dashboard_type',t,'visible',true,'is_default',t='my')) INTO payload FROM unnest(ARRAY['my','sales','manager','exec','service','renewal','admin','ai']) t;
+ PERFORM public.crm_save_dashboard_access(current_setting('test.role'),payload);
+ IF NOT EXISTS(SELECT 1 FROM public.dashboard_type_access WHERE role_key=current_setting('test.role') AND dashboard_type='my' AND is_default AND visible) THEN RAISE EXCEPTION 'Dashboard readback failed'; END IF;
+ SELECT jsonb_agg(jsonb_build_object('dashboard_type',t,'visible',true,'is_default',t='sales')) INTO payload FROM unnest(ARRAY['my','sales','manager','exec','service','renewal','admin','ai']) t;
+ PERFORM public.crm_save_dashboard_access(current_setting('test.role'),payload);
+ IF (SELECT count(*) FROM public.dashboard_type_access WHERE role_key=current_setting('test.role') AND is_default)<>1 THEN RAISE EXCEPTION 'Multiple default dashboards'; END IF;
+ BEGIN PERFORM public.crm_save_dashboard_access(current_setting('test.role'),'[]');RAISE EXCEPTION 'Incomplete dashboard matrix accepted';EXCEPTION WHEN raise_exception THEN IF SQLERRM='Incomplete dashboard matrix accepted' THEN RAISE; END IF;END;
+END $$;
 SELECT set_config('request.jwt.claim.sub',current_setting('test.member'),true);
 DO $$DECLARE n integer; BEGIN
  UPDATE public.crm_teams SET name_en='Unauthorized' WHERE id=current_setting('test.id')::uuid;GET DIAGNOSTICS n=ROW_COUNT;IF n<>0 THEN RAISE EXCEPTION 'Member update allowed'; END IF;
  BEGIN INSERT INTO public.crm_teams(name_th,name_en) VALUES('Denied','Denied');RAISE EXCEPTION 'Member create allowed';EXCEPTION WHEN insufficient_privilege THEN NULL;END;
  BEGIN PERFORM public.crm_save_permissions(current_setting('test.role'),'[]');RAISE EXCEPTION 'Member permissions write allowed';EXCEPTION WHEN insufficient_privilege THEN NULL;END;
+ BEGIN PERFORM public.crm_save_dashboard_access(current_setting('test.role'),'[]');RAISE EXCEPTION 'Member dashboard write allowed';EXCEPTION WHEN insufficient_privilege THEN NULL;END;
 END $$;
 SET LOCAL ROLE anon;
 DO $$BEGIN
