@@ -62,3 +62,7 @@ body h1, body h1 *, body [role="heading"][aria-level="1"], body [role="heading"]
 .crm-category-action{display:flex;align-items:center;gap:12px;margin-top:auto;color:var(--crm-primary,#087f7c);font-size:14px;line-height:1.6}.crm-category-action>span{font-size:22px;line-height:1}
 @media(max-width:1199px){.crm-hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.crm-hub-grid{grid-template-columns:1fr}.crm-category-card{min-height:210px;padding:20px}.crm-hub-header h1{font-size:26px}.crm-hub-role{padding:8px 10px}.crm-hub-header{gap:10px}.crm-hub-search{padding:8px 12px}}
+
+/* Sidebar logo: transparent backing and larger proportional artwork. */
+.kc-sidebar > div:first-child > div:has(img[alt="KC CuTo CRM"]){width:100%;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.kc-sidebar > div:first-child img[alt="KC CuTo CRM"]{display:block;width:100%;height:auto;max-height:64px;object-fit:contain}
