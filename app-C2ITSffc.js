@@ -1,4 +1,4 @@
-import {createSidebarToggle} from "./src/sidebar-toggle.mjs?v=20260925-keep-logo";
+import {createSidebarToggle} from "./src/sidebar-toggle.mjs?v=20260925-icon-sidebar";
 import {createExecutiveDashboard} from "./src/executive-dashboard.mjs?v=20260925";
 import {createSettingsWorkspace} from "./src/settings-workspace.mjs";
 import {createMasterData} from "./src/master-data.mjs";
