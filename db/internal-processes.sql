@@ -174,3 +174,18 @@ REVOKE ALL ON FUNCTION private.crm_reference_guard() FROM PUBLIC;
 CREATE TRIGGER crm_customer_references BEFORE INSERT OR UPDATE ON public.customers FOR EACH ROW EXECUTE FUNCTION private.crm_reference_guard('type','customer_type','Company|Individual|Government|NGO','tier','tier','Platinum|Gold|Silver|Standard');
 CREATE TRIGGER crm_opportunity_references BEFORE INSERT OR UPDATE ON public.opportunities FOR EACH ROW EXECUTE FUNCTION private.crm_reference_guard('stage','sales_stage','Lead|Qualified|Requirement|Solution Design|Proposal|Negotiation|Verbal Commit|Won|Lost');
 CREATE TRIGGER crm_asset_references BEFORE INSERT OR UPDATE ON public.assets FOR EACH ROW EXECUTE FUNCTION private.crm_reference_guard('category','asset_type','Server|Network|Security|Storage|Software|Endpoint|Printer|UPS|Other|POS|Firewall|Cloud|Industrial PC|Room Booking|Rental','status','asset_status','active|inactive|expired|maintenance|inuse|spare|retired|replaced');
+CREATE TABLE public.crm_record_versions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),module text NOT NULL CHECK(module IN ('quotations','documents')),record_id uuid NOT NULL,actor_id uuid REFERENCES public.profiles(id),snapshot jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT clock_timestamp());
+CREATE INDEX crm_record_versions_record ON public.crm_record_versions(module,record_id,created_at DESC);
+ALTER TABLE public.crm_record_versions ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.crm_record_versions FROM PUBLIC,anon,authenticated;
+GRANT SELECT ON public.crm_record_versions TO authenticated;
+CREATE POLICY crm_versions_read ON public.crm_record_versions FOR SELECT TO authenticated USING(private.crm_can(module,'view'));
+CREATE FUNCTION private.crm_capture_version() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+BEGIN
+ IF auth.uid() IS NULL THEN RETURN NEW;END IF;
+ INSERT INTO public.crm_record_versions(module,record_id,actor_id,snapshot) VALUES(TG_TABLE_NAME,NEW.id,auth.uid(),to_jsonb(NEW));
+ RETURN NEW;
+END $$;
+REVOKE ALL ON FUNCTION private.crm_capture_version() FROM PUBLIC,anon,authenticated;
+CREATE TRIGGER crm_quote_version AFTER INSERT OR UPDATE ON public.quotations FOR EACH ROW EXECUTE FUNCTION private.crm_capture_version();
+CREATE TRIGGER crm_document_version AFTER INSERT OR UPDATE ON public.documents FOR EACH ROW EXECUTE FUNCTION private.crm_capture_version();

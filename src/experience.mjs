@@ -110,10 +110,11 @@ export function createExperience({React,client,useApp,palette}) {
         module==='settings'&&h('button',{type:'button',onClick:()=>go(module,'set-hub')},tr('ศูนย์ตั้งค่า','Settings center')),
         pages.filter(x=>x.id!==page&&x.id!=='set-func'&&(module==='settings'||x.visibleInSidebar!==false)).map(item=>h('button',{key:item.id,type:'button',onClick:()=>go(module,item.id)},label(item)))));
   }
-  function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null}) {
+  function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null,navigationState}) {
     const {profile,demoMode}=useApp();
     const [query,setQuery]=React.useState('');
     const [category,setCategory]=React.useState(()=>Number.isInteger(initialCategory)&&initialCategory>=0&&initialCategory<categories.length?initialCategory:null);
+    React.useEffect(()=>{setCategory(Number.isInteger(initialCategory)?initialCategory:null);setQuery('');},[navigationState]);
     const tr=(th,en)=>lang==='th'?th:en;
     const normalized=query.trim().toLowerCase();
     const groups=categories.map((group,index)=>({...group,index,items:group.items.map(findItem).filter(Boolean)})).filter(group=>group.items.length);

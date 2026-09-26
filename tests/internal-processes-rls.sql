@@ -37,6 +37,26 @@ DO $$DECLARE r jsonb;BEGIN
  IF (SELECT count(*) FROM public.crm_approval_events WHERE request_id=(r->>'id')::uuid)<>3 THEN RAISE EXCEPTION 'Missing approval history';END IF;
  BEGIN INSERT INTO public.crm_approval_policies(name,approver_ids) VALUES('Denied',ARRAY[current_setting('test.admin')::uuid]);RAISE EXCEPTION 'Member policy write';EXCEPTION WHEN insufficient_privilege THEN NULL;END;
 END $$;
+SELECT set_config('request.jwt.claim.sub',current_setting('test.admin'),true);
+DO $$DECLARE test_record_id uuid;c uuid;r record;BEGIN
+ INSERT INTO public.customers(name,type,tier,status) VALUES('QA forms','Company','Standard','Active') RETURNING customers.id INTO c;
+ INSERT INTO public.contacts(name,customer_id,company,role,influence_level,status) VALUES('QA contact',c,'QA forms','User','medium','active');
+ INSERT INTO public.master_data_items(category,code,name_th,name_en) VALUES('sales_stage','QA_INTERNAL_STAGE','ทดสอบ','QA internal stage');
+ INSERT INTO public.opportunities(name,customer_id,stage,amount,probability,weighted_amount) VALUES('QA deal',c,'QA internal stage',100,25,25) RETURNING opportunities.id INTO test_record_id;
+ UPDATE public.opportunities SET amount=200,weighted_amount=50 WHERE opportunities.id=test_record_id;
+ IF (SELECT amount FROM public.opportunities WHERE opportunities.id=test_record_id)<>200 THEN RAISE EXCEPTION 'Opportunity readback failed';END IF;
+ INSERT INTO public.assets(name,customer_id,category,status) VALUES('QA asset',c,'Server','active');
+ INSERT INTO public.tickets(subject,customer_id,type,status,priority) VALUES('QA ticket',c,'Hardware','open','medium');
+ INSERT INTO public.activities(subject,customer_id,type,status,priority) VALUES('QA activity',c,'Internal Task','planned','medium');
+ INSERT INTO public.documents(name,customer_id,type,status) VALUES('QA document',c,'Contract','draft') RETURNING documents.id INTO test_record_id;
+ UPDATE public.documents SET name='QA document revised' WHERE documents.id=test_record_id;
+ IF (SELECT count(*) FROM public.crm_record_versions WHERE module='documents' AND record_id=test_record_id)<>2 THEN RAISE EXCEPTION 'Document versions missing';END IF;
+ INSERT INTO public.crm_branches(name,customer_id,code) VALUES('QA branch',c,'QA');
+ INSERT INTO public.crm_price_items(name,code,price,cost) VALUES('QA item','QA_'||gen_random_uuid(),100,50);
+ INSERT INTO public.crm_templates(name,header,footer) VALUES('QA template','Header','Footer');
+ INSERT INTO public.crm_knowledge_articles(name,description,status) VALUES('QA article','QA solution','published');
+ IF NOT EXISTS(SELECT 1 FROM public.notifications WHERE user_id=current_setting('test.admin')::uuid AND related_id=current_setting('test.quote')::uuid) THEN RAISE EXCEPTION 'Final approval notification missing';END IF;
+END $$;
 SET LOCAL ROLE anon;
 DO $$BEGIN BEGIN PERFORM public.crm_renew_contract(gen_random_uuid(),current_date+1,1);RAISE EXCEPTION 'Anon RPC allowed';EXCEPTION WHEN insufficient_privilege THEN NULL;END;BEGIN PERFORM 1 FROM public.crm_approval_requests;RAISE EXCEPTION 'Anon request read';EXCEPTION WHEN insufficient_privilege THEN NULL;END;END $$;
 RESET ROLE;
