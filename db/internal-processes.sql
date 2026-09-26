@@ -56,10 +56,19 @@ BEGIN
  SELECT * INTO q FROM public.quotations WHERE id=p_quotation FOR UPDATE;
  IF NOT FOUND THEN RAISE EXCEPTION 'Quotation not found'; END IF;
  SELECT * INTO r FROM public.crm_approval_requests WHERE quotation_id=p_quotation AND status='pending' FOR UPDATE;
+ IF p_action='cancel' AND r.id IS NULL AND q.approval_status='pending' THEN
+  IF NOT private.crm_is_admin() AND NOT(q.owner_id=uid AND private.crm_can('quotations','edit')) THEN RAISE EXCEPTION 'Withdrawal permission required' USING ERRCODE='42501';END IF;
+  PERFORM set_config('crm.approval_transition','yes',true);
+  UPDATE public.quotations SET approval_status=NULL,status='draft',updated_at=clock_timestamp() WHERE id=q.id;
+  PERFORM set_config('crm.approval_transition','',true);
+  INSERT INTO public.audit_logs(user_id,action,module,record_id,changes) VALUES(uid,'update','quotations',q.id,jsonb_build_object('approval_action','withdraw_legacy'));
+  RETURN jsonb_build_object('status','cancelled');
+ END IF;
  IF p_action='submit' THEN
   IF NOT (private.crm_can('quotations','edit') OR (q.owner_id=uid AND private.crm_can('quotations','create'))) THEN RAISE EXCEPTION 'Submission permission required' USING ERRCODE='42501'; END IF;
   IF r.id IS NOT NULL THEN RETURN to_jsonb(r); END IF;
   IF q.status NOT IN ('draft','rejected','submitted','pending') THEN RAISE EXCEPTION 'Quotation cannot be submitted in this state'; END IF;
+  IF q.customer_id IS NULL OR q.owner_id IS NULL OR jsonb_array_length(q.items)=0 THEN RAISE EXCEPTION 'Customer, owner and items are required before submission';END IF;
   SELECT * INTO p FROM public.crm_approval_policies WHERE is_active AND minimum_amount<=q.total ORDER BY minimum_amount DESC,id LIMIT 1;
   IF NOT FOUND THEN RAISE EXCEPTION 'Configure an active approval policy for this amount first'; END IF;
   IF uid=ANY(p.approver_ids) OR q.owner_id=ANY(p.approver_ids) THEN RAISE EXCEPTION 'The requester and sales owner cannot approve their own quotation'; END IF;
@@ -189,3 +198,43 @@ END $$;
 REVOKE ALL ON FUNCTION private.crm_capture_version() FROM PUBLIC,anon,authenticated;
 CREATE TRIGGER crm_quote_version AFTER INSERT OR UPDATE ON public.quotations FOR EACH ROW EXECUTE FUNCTION private.crm_capture_version();
 CREATE TRIGGER crm_document_version AFTER INSERT OR UPDATE ON public.documents FOR EACH ROW EXECUTE FUNCTION private.crm_capture_version();
+CREATE FUNCTION private.crm_quote_totals() RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
+DECLARE item jsonb;q numeric;p numeric;d numeric;sub numeric:=0;disc numeric:=0;clean_items jsonb:='[]';
+BEGIN
+ IF TG_OP='UPDATE' AND NEW.items IS NOT DISTINCT FROM OLD.items AND NEW.subtotal IS NOT DISTINCT FROM OLD.subtotal AND NEW.discount IS NOT DISTINCT FROM OLD.discount AND NEW.vat IS NOT DISTINCT FROM OLD.vat AND NEW.total IS NOT DISTINCT FROM OLD.total THEN RETURN NEW;END IF;
+ IF jsonb_typeof(NEW.items)<>'array' OR jsonb_array_length(NEW.items)>500 THEN RAISE EXCEPTION 'Invalid quotation items';END IF;
+ FOR item IN SELECT * FROM jsonb_array_elements(NEW.items) LOOP
+  q:=(item->>'qty')::numeric;p:=(item->>'price')::numeric;d:=coalesce((item->>'discount')::numeric,0);
+  IF length(trim(coalesce(item->>'name','')))=0 OR q IS NULL OR p IS NULL OR q<=0 OR p<0 OR d<0 OR d>q*p OR q>=1e12 OR p>=1e12 OR q='NaN'::numeric OR p='NaN'::numeric OR d='NaN'::numeric THEN RAISE EXCEPTION 'Invalid quantity, price or discount';END IF;
+  sub:=sub+q*p;disc:=disc+d;clean_items:=clean_items||jsonb_build_array(item||jsonb_build_object('total',round(q*p-d,2))); 
+ END LOOP;
+ NEW.items:=clean_items;NEW.subtotal:=round(sub,2);NEW.discount:=round(disc,2);NEW.vat:=round((NEW.subtotal-NEW.discount)*0.07,2);NEW.total:=NEW.subtotal-NEW.discount+NEW.vat;
+ RETURN NEW;
+END $$;
+REVOKE ALL ON FUNCTION private.crm_quote_totals() FROM PUBLIC;
+CREATE TRIGGER crm_quote_totals BEFORE INSERT OR UPDATE ON public.quotations FOR EACH ROW EXECUTE FUNCTION private.crm_quote_totals();
+ALTER TABLE public.opportunities ADD CONSTRAINT crm_opportunity_amount_nonnegative CHECK(amount>=0 AND amount<1e15 AND probability BETWEEN 0 AND 100) NOT VALID;
+CREATE FUNCTION private.crm_opportunity_amount() RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
+BEGIN
+ IF NEW.stage='Won' THEN NEW.status:='won';ELSIF NEW.stage='Lost' THEN NEW.status:='lost';END IF;
+ IF NEW.status='won' THEN NEW.probability:=100;NEW.stage:='Won';ELSIF NEW.status='lost' THEN NEW.probability:=0;NEW.stage:='Lost';END IF;
+ NEW.weighted_amount:=round(NEW.amount*NEW.probability/100,2);RETURN NEW;
+END $$;
+REVOKE ALL ON FUNCTION private.crm_opportunity_amount() FROM PUBLIC;
+CREATE TRIGGER crm_opportunity_amount BEFORE INSERT OR UPDATE ON public.opportunities FOR EACH ROW EXECUTE FUNCTION private.crm_opportunity_amount();
+CREATE UNIQUE INDEX crm_approval_threshold ON public.crm_approval_policies(minimum_amount) WHERE is_active;
+-- Validate cross-record ownership of related customer records on new/changed links.
+CREATE FUNCTION private.crm_customer_links() RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
+DECLARE doc jsonb:=to_jsonb(NEW);old_doc jsonb:='{}';field text;tbl text;linked_customer uuid;link uuid;
+BEGIN
+ IF TG_OP='UPDATE' THEN old_doc:=to_jsonb(OLD);END IF;
+ FOR field,tbl IN SELECT * FROM (VALUES('contact_id','contacts'),('opportunity_id','opportunities'),('contract_id','contracts'),('asset_id','assets')) refs(f,t) LOOP
+  IF NOT doc?field OR doc->>field IS NULL OR doc->>'customer_id' IS NULL THEN CONTINUE;END IF;
+  IF TG_OP='UPDATE' AND doc->>field IS NOT DISTINCT FROM old_doc->>field AND doc->>'customer_id' IS NOT DISTINCT FROM old_doc->>'customer_id' THEN CONTINUE;END IF;
+  link:=(doc->>field)::uuid;
+  EXECUTE format('SELECT customer_id FROM public.%I WHERE id=$1',tbl) INTO linked_customer USING link;
+  IF linked_customer IS DISTINCT FROM (doc->>'customer_id')::uuid THEN RAISE EXCEPTION 'Related record is inaccessible or belongs to another customer: %',field;END IF;
+ END LOOP;RETURN NEW;
+END $$;
+REVOKE ALL ON FUNCTION private.crm_customer_links() FROM PUBLIC;
+DO $$DECLARE tbl text;BEGIN FOREACH tbl IN ARRAY ARRAY['opportunities','quotations','contracts','assets','tickets','activities'] LOOP EXECUTE format('CREATE TRIGGER crm_customer_links BEFORE INSERT OR UPDATE ON public.%I FOR EACH ROW EXECUTE FUNCTION private.crm_customer_links()',tbl);END LOOP;END $$;

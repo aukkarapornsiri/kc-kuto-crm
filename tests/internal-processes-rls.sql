@@ -9,7 +9,8 @@ SET LOCAL ROLE authenticated;
 UPDATE public.role_permissions SET can_view=true,can_approve=true WHERE role_key='sales_user' AND module='quotations';
 DO $$DECLARE q uuid;c uuid;n public.contracts;n2 public.contracts;l uuid;customer uuid;req jsonb;BEGIN
  INSERT INTO public.crm_approval_policies(name,minimum_amount,approver_ids) VALUES('QA rollback',999999999999,ARRAY[current_setting('test.first')::uuid,current_setting('test.second')::uuid]);
- INSERT INTO public.quotations(customer_name,total,status,owner_id) VALUES('QA rollback',999999999999,'draft',current_setting('test.admin')::uuid) RETURNING id INTO q;PERFORM set_config('test.quote',q::text,true);
+ INSERT INTO public.customers(name) VALUES('QA approval customer') RETURNING id INTO customer;
+ INSERT INTO public.quotations(customer_id,customer_name,total,items,status,owner_id) VALUES(customer,'QA rollback',999999999999,'[{"name":"QA","qty":1,"price":999999999999}]','draft',current_setting('test.admin')::uuid) RETURNING id INTO q;PERFORM set_config('test.quote',q::text,true);
  req:=public.crm_quotation_transition(q,'submit','QA');
  IF req->>'current_step'<>'1' THEN RAISE EXCEPTION 'Submission failed';END IF;
  IF public.crm_quotation_transition(q,'submit','QA')->>'id'<>req->>'id' THEN RAISE EXCEPTION 'Duplicate submission';END IF;
