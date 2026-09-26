@@ -33,6 +33,8 @@ jobs:
       - name: Run desktop and mobile smoke tests
         run: |
           mkdir -p test-artifacts
+          SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/internal-workspace-smoke.mjs
+          SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/navigation-smoke.mjs
           SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/smoke.mjs
           SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/settings-cards-smoke.mjs
           SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/settings-smoke.mjs
