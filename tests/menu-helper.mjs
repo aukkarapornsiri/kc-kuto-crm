@@ -29,3 +29,9 @@ export async function openDesktopMenu(page,parent,child){
 }
 
 export const railLabels=['Home','Leads','Contacts','Accounts','Sales','Service','Activities','Documents','Analytics','Settings'];
+
+export async function openThaiSettings(page,width){
+  if(width>=1024)return page.getByRole('navigation',{name:'หมวดหลัก'}).getByRole('button',{name:'ตั้งค่า',exact:true}).click();
+  await page.locator('button.lg\\:hidden').first().click();
+  await page.getByRole('button',{name:'ตั้งค่าระบบ',exact:true}).filter({visible:true}).click();
+}

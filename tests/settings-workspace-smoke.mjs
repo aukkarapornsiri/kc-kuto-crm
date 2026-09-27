@@ -1,11 +1,12 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
+import {openThaiSettings} from './menu-helper.mjs';
 const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
 try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');
  await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
- const open=async name=>{if(width<1024)await page.locator('button.lg\\:hidden').first().click();await page.getByRole('button',{name:'ตั้งค่าระบบ',exact:true}).filter({visible:true}).click();await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill(name);await page.getByRole('button',{name,exact:true}).click();};
+ const open=async name=>{await openThaiSettings(page,width);await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill(name);await page.getByRole('button',{name,exact:true}).click();};
  await open('ข้อมูลบริษัท');
  if(width>=640){
   const breadcrumb=page.getByRole('navigation',{name:'เส้นทางนำทาง',exact:true});
@@ -44,6 +45,6 @@ try{for(const width of [1440,390]){
  await page.getByLabel('เลือกไฟล์ CSV',{exact:true}).setInputFiles({name:'bad.csv',mimeType:'text/csv',buffer:Buffer.from('name,role\nQA,admin')});await page.getByRole('alert').filter({hasText:'Unknown or duplicate columns'}).waitFor();assert.equal(await page.getByRole('button',{name:'ยืนยันนำเข้า',exact:true}).count(),0);
  for(const menu of ['ผู้ใช้งาน','Workflow การอนุมัติ','การแจ้งเตือน','ประวัติการใช้งานระบบ','ความปลอดภัย','ตั้งค่า AI']){await open(menu);await page.getByRole('heading',{level:1}).waitFor();}
  await open('ตั้งค่าภาษา');await page.getByRole('button',{name:'ใช้ภาษาอังกฤษตอนนี้',exact:true}).click();await page.getByRole('button',{name:'Switch to Thai',exact:true}).waitFor();await page.reload();await page.getByRole('button',{name:'Switch to Thai',exact:true}).waitFor();await page.getByRole('button',{name:'Switch to Thai',exact:true}).click();await page.getByRole('button',{name:'เปลี่ยนเป็นภาษาอังกฤษ',exact:true}).waitFor();
- const weights=await page.locator('body').evaluate(()=>Array.from(document.querySelectorAll('nav button')).map(e=>getComputedStyle(e).fontWeight));assert.ok(weights.every(x=>x==='400'));
+ const weights=await page.locator('.crm-settings').evaluate(el=>Array.from(el.querySelectorAll('nav button')).map(e=>getComputedStyle(e).fontWeight));assert.ok(weights.every(x=>x==='400'));
  assert.deepEqual(errors,[]);await page.screenshot({path:`test-artifacts/settings-workspace-${width}.png`,fullPage:true});await page.close();
 }console.log('PASS settings company/team/role persistence, import preview/export, validation, all rebuilt routes, language reload and globe, regular typography; desktop/mobile');}finally{await browser.close();}
