@@ -3,7 +3,7 @@ import {createInternalWorkspace,createInternalQuickMenu} from './src/internal-wo
 import {createSidebarToggle} from "./src/sidebar-toggle.mjs?v=20260927-layout";
 import {createGroupedNavigation} from "./src/grouped-navigation.mjs?v=20260927";
 import {createContextNavigation} from "./src/context-navigation.mjs?v=20260927-color-icons";
-import {createExecutiveDashboard} from "./src/executive-dashboard.mjs?v=20260925";
+import {createExecutiveDashboard} from "./src/executive-dashboard.mjs?v=20260927-hide-sample-banner";
 import {createSettingsWorkspace} from "./src/settings-workspace.mjs?v=20260927-hide-demo-notices";
 import {createMasterData} from "./src/master-data.mjs?v=20260927-hide-demo-notices";
 import {createExperience} from "./src/experience.mjs?v=20260927-hide-demo-notices";
