@@ -56,7 +56,7 @@ export function createWorkspaceTheme({React,client,useApp,onChange,readableInk})
   return h('section',{className:'crm-personal-workspace','aria-label':tr('สีและมิติพื้นที่ทำงานของฉัน','My workspace colors and dimensions')},
    h('h2',null,tr('สีและมิติพื้นที่ทำงานของฉัน','My workspace colors and dimensions')),
    h('p',null,tr('ใช้เฉพาะบัญชีของคุณ สีโลโก้และรูปแบบเอกสารใช้การตั้งค่าเดิม','Only for your account. Logo colors and document layouts keep their existing settings.')),
-   demoMode&&h('p',{className:'crm-notice'},tr('โหมดทดลอง • บันทึกบนเบราว์เซอร์นี้เท่านั้น','Demo mode • Saved only in this browser')),
+
    loading&&h('p',{role:'status'},tr('กำลังโหลดสีส่วนตัว…','Loading personal theme…')),
    h('label',{className:'crm-personal-enable'},h('input',{type:'checkbox',checked:value.enabled,disabled,onChange:e=>update('enabled',e.target.checked)}),tr('ใช้สีส่วนตัว','Use personal colors')),
    h('fieldset',{disabled:disabled||!value.enabled},h('legend',{className:'sr-only'},tr('ปรับแต่งพื้นที่ทำงาน','Customize workspace')),

@@ -1,4 +1,4 @@
-import {createWorkspaceTheme,WORKSPACE_SHADOWS} from './workspace-theme.mjs';
+import {createWorkspaceTheme,WORKSPACE_SHADOWS} from './workspace-theme.mjs?v=20260927-hide-demo-notices';
 // Editable source for the Settings extension. The original frontend is distributed as a bundle.
 export const DEFAULT_DESIGN = Object.freeze({primary:'#0AADA9',sidebar:'#172033',background:'#F7FAFA',font:'IBM Plex Sans Thai',fontSize:'14',radius:'12',density:'comfortable'});
 export const FONTS = ['IBM Plex Sans Thai','Anuphan','Inter','system'];
@@ -178,7 +178,7 @@ export function createExperience({React,client,useApp,palette}) {
     return h('section',{className:'crm-settings'},
       h('div',{className:'crm-intro'},h('h1',null,scopeMode?tr('การเชื่อมโยง KC Ecosystem','KC Ecosystem references'):tr('Design, Font และ UX/UI','Design, Font & UX/UI')),h('p',null,scopeMode?tr('ระบุ UUID จริงจาก KC Account 360 และ KC EAM เพื่อเตรียมการจับคู่บริษัท ไม่ใช่การเปิดใช้ Sync','Use real KC Account 360 and KC EAM UUIDs to prepare company mapping. This does not enable sync.'):tr('ปรับสี ฟอนต์ ขนาด และระยะห่าง ตามแนวทาง KC Account 360','Customize colors, typography and spacing using the KC Account 360 design approach'))),
       !scopeMode&&h(PersonalWorkspace,{lang}),
-      demoMode&&h('p',{className:'crm-notice'},tr('โหมดทดลอง • ไม่มีการบันทึกลงฐานข้อมูลจริง','Demo mode • No production database writes')),
+
       !canEdit&&h('p',{className:'crm-notice'},tr('อ่านอย่างเดียว ต้องเป็น Admin เพื่อแก้ไข','Read only. An admin is required to edit.')),
       loading?h('p',{role:'status'},tr('กำลังโหลด…','Loading…')):h(React.Fragment,null,
         h('div',{className:'crm-grid'},scopeMode?
