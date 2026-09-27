@@ -36,6 +36,7 @@ test('context tabs expose grouped modules and direct module pages',()=>{
   assert.equal(contextEntries(fixture,'quotations').items[4].page.id,'quot-pricebook');
   const service=contextEntries(fixture,'tickets').items;
   assert.deepEqual(service.map(item=>item.module.id),['tickets','contacts','customers','assets','tickets','reports','tickets']);
+  assert.deepEqual([service[0].label.th,service[3].label.th,service[5].label.th],['เคส','สินทรัพย์','การวิเคราะห์']);
   assert.deepEqual([service[2].page.id,service[4].page.id,service[6].page.id],['accounts','tk-sla','tk-kb']);
   const direct=contextEntries(fixture,'customers');
   assert.deepEqual(direct.items.map(item=>item.page.id),['customer-list','accounts']);
