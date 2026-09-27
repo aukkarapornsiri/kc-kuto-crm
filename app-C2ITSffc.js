@@ -1,5 +1,5 @@
 import {createInternalReports} from './src/internal-reports.mjs?v=20260927-hide-demo-notices';
-import {createInternalWorkspace,createInternalQuickMenu} from './src/internal-workspace.mjs?v=20260927-sales-list-v2';
+import {createInternalWorkspace,createInternalQuickMenu} from './src/internal-workspace.mjs?v=20260927-sales-list-v3';
 import {createSidebarToggle} from "./src/sidebar-toggle.mjs?v=20260927-layout";
 import {createGroupedNavigation} from "./src/grouped-navigation.mjs?v=20260927";
 import {createContextNavigation} from "./src/context-navigation.mjs?v=20260927-sales-tabs";
