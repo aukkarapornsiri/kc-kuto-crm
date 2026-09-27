@@ -1,0 +1,48 @@
+.crm-internal[data-entity=tickets]{max-width:none}
+.crm-service-header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-height:106px;margin:2px 0 16px;padding:18px 22px;background:#fff;border:1px solid #d8e9e5;border-radius:16px}
+.crm-service-icon{display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:12px;background:#ffe5ee;color:#d94579}
+.crm-service-title{flex:1;min-width:230px;display:flex;flex-direction:column;gap:3px;color:#17243b;font-size:12px}
+.crm-service-title>span{color:#68798f}
+.crm-service-view-control{display:flex;align-items:center;gap:10px;position:relative;width:max-content;max-width:100%}
+.crm-service-title h1{margin:0;font-size:inherit}
+.crm-service-view-button{max-width:100%;padding:0 3px 2px 0;border-bottom:2px solid transparent;color:#17243b;text-align:left;font-size:25px;font-weight:700;line-height:1.3}
+.crm-service-view-button:hover,.crm-service-view-button[aria-expanded=true]{border-bottom-color:#087b70}
+.crm-service-pin{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:9px;background:#e6f8f4;color:#087b70}
+.crm-service-pin[aria-pressed=true]{background:#c5efe5}
+.crm-service-primary-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+.crm-service-primary-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:8px 12px;border:1px solid #bdded5;border-radius:9px;background:#edf9f6;color:#087b70;font-weight:600;font-size:12px}
+.crm-service-primary-actions .crm-service-print{background:#fff;color:#315b63}
+.crm-service-primary-actions .crm-save{background:#087b70;border-color:#087b70;color:#fff}
+.crm-service-view-menu{position:absolute;top:calc(100% + 9px);left:0;z-index:100;width:min(360px,calc(100vw - 36px));padding:8px;background:#fff;border:1px solid #d8e9e5;border-radius:13px;box-shadow:0 15px 35px #12284225}
+.crm-service-view-menu button{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:8px 10px;border-radius:8px;color:#273a52;text-align:left}
+.crm-service-view-menu button:hover,.crm-service-view-menu button[aria-selected=true]{background:#e9f8f4}
+.crm-service-view-dot{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#e8f7f3;color:#087b70}
+.crm-service-view-dot[data-view=urgent]{background:#fff0e1;color:#d6732a}
+.crm-service-view-dot[data-view=resolved]{background:#e8f4ff;color:#3478ea}
+.crm-service-check{margin-left:auto;color:#087b70;font-weight:700}
+.crm-service-toolbar{display:flex;align-items:center;gap:14px;min-height:48px;margin-bottom:14px}
+.crm-service-count{color:#68798f;font-size:12px}
+.crm-service-tools{display:flex;align-items:center;gap:8px;margin-left:auto}
+.crm-service-search{display:flex;align-items:center;gap:8px;width:min(300px,34vw);height:42px;padding:0 12px;border:1px solid #d8e7e2;border-radius:10px;background:#fff;color:#087b70}
+.crm-service-search:focus-within{outline:2px solid #087b70;outline-offset:2px}
+.crm-service-search input{width:100%;min-width:0;height:100%;padding:0;border:0;outline:0;background:transparent;color:#17243b;font:inherit}
+.crm-service-tool{display:grid;place-items:center;flex:none;width:40px;height:40px;min-height:40px;padding:0;border:0;border-radius:10px;background:#e7f7f2;color:#087b70}
+.crm-service-tool[aria-pressed=true]{background:#087b70;color:#fff}
+.crm-service-filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:17px;padding:12px;border:1px solid #d8e9e5;border-radius:12px;background:#f2fbf8}
+.crm-service-filters label{display:flex;align-items:center;gap:6px;color:#46556a;font-size:12px}
+.crm-service-filters select,.crm-service-filters button{min-height:38px;padding:0 9px;border:1px solid #c7ded7;border-radius:8px;background:#fff;color:#273a52;font:inherit;font-size:12px}
+.crm-internal[data-entity=tickets] .crm-table-scroll{overflow-x:auto;border:1px solid #d8e9e5;border-radius:15px;background:#fff}
+.crm-internal[data-entity=tickets] .crm-master-table{min-width:1050px;width:100%;border-collapse:collapse}
+.crm-internal[data-entity=tickets] .crm-master-table th{white-space:nowrap;padding:15px 14px;background:#f0faf7;color:#365c56;font-size:12px}
+.crm-internal[data-entity=tickets] .crm-master-table td{padding:13px 14px}
+.crm-service-empty-row td{padding:0!important}
+.crm-service-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:310px;padding:30px 18px;color:#68798f;text-align:center}
+.crm-service-empty>span{display:grid;place-items:center;width:74px;height:74px;border-radius:50%;background:#f9a4c2;color:#9d1f54}
+.crm-service-empty h2{margin:4px 0 0;color:#17243b;font-size:20px}
+.crm-service-empty p{margin:0;font-size:13px}
+.crm-service-empty button{padding:9px 16px;border:0;border-radius:9px;background:#087b70;color:#fff}
+.kc-app .crm-internal[data-entity=tickets] .crm-service-empty button{color:#fff}
+.kc-app .crm-internal[data-entity=tickets] .crm-service-empty h2{color:#17243b}
+.crm-service-view-button:focus-visible,.crm-service-pin:focus-visible,.crm-service-tool:focus-visible,.crm-service-primary-actions button:focus-visible,.crm-service-view-menu button:focus-visible{outline:3px solid #087b70;outline-offset:2px}
+@media(max-width:760px){.crm-service-header{padding:16px}.crm-service-view-button{font-size:21px}.crm-service-primary-actions{width:100%;margin-left:0}.crm-service-primary-actions button{flex:1}.crm-service-toolbar{align-items:flex-start;flex-direction:column}.crm-service-tools{width:100%;margin-left:0}.crm-service-search{flex:1;width:auto}}
+@media print{.kc-primary-rail,.kc-context-bar,.crm-service-primary-actions,.crm-service-toolbar,.crm-service-filters,.crm-internal[data-entity=tickets]>.crm-actions,.kc-app>.flex-1>.h-14{display:none!important}.crm-internal[data-entity=tickets]{padding:0!important}.crm-internal[data-entity=tickets] .crm-table-scroll{overflow:visible;border:0}.crm-internal[data-entity=tickets] .crm-master-table{min-width:0;font-size:10px}.crm-internal[data-entity=tickets] .crm-master-table th:last-child,.crm-internal[data-entity=tickets] .crm-master-table td:last-child{display:none}}

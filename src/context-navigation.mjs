@@ -1,4 +1,4 @@
-import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs';
+import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs?v=20260927-service';
 
 const RAIL_LABELS={
   dashboard:{th:'หน้าหลัก',en:'Home'},leads:{th:'ลีด',en:'Leads'},
@@ -37,6 +37,16 @@ export function contextEntries(modules,activeModule){
         const item=byId.get(id);
         if(!item)return null;
         const page=index===2?item.subs?.find(x=>x.id==='accounts'):index===4?item.subs?.find(x=>x.id==='quot-pricebook'):index===7?item.subs?.find(x=>x.id==='act-calendar'):null;
+        return {module:item,page:page||null};
+      }).filter(Boolean);
+      return {title:group.label,items,extra:[]};
+    }
+    if(group.id==='service'){
+      const ids=['tickets','contacts','customers','assets','tickets','reports','tickets'];
+      const items=ids.map((id,index)=>{
+        const item=byId.get(id);
+        if(!item)return null;
+        const page=index===2?item.subs?.find(x=>x.id==='accounts'):index===4?item.subs?.find(x=>x.id==='tk-sla'):index===6?item.subs?.find(x=>x.id==='tk-kb'):null;
         return {module:item,page:page||null};
       }).filter(Boolean);
       return {title:group.label,items,extra:[]};
@@ -99,7 +109,7 @@ export function createContextNavigation({React,logo,useApp}){
       h('strong',{className:'kc-context-heading'},localized(title,lang)),
       h('nav',{'aria-label':lang==='th'?'เมนูของหมวด':'Section navigation',className:'kc-context-tabs'},
         items.map(({module,page})=>{
-          const id=module.id, label=localized(page?.label||module.label,lang), selected=activeModule===id&&(!page?!(id==='quotations'&&activeSub==='quot-pricebook'):activeSub===page.id);
+          const id=module.id, label=localized(page?.label||module.label,lang), selected=activeModule===id&&(!page?!(id==='quotations'&&activeSub==='quot-pricebook')&&!(id==='tickets'&&['tk-sla','tk-kb'].includes(activeSub)):activeSub===page.id);
           const pages=!page?(module.subs||[]):[];
           return h('div',{key:page?.id||id,className:'kc-context-tab-wrap'},
             h('button',{type:'button',className:'kc-context-tab','aria-current':selected?'page':undefined,
