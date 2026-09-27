@@ -11,6 +11,7 @@ const RAIL_LABELS={
 export function firstPage(module){
   if(!module)return null;
   if(module.id==='settings')return {moduleId:'settings',pageId:'set-hub'};
+  if(module.id==='opportunities'&&module.subs?.some(page=>page.id==='opp-list'))return {moduleId:'opportunities',pageId:'opp-list'};
   return {moduleId:module.id,pageId:module.subs?.find(page=>page.visibleInSidebar!==false)?.id||module.subs?.[0]?.id||module.id};
 }
 
@@ -29,7 +30,19 @@ export function contextEntries(modules,activeModule){
   const byId=new Map(modules.map(module=>[module.id,module]));
   const group=SIDEBAR_GROUPS.find(item=>item.modules.includes(activeModule));
   const module=byId.get(activeModule);
-  if(group)return {title:group.label,items:group.modules.map(id=>byId.get(id)).filter(Boolean).map(item=>({module:item,page:null})),extra:[]};
+  if(group){
+    if(group.id==='sales'){
+      const ids=['leads','contacts','customers','opportunities','quotations','quotations','contracts','activities','reports'];
+      const items=ids.map((id,index)=>{
+        const item=byId.get(id);
+        if(!item)return null;
+        const page=index===2?item.subs?.find(x=>x.id==='accounts'):index===4?item.subs?.find(x=>x.id==='quot-pricebook'):index===7?item.subs?.find(x=>x.id==='act-calendar'):null;
+        return {module:item,page:page||null};
+      }).filter(Boolean);
+      return {title:group.label,items,extra:[]};
+    }
+    return {title:group.label,items:group.modules.map(id=>byId.get(id)).filter(Boolean).map(item=>({module:item,page:null})),extra:[]};
+  }
   if(!module)return {title:null,items:[],extra:[]};
   const visible=(module.subs||[]).filter(page=>page.visibleInSidebar!==false);
   const extra=(module.subs||[]).filter(page=>page.visibleInSidebar===false);
@@ -86,7 +99,7 @@ export function createContextNavigation({React,logo,useApp}){
       h('strong',{className:'kc-context-heading'},localized(title,lang)),
       h('nav',{'aria-label':lang==='th'?'เมนูของหมวด':'Section navigation',className:'kc-context-tabs'},
         items.map(({module,page})=>{
-          const id=module.id, label=localized(page?.label||module.label,lang), selected=activeModule===id&&(!page||activeSub===page.id);
+          const id=module.id, label=localized(page?.label||module.label,lang), selected=activeModule===id&&(!page?!(id==='quotations'&&activeSub==='quot-pricebook'):activeSub===page.id);
           const pages=!page?(module.subs||[]):[];
           return h('div',{key:page?.id||id,className:'kc-context-tab-wrap'},
             h('button',{type:'button',className:'kc-context-tab','aria-current':selected?'page':undefined,
