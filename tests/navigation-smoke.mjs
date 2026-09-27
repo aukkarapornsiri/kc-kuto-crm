@@ -1,14 +1,20 @@
 import {chromium} from 'playwright';import assert from 'node:assert/strict';
 const modules=['Dashboard','Leads','Customers','Contacts','Opportunities','Quotations','Contracts & Renewal','Assets / Installed Base','Tickets / Service Desk','Activities','Documents','Reports & Analytics','AI Insights','Settings'];
 const entryPages={'Leads':'Lead Inbox','Customers':'Customer List','Contacts':'Contact List','Opportunities':'Pipeline Kanban','Quotations':'Quotation List','Contracts & Renewal':'All Contracts','Assets / Installed Base':'All Assets','Tickets / Service Desk':'All Tickets','Activities':'My Activities','Documents':'All Documents','AI Insights':'AI Customer Summary'};
+const groupFor={Opportunities:'Sales',Quotations:'Sales','Contracts & Renewal':'Sales','Assets / Installed Base':'Service','Tickets / Service Desk':'Service','Reports & Analytics':'Analytics','AI Insights':'Analytics'};
 const browser=await chromium.launch({headless:true});
 try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();await page.getByRole('button',{name:'เปลี่ยนเป็นภาษาอังกฤษ',exact:true}).click();
  const nav=page.getByRole('navigation',{name:'Breadcrumb',exact:true});let checked=0;
+ const firstSidebar=page.locator(width<1024?'div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden':'#crm-desktop-sidebar');
+ if(width<1024)await page.locator('button.lg\\:hidden').first().click();
+ assert.deepEqual(await firstSidebar.locator('nav > div > button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label')||node.querySelector('span')?.textContent?.trim())),['Dashboard','Leads','Contacts','Customers','Sales','Service','Activities','Documents','Analytics','Settings']);
+ if(width<1024)await page.locator('button.lg\\:hidden').first().click();
  for(const name of modules){
   if(width<1024)await page.locator('button.lg\\:hidden').first().click();
   const sidebar=page.locator(width<1024?'div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden':'div.hidden.lg\\:flex.w-64').first();
+  if(groupFor[name]&&!await sidebar.getByText(name,{exact:true}).isVisible())await sidebar.getByRole('button',{name:groupFor[name],exact:true}).click();
   await sidebar.getByText(name,{exact:true}).click();
   if(entryPages[name])await sidebar.getByText(entryPages[name],{exact:true}).click();
   assert.equal(await nav.isVisible(),true);
