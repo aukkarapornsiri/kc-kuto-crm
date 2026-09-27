@@ -10,7 +10,7 @@ try{for(const width of [1440,390]){
  const firstSidebar=page.locator(width<1024?'div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden':'#crm-desktop-sidebar');
  if(width<1024)await page.locator('button.lg\\:hidden').first().click();
  assert.deepEqual(await firstSidebar.locator('nav > div > button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label')||node.querySelector('span')?.textContent?.trim())),['Dashboard','Leads','Contacts','Customers','Sales','Service','Activities','Documents','Analytics','Settings']);
- if(width<1024)await page.locator('button.lg\\:hidden').first().click();
+ if(width<1024)await page.mouse.click(width-5,500);
  for(const name of modules){
   if(width<1024)await page.locator('button.lg\\:hidden').first().click();
   const sidebar=page.locator(width<1024?'div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden':'div.hidden.lg\\:flex.w-64').first();
