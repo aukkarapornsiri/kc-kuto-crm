@@ -43,11 +43,12 @@ export function contextEntries(modules,activeModule){
     }
     if(group.id==='service'){
       const ids=['tickets','contacts','customers','assets','tickets','reports','tickets'];
+      const labels=[{th:'เคส',en:'Cases'},null,null,{th:'สินทรัพย์',en:'Assets'},null,{th:'การวิเคราะห์',en:'Analytics'},null];
       const items=ids.map((id,index)=>{
         const item=byId.get(id);
         if(!item)return null;
         const page=index===2?item.subs?.find(x=>x.id==='accounts'):index===4?item.subs?.find(x=>x.id==='tk-sla'):index===6?item.subs?.find(x=>x.id==='tk-kb'):null;
-        return {module:item,page:page||null};
+        return {module:item,page:page||null,label:labels[index]};
       }).filter(Boolean);
       return {title:group.label,items,extra:[]};
     }
@@ -114,8 +115,8 @@ export function createContextNavigation({React,logo,useApp}){
     return h('div',{ref:root,className:'kc-context-bar'},
       h('strong',{className:'kc-context-heading'},localized(title,lang)),
       h('nav',{'aria-label':lang==='th'?'เมนูของหมวด':'Section navigation',className:'kc-context-tabs'},
-        items.map(({module,page})=>{
-          const id=module.id, label=localized(page?.label||module.label,lang), selected=activeModule===id&&(!page?!(id==='quotations'&&activeSub==='quot-pricebook')&&!(id==='tickets'&&['tk-sla','tk-kb'].includes(activeSub)):activeSub===page.id);
+        items.map(({module,page,label:tabLabel})=>{
+          const id=module.id, label=localized(tabLabel||page?.label||module.label,lang), selected=activeModule===id&&(!page?!(id==='quotations'&&activeSub==='quot-pricebook')&&!(id==='tickets'&&['tk-sla','tk-kb'].includes(activeSub)):activeSub===page.id);
           const pages=!page?(module.subs||[]):[];
           return h('div',{key:page?.id||id,className:'kc-context-tab-wrap'},
             h('button',{type:'button',className:'kc-context-tab','aria-current':selected?'page':undefined,
