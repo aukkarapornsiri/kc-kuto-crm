@@ -6,7 +6,7 @@ export function createSidebarToggle({React}){
   React.useEffect(()=>{const sidebar=document.getElementById('crm-desktop-sidebar');if(!sidebar)return;
    const labelButtons=()=>sidebar.querySelectorAll('nav > div > button').forEach(button=>{const label=button.querySelector('span')?.textContent?.trim();if(label&&button.title!==label)button.title=label;});
    labelButtons();const observer=new MutationObserver(labelButtons);observer.observe(sidebar,{childList:true,subtree:true,characterData:true});
-   const openGroup=event=>{const button=event.target.closest('nav > div > button');if(hidden&&window.matchMedia('(min-width:1024px)').matches&&button?.querySelector('.lucide-chevron-right,.lucide-chevron-down'))S(false);};
+   const openGroup=event=>{const button=event.target.closest('nav > div > button');if(hidden&&window.matchMedia('(min-width:1024px)').matches&&(button?.classList.contains('crm-nav-group-button')||button?.querySelector('.lucide-chevron-right,.lucide-chevron-down')))S(false);};
    sidebar.addEventListener('click',openGroup,true);return()=>{observer.disconnect();sidebar.removeEventListener('click',openGroup,true);};
   },[hidden,lang]);
   const label=lang==='th'?(hidden?'ขยายแถบเมนู':'ย่อแถบเมนู'):(hidden?'Expand sidebar':'Collapse sidebar');

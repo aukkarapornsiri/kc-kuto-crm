@@ -21,6 +21,7 @@ const groups = [
   { parent: 'AI Insights', children: ['AI Customer Summary', 'AI Next Best Action', 'AI Renewal Risk'] },
   { parent: 'Settings', children: [] },
 ];
+const groupFor = {Opportunities:'Sales',Quotations:'Sales','Contracts & Renewal':'Sales','Assets / Installed Base':'Service','Tickets / Service Desk':'Service','Reports & Analytics':'Analytics','AI Insights':'Analytics'};
 
 async function clickExactVisible(page, label) {
   const exact = page.getByText(label, { exact: true });
@@ -127,6 +128,9 @@ for (const viewport of [
 
     for (const group of groups) {
       if (viewport.name === 'mobile') await ensureMobileDrawerOpen(page);
+      if (groupFor[group.parent] && !(await sidebarHas(page, viewport.name, group.parent))) {
+        await clickSidebar(page, viewport.name, groupFor[group.parent]);
+      }
 
       let parentOk = await sidebarHas(page, viewport.name, group.parent);
       if (!parentOk) {
