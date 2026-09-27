@@ -1,4 +1,5 @@
 import { chromium } from 'playwright';
+import {openDesktopMenu,railLabels} from './menu-helper.mjs';
 
 const base = process.env.SITE_URL || 'http://127.0.0.1:4173/kc-kuto-crm/';
 const browser = await chromium.launch({ headless: true });
@@ -126,7 +127,22 @@ for (const viewport of [
 
     await page.screenshot({ path: `test-artifacts/${viewport.name}-home.png`, fullPage: true });
 
+    if(viewport.name==='desktop'){
+      const rail=page.getByRole('navigation',{name:'Primary navigation'});
+      const labels=await rail.getByRole('button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label')));
+      if(JSON.stringify(labels)!==JSON.stringify(railLabels))failures.push(`desktop: primary menu mismatch: ${labels}`);
+    }
+
     for (const group of groups) {
+      if(viewport.name==='desktop'){
+        const pages=group.children.length?group.children:[undefined];
+        for(const child of pages){
+          await openDesktopMenu(page,group.parent,child);
+          await assertHealthy(page,`desktop: ${group.parent}${child?' > '+child:''}`);
+          results.push(`desktop: ${group.parent}${child?' > '+child:''} OK`);
+        }
+        continue;
+      }
       if (viewport.name === 'mobile') await ensureMobileDrawerOpen(page);
       if (groupFor[group.parent] && !(await sidebarHas(page, viewport.name, group.parent))) {
         await clickSidebar(page, viewport.name, groupFor[group.parent]);
@@ -179,7 +195,9 @@ for (const viewport of [
     // Integration-specific pages live under the Settings hub instead of the sidebar.
     for (const settingsPage of ['API & Integration', 'Package']) {
       if (viewport.name === 'mobile') await ensureMobileDrawerOpen(page);
-      const settingsOk = await clickSidebar(page, viewport.name, 'Settings');
+      const settingsOk = viewport.name==='desktop'
+        ? await openDesktopMenu(page,'Settings').then(()=>true)
+        : await clickSidebar(page, viewport.name, 'Settings');
       if (!settingsOk) {
         failures.push(`${viewport.name}: cannot open Settings hub for ${settingsPage}`);
         continue;
