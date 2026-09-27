@@ -1,4 +1,4 @@
-import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs';
+import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs?v=20260927-service';
 
 const RAIL_LABELS={
   dashboard:{th:'หน้าหลัก',en:'Home'},leads:{th:'ลีด',en:'Leads'},
@@ -41,6 +41,16 @@ export function contextEntries(modules,activeModule){
       }).filter(Boolean);
       return {title:group.label,items,extra:[]};
     }
+    if(group.id==='service'){
+      const ids=['tickets','contacts','customers','assets','tickets','reports','tickets'];
+      const items=ids.map((id,index)=>{
+        const item=byId.get(id);
+        if(!item)return null;
+        const page=index===2?item.subs?.find(x=>x.id==='accounts'):index===4?item.subs?.find(x=>x.id==='tk-sla'):index===6?item.subs?.find(x=>x.id==='tk-kb'):null;
+        return {module:item,page:page||null};
+      }).filter(Boolean);
+      return {title:group.label,items,extra:[]};
+    }
     return {title:group.label,items:group.modules.map(id=>byId.get(id)).filter(Boolean).map(item=>({module:item,page:null})),extra:[]};
   }
   if(!module)return {title:null,items:[],extra:[]};
@@ -55,16 +65,18 @@ export function createContextNavigation({React,logo,useApp}){
 
   function PrimaryRail({lang,activeModule,modules,onNavigate,onSignOut,demoMode}){
     const {profile}=useApp();
+    const [section,setSection]=React.useState(null);
+    React.useEffect(()=>{const select=event=>setSection(['sales','service'].includes(event.detail)?event.detail:null);window.addEventListener('kc-crm-section',select);return()=>window.removeEventListener('kc-crm-section',select);},[]);
     const name=profile?.display_name||profile?.email||(lang==='th'?'ผู้ใช้งาน':'User');
     const initials=name.trim().split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase();
     return h('div',{className:'kc-sidebar kc-primary-rail'},
       h('div',{className:'kc-rail-brand'},h('img',{src:logo,alt:'KC CuTo CRM'})),
       h('nav',{'aria-label':lang==='th'?'หมวดหลัก':'Primary navigation'},
         railEntries(modules).map(item=>{
-          const Icon=item.icon, label=localized(item.label,lang), active=item.moduleIds.includes(activeModule);
+          const Icon=item.icon, label=localized(item.label,lang), active=section?item.id===section:item.moduleIds.includes(activeModule);
           return h('button',{key:item.id,type:'button',className:'kc-rail-item',title:label,
             'aria-label':label,'aria-current':active?'page':undefined,'data-active':active,'data-section':item.id,
-            onClick:()=>onNavigate(item.target.moduleId,item.target.pageId)},
+            onClick:()=>{window.dispatchEvent(new CustomEvent('kc-crm-section',{detail:item.id}));onNavigate(item.target.moduleId,item.target.pageId);}},
             Icon&&h('span',{className:'kc-rail-icon','aria-hidden':true},h(Icon,{size:21})),h('span',null,label));
         })),
       h('div',{className:'kc-rail-profile'},
@@ -76,7 +88,9 @@ export function createContextNavigation({React,logo,useApp}){
 
   function ContextNav({lang,activeModule,activeSub,modules,onNavigate}){
     const [open,setOpen]=React.useState(null);
+    const [section,setSection]=React.useState(null);
     const root=React.useRef(null);
+    React.useEffect(()=>{const select=event=>setSection(['sales','service'].includes(event.detail)?event.detail:null);window.addEventListener('kc-crm-section',select);return()=>window.removeEventListener('kc-crm-section',select);},[]);
     React.useEffect(()=>{
       if(!open)return;
       const close=event=>{if(event.type==='keydown'&&event.key==='Escape')setOpen(null);
@@ -85,9 +99,11 @@ export function createContextNavigation({React,logo,useApp}){
       return()=>{document.removeEventListener('keydown',close);document.removeEventListener('pointerdown',close);};
     },[open]);
     React.useEffect(()=>setOpen(null),[activeModule,activeSub]);
-    const {title,items,extra}=contextEntries(modules,activeModule);
+    const contextModule=section==='service'?'tickets':section==='sales'?'opportunities':activeModule;
+    const {title,items,extra}=contextEntries(modules,contextModule);
     if(!title)return null;
     const go=(module,page)=>{const target=page?{moduleId:module.id,pageId:page.id}:firstPage(module);
+      if(!section){const group=SIDEBAR_GROUPS.find(item=>['sales','service'].includes(item.id)&&item.modules.includes(activeModule));if(group){setSection(group.id);window.dispatchEvent(new CustomEvent('kc-crm-section',{detail:group.id}));}}
       setOpen(null);onNavigate(target.moduleId,target.pageId);};
     const toggle=(id,event)=>{const rect=event.currentTarget.getBoundingClientRect();
       setOpen(previous=>previous?.id===id?null:{id,left:Math.max(8,Math.min(rect.left,window.innerWidth-238)),top:rect.bottom+4});};
@@ -99,7 +115,7 @@ export function createContextNavigation({React,logo,useApp}){
       h('strong',{className:'kc-context-heading'},localized(title,lang)),
       h('nav',{'aria-label':lang==='th'?'เมนูของหมวด':'Section navigation',className:'kc-context-tabs'},
         items.map(({module,page})=>{
-          const id=module.id, label=localized(page?.label||module.label,lang), selected=activeModule===id&&(!page?!(id==='quotations'&&activeSub==='quot-pricebook'):activeSub===page.id);
+          const id=module.id, label=localized(page?.label||module.label,lang), selected=activeModule===id&&(!page?!(id==='quotations'&&activeSub==='quot-pricebook')&&!(id==='tickets'&&['tk-sla','tk-kb'].includes(activeSub)):activeSub===page.id);
           const pages=!page?(module.subs||[]):[];
           return h('div',{key:page?.id||id,className:'kc-context-tab-wrap'},
             h('button',{type:'button',className:'kc-context-tab','aria-current':selected?'page':undefined,

@@ -2,7 +2,7 @@
 // changes only how those modules are presented in the sidebar.
 export const SIDEBAR_GROUPS = Object.freeze([
   {id:'sales', label:{th:'การขาย',en:'Sales'}, icon:'opportunities', modules:['opportunities','quotations','contracts']},
-  {id:'service', label:{th:'งานบริการ',en:'Service'}, icon:'tickets', modules:['assets','tickets']},
+  {id:'service', label:{th:'บริการ',en:'Service'}, icon:'tickets', modules:['tickets','assets']},
   {id:'insights', label:{th:'วิเคราะห์ข้อมูล',en:'Analytics'}, icon:'reports', modules:['reports','ai']},
 ]);
 export const SIDEBAR_PRIMARY_ORDER = Object.freeze([
