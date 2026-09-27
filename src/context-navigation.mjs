@@ -50,9 +50,9 @@ export function createContextNavigation({React,logo,useApp}){
         railEntries(modules).map(item=>{
           const Icon=item.icon, label=localized(item.label,lang), active=item.moduleIds.includes(activeModule);
           return h('button',{key:item.id,type:'button',className:'kc-rail-item',title:label,
-            'aria-label':label,'aria-current':active?'page':undefined,'data-active':active,
+            'aria-label':label,'aria-current':active?'page':undefined,'data-active':active,'data-section':item.id,
             onClick:()=>onNavigate(item.target.moduleId,item.target.pageId)},
-            Icon&&h(Icon,{size:22,'aria-hidden':true}),h('span',null,label));
+            Icon&&h('span',{className:'kc-rail-icon','aria-hidden':true},h(Icon,{size:21})),h('span',null,label));
         })),
       h('div',{className:'kc-rail-profile'},
         h('span',{className:'kc-rail-avatar','aria-hidden':true},initials||'?'),
