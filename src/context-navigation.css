@@ -1,8 +1,8 @@
 @media(min-width:1024px){
  .crm-desktop-sidebar{width:220px!important;min-width:220px!important}
  html[data-crm-sidebar-hidden=true] .crm-desktop-sidebar{width:80px!important;min-width:80px!important}
- .kc-primary-rail{height:100%;display:flex;flex-direction:column;background:var(--crm-sidebar,#0aada9);color:var(--crm-sidebar-ink,#fff);min-width:0;width:100%}
- .kc-rail-brand{height:74px;flex:none;display:flex;align-items:center;justify-content:center;padding:10px;border-bottom:1px solid rgba(255,255,255,.2)}
+ .kc-sidebar.kc-primary-rail{height:100%;display:flex;flex-direction:column;background-color:color-mix(in srgb,var(--crm-sidebar,#0aada9) 18%,#061f22)!important;color:var(--crm-sidebar-ink,#fff);min-width:0;width:100%}
+ .kc-rail-brand{height:74px;flex:none;display:flex;align-items:center;justify-content:center;padding:10px;background:var(--crm-sidebar,#0aada9);border-bottom:1px solid rgba(255,255,255,.2)}
  .kc-rail-brand img{width:100%;max-width:178px;max-height:55px;object-fit:contain}
  .kc-primary-rail nav{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:7px 5px}
  .kc-primary-rail nav::-webkit-scrollbar{display:none}
