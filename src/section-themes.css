@@ -1,0 +1,29 @@
+/* The page accent follows the active primary navigation icon. Keep content
+   surfaces quiet while using a darker companion color for readable text. */
+.kc-app{--kc-section-icon:#73d2fa;--kc-section-action:#13729c}
+.kc-app:has(.kc-rail-item[data-section="leads"][data-active="true"]){--kc-section-icon:#ffbd6e;--kc-section-action:#a65d13}
+.kc-app:has(.kc-rail-item[data-section="contacts"][data-active="true"]){--kc-section-icon:#d1adff;--kc-section-action:#8050b3}
+.kc-app:has(.kc-rail-item[data-section="customers"][data-active="true"]){--kc-section-icon:#95bfff;--kc-section-action:#2e64aa}
+.kc-app:has(.kc-rail-item[data-section="sales"][data-active="true"]){--kc-section-icon:#ffda80;--kc-section-action:#8d6100}
+.kc-app:has(.kc-rail-item[data-section="service"][data-active="true"]){--kc-section-icon:#75e4d0;--kc-section-action:#087b70}
+.kc-app:has(.kc-rail-item[data-section="activities"][data-active="true"]){--kc-section-icon:#ffa39e;--kc-section-action:#a34347}
+.kc-app:has(.kc-rail-item[data-section="documents"][data-active="true"]){--kc-section-icon:#f4c78d;--kc-section-action:#905c1b}
+.kc-app:has(.kc-rail-item[data-section="insights"][data-active="true"]){--kc-section-icon:#91e6f9;--kc-section-action:#16758b}
+.kc-app:has(.kc-rail-item[data-section="settings"][data-active="true"]){--kc-section-icon:#c0c5f6;--kc-section-action:#575da1}
+
+.kc-app > .flex-1 > .h-14{border-bottom:2px solid var(--kc-section-icon)!important}
+.kc-app .flex-1.overflow-y-auto.p-4{background-color:color-mix(in srgb,var(--kc-section-icon) 5%,var(--crm-background,#f5f7fa))}
+.kc-app .kc-context-bar{background:color-mix(in srgb,var(--kc-section-icon) 12%,var(--crm-surface,#fff));border-bottom-color:color-mix(in srgb,var(--kc-section-icon) 42%,var(--crm-border,#e2e8f0))}
+.kc-app .kc-context-heading,.kc-app .kc-context-tab[data-active="true"]{color:var(--kc-section-action)}
+.kc-app .kc-context-tab[data-active="true"]{border-bottom-color:var(--kc-section-action)}
+.kc-app .kc-context-tab:hover,.kc-app .kc-context-more:hover,.kc-app .kc-context-menu button:hover{background:color-mix(in srgb,var(--kc-section-icon) 18%,white);color:var(--kc-section-action)}
+.kc-app .kc-rail-item[data-active="true"]{background:color-mix(in srgb,var(--rail-icon) 17%,transparent)}
+.kc-app .flex-1.overflow-y-auto.p-4 > .mb-4 .text-xl.font-bold,.kc-app .crm-settings :is(h1,h2){color:var(--kc-section-action)}
+.kc-app .crm-settings :is(.crm-tabs button[aria-pressed="true"],.crm-actions .crm-save),
+.kc-app .crm-contact-primary-actions .crm-save,
+.kc-app .exec-mode button[aria-pressed="true"]{background:var(--kc-section-action);border-color:var(--kc-section-action);color:#fff}
+.kc-app .crm-master-table button,.kc-app .crm-settings-card svg{color:var(--kc-section-action)}
+.kc-app .crm-notice{background:color-mix(in srgb,var(--kc-section-icon) 16%,white);color:var(--kc-section-action)}
+.kc-app .crm-contact-header{border-color:color-mix(in srgb,var(--kc-section-icon) 45%,#e2e8f0)}
+.kc-app .crm-contact-icon,.kc-app .crm-contact-tool[aria-pressed="true"]{background:color-mix(in srgb,var(--kc-section-icon) 28%,white);color:var(--kc-section-action)}
+.kc-app :is(button,input,select,textarea):focus-visible{outline-color:var(--kc-section-action)}
