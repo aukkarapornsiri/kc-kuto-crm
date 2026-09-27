@@ -1,5 +1,6 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
+import {openThaiSettings} from './menu-helper.mjs';
 const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
 try {
  for(const width of [1440,390]) {
@@ -7,10 +8,7 @@ try {
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');
   await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
-  const openSettings=async()=>{
-   if(width<1024)await page.locator('button.lg\\:hidden').first().click();
-   await page.getByRole('button',{name:'ตั้งค่าระบบ',exact:true}).filter({visible:true}).click();
-  };
+  const openSettings=async()=>openThaiSettings(page,width);
   await openSettings();
   await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('font');
   await page.getByRole('button',{name:'Design, Font และ UX/UI',exact:false}).click();

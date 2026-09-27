@@ -1,5 +1,6 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
+import {openThaiSettings} from './menu-helper.mjs';
 const browser=await chromium.launch({headless:true});
 try {
  for(const width of [1440,390]) {
@@ -7,8 +8,7 @@ try {
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');
   await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
-  if(width<1024)await page.locator('button.lg\\:hidden').first().click();
-  await page.getByRole('button',{name:'ตั้งค่าระบบ',exact:true}).filter({visible:true}).click();
+  await openThaiSettings(page,width);
   await page.getByRole('searchbox',{name:'ค้นหาเมนูตั้งค่า'}).fill('ข้อมูลหลัก');
   await page.getByRole('button',{name:'ข้อมูลหลัก',exact:false}).filter({visible:true}).click();
   const categories=['ประเภทลูกค้า','ประเภทธุรกิจ','แหล่งที่มาของลูกค้า','ขั้นตอนการขาย','หมวดหมู่สินค้า','ภูมิภาค','ระดับ','หน่วย','แท็ก','เหตุผลที่แพ้','ประเภทสินทรัพย์','ยี่ห้อสินทรัพย์','รุ่นสินทรัพย์','สถานะสินทรัพย์','สถานะประกัน','สถานะไลเซนส์','ที่ตั้งสินทรัพย์'];
