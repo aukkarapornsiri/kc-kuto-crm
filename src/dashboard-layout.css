@@ -10,7 +10,7 @@
 .kc-role-dashboard>div:first-child:has(h1)>div:last-child>div{flex-wrap:wrap}
 .kc-role-dashboard>div:first-child button,.kc-role-dashboard>div:first-child select,.kc-role-dashboard>div:nth-child(2) select{min-height:44px;font-size:13px;padding:8px 14px;border-radius:10px}
 .kc-role-dashboard button:focus-visible,.kc-role-dashboard select:focus-visible,.kc-role-dashboard input:focus-visible{outline:3px solid #0aada9;outline-offset:3px}
-.kc-role-dashboard>div:nth-child(2):has(input){gap:12px;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent}
+.kc-role-dashboard>div.bg-white.rounded-xl.shadow-sm:nth-child(2):has(input){gap:12px;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent}
 .kc-role-dashboard>div:nth-child(2):has(input)>div{min-height:44px;background:var(--crm-surface,#fff);border-color:var(--crm-border,#dce6e7);border-radius:10px;padding:8px 14px;min-width:180px}
 .kc-role-dashboard>div:nth-child(2) input{min-width:0;font-size:14px}
 .kc-role-dashboard>div:nth-child(2) select{background:var(--crm-surface,#fff);color:var(--crm-surface-ink,#172033);border-color:var(--crm-border,#dce6e7);min-width:150px;max-width:100%}
@@ -21,7 +21,7 @@
 .kc-role-dashboard .kc-dash-kpis>div>div>.min-w-0>p:first-child{font-size:14px;line-height:1.5;margin:0 0 10px;color:inherit}
 .kc-role-dashboard .kc-dash-kpis .text-2xl{font-size:30px;line-height:1.2;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:0;color:inherit;overflow-wrap:anywhere}
 .kc-role-dashboard .kc-dash-kpis>div>div>.min-w-0>p:nth-child(n+3){font-size:13px;line-height:1.6;margin-top:12px}
-.kc-role-dashboard .kc-dash-kpis>div:first-child{background:#087f7c;border-color:#087f7c;color:#fff}
+.kc-role-dashboard .kc-dash-kpis>div.bg-white.rounded-xl.shadow-sm:first-child{background:#087f7c;border-color:#087f7c;color:#fff}
 .kc-role-dashboard .kc-dash-kpis>div:first-child p{color:#fff!important}
 .kc-role-dashboard .kc-dash-kpis>div:first-child .shrink-0{background:#ffffff26!important}
 .kc-role-dashboard .kc-dash-kpis>div:first-child svg{color:#fff!important}
