@@ -10,7 +10,9 @@ export const WORKSPACE_PRESETS=[
  ['Asphalt','#66696B','#252729','#F5F6F7','#FFFFFF','#D4D6D8'],
  ['Teal Glow','#168B87','#092A2C','#F0FAFA','#FFFFFF','#65C8C5'],
  ['Electric Blue','#2D599A','#101828','#F0F6FC','#FFFFFF','#A6C7E3'],
- ['Indigo','#6552B8','#292440','#F7F5FC','#FFFFFF','#E2DCF1']
+ ['Indigo','#6552B8','#292440','#F7F5FC','#FFFFFF','#E2DCF1'],
+ ['Mint & Deep Green','#079F8C','#073F35','#F1FBF7','#FFFFFF','#B7E2D2'],
+ ['Midnight Violet','#635BFF','#27264F','#27284E','#F6F5FD','#B5AED6']
 ].map(([name,primary,sidebar,background,surface,border])=>({name,primary,sidebar,background,surface,border}));
 export const WORKSPACE_SHADOWS={none:'none',soft:'0 3px 12px rgba(15,23,42,0.08)',raised:'0 8px 24px rgba(15,23,42,0.16)'};
 export function validateWorkspace(input){

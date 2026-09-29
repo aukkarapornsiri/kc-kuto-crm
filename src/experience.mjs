@@ -1,4 +1,4 @@
-import {createWorkspaceTheme,WORKSPACE_SHADOWS} from './workspace-theme.mjs?v=20260927-hide-demo-notices';
+import {createWorkspaceTheme,WORKSPACE_SHADOWS} from './workspace-theme.mjs?v=20260929-two-palettes';
 // Editable source for the Settings extension. The original frontend is distributed as a bundle.
 export const DEFAULT_DESIGN = Object.freeze({primary:'#0AADA9',sidebar:'#172033',background:'#F7FAFA',font:'IBM Plex Sans Thai',fontSize:'14',radius:'12',density:'comfortable'});
 export const FONTS = ['IBM Plex Sans Thai','Anuphan','Inter','system'];
