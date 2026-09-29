@@ -4,7 +4,7 @@ try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
  const open=async()=>{await page.getByRole('button',{name:'ปรับพื้นที่ทำงานของฉัน',exact:true}).click();await page.getByRole('button',{name:'โหลดค่าส่วนตัวใหม่',exact:true}).waitFor();await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).waitFor();};
- await open();await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).check();assert.equal(await page.locator('.crm-preset-grid button').count(),11);
+ await open();await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).check();assert.equal(await page.locator('.crm-preset-grid button').count(),13);
  await page.getByRole('button',{name:'Clear Sky',exact:true}).click();
  await page.getByLabel('พื้นกล่อง',{exact:true}).fill('#FFF4E8');await page.getByLabel('เส้นกรอบ',{exact:true}).fill('#CC8844');
  await page.getByLabel('ความโค้งของกล่อง',{exact:true}).selectOption('24');await page.getByLabel('มิติและเงา',{exact:true}).selectOption('raised');
@@ -19,6 +19,11 @@ try{for(const width of [1440,390]){
  await page.getByRole('button',{name:'ยกเลิกสีส่วนตัวที่แก้ไข',exact:true}).click();await page.screenshot({path:`test-artifacts/workspace-theme-${width}.png`,fullPage:true});
  await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'hidden'});assert.equal(await page.getByRole('dialog').count(),0);
  await page.reload();await open();assert.equal(await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).isChecked(),true);assert.equal(await page.getByLabel('พื้นกล่อง',{exact:true}).inputValue(),'#FFF4E8');assert.deepEqual(await snapshot(),saved);
+ await page.getByRole('button',{name:'Mint & Deep Green',exact:true}).click();assert.equal(await page.getByLabel('สีหลักและปุ่ม',{exact:true}).inputValue(),'#079F8C');assert.equal(await page.getByLabel('แถบเมนู',{exact:true}).inputValue(),'#073F35');
+ await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.waitForFunction(()=>document.documentElement.style.getPropertyValue('--crm-primary')==='#079F8C');await page.screenshot({path:`test-artifacts/workspace-mint-${width}.png`});
+ await page.getByRole('button',{name:'Midnight Violet',exact:true}).click();assert.equal(await page.getByLabel('พื้นหลัง',{exact:true}).inputValue(),'#27284E');assert.equal(await page.locator('.crm-personal-preview').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(39, 40, 78)');
+ await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.waitForFunction(()=>document.documentElement.style.getPropertyValue('--crm-primary')==='#635BFF');await page.screenshot({path:`test-artifacts/workspace-violet-${width}.png`});
+ await page.reload();await open();assert.equal(await page.getByLabel('สีหลักและปุ่ม',{exact:true}).inputValue(),'#635BFF');assert.equal(await page.getByLabel('แถบเมนู',{exact:true}).inputValue(),'#27264F');
  await page.getByRole('button',{name:'คืนค่าตามบริษัท',exact:true}).click();await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.getByRole('status').filter({hasText:'บันทึกสีส่วนตัว'}).waitFor();assert.equal(await page.locator('html').getAttribute('data-crm-personal'),null);
  await page.reload();await open();assert.equal(await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).isChecked(),false);assert.equal(await page.locator('html').getAttribute('data-crm-personal'),null);
  assert.deepEqual(errors,[]);await page.close();
