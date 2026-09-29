@@ -46,3 +46,7 @@
  .kc-role-dashboard .bg-white.rounded-xl.shadow-sm:is(.p-4,.p-5){padding:16px}
  .kc-role-dashboard>div:nth-child(2) select{flex:1;min-width:130px}
 }
+@media screen{
+ html[data-crm-personal=true] .kc-app .kc-role-dashboard .kc-dash-kpis>div:first-child{background-color:#087f7c!important;border-color:#087f7c!important;color:#fff}
+ html[data-crm-personal=true] .kc-app .kc-role-dashboard .kc-dash-kpis>div:first-child p{color:#fff!important}
+}
