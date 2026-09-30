@@ -1,4 +1,4 @@
-import {createAccountList} from './account-list-view.mjs?v=20260930-customers';
+import {createAccountList} from './account-list-view.mjs?v=20260930-customer-card';
 import {OPTIONS} from './internal-options.mjs';
 import {ENTITIES,LABELS,MASTER_FIELDS,RELATIONS,fieldsFor,validateRecord,quoteTotals,filterRows,summarizePipeline} from './internal-model.mjs?v=20260930-customers';
 import {PROFILE_LABELS,profileDraft,reportingOptions,hydrateRelations,convertDemoLead} from './record-profile.mjs?v=20260930-customers';
