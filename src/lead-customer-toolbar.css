@@ -5,3 +5,69 @@
   .crm-internal:is([data-entity="leads"],[data-entity="customers"]) .crm-list-primary-actions input{flex-basis:100%;width:100%}
   .crm-internal:is([data-entity="leads"],[data-entity="customers"]) .crm-list-view-controls button{flex:none}
 }
+
+/* Keep list counts and adjacent controls on the same visual baseline on desktop. */
+@media(min-width:761px){
+  .crm-internal:is(
+    [data-entity="leads"],
+    [data-entity="customers"],
+    [data-entity="contacts"],
+    [data-entity="opportunities"],
+    [data-entity="tickets"],
+    [data-entity="activities"],
+    [data-entity="documents"],
+    [data-entity="prices"],
+    [data-entity="quotations"],
+    [data-entity="contracts"],
+    [data-entity="branches"],
+    [data-entity="assets"],
+    [data-entity="templates"],
+    [data-entity="knowledge"]
+  ) :is(.crm-contact-toolbar,.crm-account-toolbar,.crm-sales-toolbar,.crm-service-toolbar){
+    align-items:center;
+  }
+
+  .crm-internal:is(
+    [data-entity="leads"],
+    [data-entity="customers"],
+    [data-entity="contacts"],
+    [data-entity="opportunities"],
+    [data-entity="tickets"],
+    [data-entity="activities"],
+    [data-entity="documents"],
+    [data-entity="prices"],
+    [data-entity="quotations"],
+    [data-entity="contracts"],
+    [data-entity="branches"],
+    [data-entity="assets"],
+    [data-entity="templates"],
+    [data-entity="knowledge"]
+  ) :is(.crm-contact-count,.crm-account-count,.crm-sales-count,.crm-service-count){
+    display:flex;
+    align-items:center;
+    min-height:42px;
+    margin-top:0;
+    margin-bottom:0;
+    line-height:1.25;
+  }
+
+  .crm-internal:is(
+    [data-entity="leads"],
+    [data-entity="customers"],
+    [data-entity="contacts"],
+    [data-entity="opportunities"],
+    [data-entity="tickets"],
+    [data-entity="activities"],
+    [data-entity="documents"],
+    [data-entity="prices"],
+    [data-entity="quotations"],
+    [data-entity="contracts"],
+    [data-entity="branches"],
+    [data-entity="assets"],
+    [data-entity="templates"],
+    [data-entity="knowledge"]
+  ) :is(.crm-contact-tools,.crm-account-tools,.crm-sales-tools,.crm-service-tools){
+    align-items:center;
+    min-height:42px;
+  }
+}
