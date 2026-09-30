@@ -1,0 +1,1 @@
+ALTER TABLE public.crm_workspace_preferences ADD COLUMN text_color text CHECK (text_color ~ '^#[0-9A-Fa-f]{6}$'), ADD COLUMN link_color text CHECK (link_color ~ '^#[0-9A-Fa-f]{6}$'), ADD COLUMN button_text text CHECK (button_text ~ '^#[0-9A-Fa-f]{6}$');
