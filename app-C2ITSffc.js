@@ -1,6 +1,6 @@
 import {LoginLayout as KCLoginLayout} from './src/login-layout.mjs?v=20260930-login';
 import {createInternalReports} from './src/internal-reports.mjs?v=20260927-hide-demo-notices';
-import {createInternalWorkspace,createInternalQuickMenu} from './src/internal-workspace.mjs?v=20260930-lead-activity';
+import {createInternalWorkspace,createInternalQuickMenu} from './src/internal-workspace.mjs?v=20260930-documents';
 import {createSidebarToggle} from "./src/sidebar-toggle.mjs?v=20260927-layout";
 import {createGroupedNavigation} from "./src/grouped-navigation.mjs?v=20260927-service";
 import {createContextNavigation} from "./src/context-navigation.mjs?v=20260930-customers";
