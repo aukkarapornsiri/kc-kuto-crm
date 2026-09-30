@@ -1,5 +1,5 @@
 import {OPTIONS} from './internal-options.mjs';
-import {fullPersonName} from './record-profile.mjs';
+import {fullPersonName} from './record-profile.mjs?v=20260930-record-profile-v2';
 export const ENTITIES={
  branches:{table:'crm_branches',module:'customers',title:['สาขาลูกค้า','Customer branches'],name:'name',fields:'name*,code,customer_id@,address~,phone,status',statuses:['active','inactive']},
  prices:{table:'crm_price_items',module:'quotations',title:['รายการสินค้าและราคา','Products and prices'],name:'name',fields:'name*,code*,category,unit,price#,cost#,description~,status',statuses:['active','inactive']},
