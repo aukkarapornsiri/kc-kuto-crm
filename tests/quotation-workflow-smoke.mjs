@@ -47,5 +47,8 @@ try{for(const width of [1440,390]){
  if(width===1440)await page.pdf({path:'test-artifacts/QA-E2E-quotation.pdf',format:'A4',printBackground:true,preferCSSPageSize:true});
  await detail('quotations').getByRole('button',{name:'Edit',exact:true}).click();await form.getByLabel('Notes',{exact:true}).fill('UNSAVED');await page.keyboard.press('Escape');await detail('quotations').waitFor({state:'hidden'}).catch(()=>{});
  await root('quotations').getByRole('button',{name:/^Details /}).first().click();assert.ok(!(await print.innerText()).includes('UNSAVED'));
+ await open('Accounts','Account List');await page.emulateMedia({media:'print'});
+ assert.equal(await root('customers').evaluate(el=>getComputedStyle(el).visibility),'visible','quotation print rules must not hide other pages');
+ assert.ok(await root('customers').isVisible(),'other pages remain printable');
  assert.deepEqual(errors,[]);console.log(`PASS ${width}px: QA/E2E customer-contact-opportunity-quotation links, modal, VAT/WHT, edit/readback, preview/PDF, cancel and Account 360 route (demo UI; database verified separately)`);await page.close();
 }}finally{await browser.close();}
