@@ -29,9 +29,9 @@ test('groups expand and collapse without changing module destinations',()=>{
   globalThis.document={documentElement:{dataset:{}}};
   const service=buttons(render()).find(button=>button.props['aria-label']==='Service');
   service.props.onClick();
-  assert.deepEqual(shownModules(render()).filter(id=>['assets','tickets'].includes(id)),['assets','tickets']);
+  assert.deepEqual(shownModules(render()).filter(id=>['assets','tickets'].includes(id)),['tickets','assets']);
   buttons(render()).find(button=>button.props['aria-label']==='Service').props.onClick();
   assert.equal(shownModules(render()).includes('assets'),false);
-  assert.equal(buttons(render('th')).find(button=>button.props['aria-label']==='งานบริการ').props['aria-expanded'],false);
+  assert.equal(buttons(render('th')).find(button=>button.props['aria-label']==='บริการ').props['aria-expanded'],false);
   delete globalThis.document;
 });
