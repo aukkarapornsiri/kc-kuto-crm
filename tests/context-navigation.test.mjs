@@ -8,7 +8,7 @@ const fixture=[
   {id:'dashboard',label:label('Dashboard')},
   {id:'leads',label:label('Leads'),subs:[page('lead-list','Lead Inbox')]},
   {id:'contacts',label:label('Contacts'),subs:[page('contact-list','Contact List')]},
-  {id:'customers',label:label('Customers'),subs:[page('customer-list','Customer List'),page('accounts','Accounts'),page('branches','Branches',false)]},
+  {id:'customers',label:label('Accounts'),subs:[page('customer-list','Account List'),page('accounts','Accounts'),page('branches','Branches',false)]},
   {id:'opportunities',label:label('Opportunities'),subs:[page('pipeline','Pipeline Kanban'),page('opp-list','Opportunity List')]},
   {id:'quotations',label:label('Quotations'),subs:[page('quotes','Quotation List'),page('quot-pricebook','Price Book')]},
   {id:'contracts',label:label('Contracts & Renewal'),subs:[page('contracts','All Contracts')]},
@@ -42,3 +42,4 @@ test('context tabs expose grouped modules and direct module pages',()=>{
   assert.deepEqual(direct.items.map(item=>item.page.id),['customer-list','accounts']);
   assert.deepEqual(direct.extra.map(item=>item.id),['branches']);
 });
+
