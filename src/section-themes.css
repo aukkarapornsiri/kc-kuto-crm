@@ -2,7 +2,7 @@
    surfaces quiet while using a darker companion color for readable text. */
 .kc-app{--kc-section-icon:#73d2fa;--kc-section-action:#13729c}
 .kc-app:has(.kc-rail-item[data-section="leads"][data-active="true"]){--kc-section-icon:#ffbd6e;--kc-section-action:#a65d13}
-.kc-app:has(.kc-rail-item[data-section="contacts"][data-active="true"]){--kc-section-icon:#d1adff;--kc-section-action:#8050b3}
+.kc-app:has(.kc-rail-item[data-section="contacts"][data-active="true"]){--kc-section-icon:#ffda80;--kc-section-action:#8d6100}
 .kc-app:has(.kc-rail-item[data-section="customers"][data-active="true"]){--kc-section-icon:#95bfff;--kc-section-action:#2e64aa}
 .kc-app:has(.kc-rail-item[data-section="sales"][data-active="true"]){--kc-section-icon:#ffda80;--kc-section-action:#8d6100}
 .kc-app:has(.kc-rail-item[data-section="service"][data-active="true"]){--kc-section-icon:#75e4d0;--kc-section-action:#087b70}
