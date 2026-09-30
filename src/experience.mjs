@@ -1,4 +1,4 @@
-import {createWorkspaceTheme,WORKSPACE_SHADOWS} from './workspace-theme.mjs?v=20260929-two-palettes';
+import {createWorkspaceTheme,WORKSPACE_SHADOWS} from './workspace-theme.mjs?v=20260930-independent-colors';
 // Editable source for the Settings extension. The original frontend is distributed as a bundle.
 export const DEFAULT_DESIGN = Object.freeze({primary:'#0AADA9',sidebar:'#172033',background:'#F7FAFA',font:'IBM Plex Sans Thai',fontSize:'14',radius:'12',density:'comfortable'});
 export const FONTS = ['IBM Plex Sans Thai','Anuphan','Inter','system'];
@@ -35,7 +35,7 @@ export function createExperience({React,client,useApp,palette}) {
   function applyDesign(input) {
     const root=document.documentElement;
     if(!input) {
-      for(const name of ['primary','sidebar','sidebar-ink','background','font','font-size','radius','row-padding','surface','surface-ink','background-ink','primary-ink','border','shadow'])root.style.removeProperty('--crm-'+name);
+      for(const name of ['primary','sidebar','sidebar-ink','background','font','font-size','radius','row-padding','surface','surface-ink','background-ink','primary-ink','border','shadow','link-ink'])root.style.removeProperty('--crm-'+name);
       delete root.dataset.crmPersonal;palette.teal='#0EA5A0';return;
     }
     const value=validateDesign(input);
@@ -50,13 +50,13 @@ export function createExperience({React,client,useApp,palette}) {
   function repaint(){
     applyDesign(companyDesign);
     const root=document.documentElement;
-    for(const name of ['surface','surface-ink','background-ink','primary-ink','border','shadow'])root.style.removeProperty('--crm-'+name);
+    for(const name of ['surface','surface-ink','background-ink','primary-ink','border','shadow','link-ink'])root.style.removeProperty('--crm-'+name);
     delete root.dataset.crmPersonal;
     document.getElementById('crm-personal-actions')?.remove();
     if(personalDesign?.enabled){
       const companyPrimary=palette.teal;
       applyDesign({...DEFAULT_DESIGN,...companyDesign,primary:personalDesign.primary,sidebar:personalDesign.sidebar,background:personalDesign.background,radius:personalDesign.radius==='0'||personalDesign.radius==='24'?'12':personalDesign.radius});
-      const vars={surface:personalDesign.surface,'surface-ink':readableInk(personalDesign.surface),'background-ink':readableInk(personalDesign.background),'primary-ink':readableInk(personalDesign.primary),border:personalDesign.border,shadow:WORKSPACE_SHADOWS[personalDesign.shadow],radius:personalDesign.radius+'px'};
+      const vars={surface:personalDesign.surface,'surface-ink':personalDesign.text_color||readableInk(personalDesign.surface),'background-ink':personalDesign.text_color||readableInk(personalDesign.background),'primary-ink':personalDesign.button_text||readableInk(personalDesign.primary),'link-ink':personalDesign.link_color||personalDesign.primary,border:personalDesign.border,shadow:WORKSPACE_SHADOWS[personalDesign.shadow],radius:personalDesign.radius+'px'};
       for(const [key,value] of Object.entries(vars))root.style.setProperty('--crm-'+key,value);
       root.dataset.crmPersonal='true';
       // Personal colors are a screen-only layer; retain company palette for document generation.
