@@ -10,3 +10,24 @@ html[data-crm-personal=true] .kc-app .crm-master-table .crm-task-empty button{co
 .crm-internal[data-entity=leads] .crm-master-table .crm-task-empty button.crm-lead-empty-create{color:#fff!important;font-size:14px;font-weight:600;min-width:112px;min-height:42px}
 
 .crm-internal[data-entity=quotations] .crm-master-table .crm-task-empty button.crm-quotation-empty-create{display:inline-flex;align-items:center;justify-content:center;min-width:150px;min-height:42px;padding:9px 18px;white-space:nowrap;color:#fff!important;font-size:14px;font-weight:600;line-height:1.2}
+/* Shared empty-state CTA: always show the page-specific action text and follow the active menu accent. */
+.kc-app .crm-empty-create{
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  min-width:112px;
+  min-height:42px;
+  padding:9px 18px!important;
+  border:1px solid var(--kc-section-action,#8d6100)!important;
+  border-radius:10px;
+  background:var(--kc-section-action,#8d6100)!important;
+  color:#fff!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  line-height:1.2;
+  white-space:nowrap;
+  text-indent:0;
+  opacity:1;
+}
+.kc-app .crm-empty-create:disabled{opacity:.55}
+
