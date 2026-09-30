@@ -55,3 +55,12 @@
 .crm-contact-empty p{margin:0;font-size:13px}
 .crm-contact-empty button{border:0;border-radius:10px;background:#0aada9;color:#fff;padding:9px 17px}
 @media(max-width:760px){.crm-contact-header{padding:16px}.crm-contact-view-button{font-size:21px}.crm-contact-primary-actions{width:100%;margin-left:0}.crm-contact-primary-actions button{flex:1}.crm-contact-toolbar{align-items:flex-start;flex-direction:column}.crm-contact-tools{width:100%;margin-left:0}.crm-contact-search{flex:1;width:auto}.crm-contact-count{order:1}.crm-contact-filters>select{max-width:100%}}
+/* Contacts belongs to the sales workflow: keep the empty-state card on the Sales accent. */
+.kc-app .crm-internal[data-entity=contacts] .crm-contact-empty>span{
+  background:color-mix(in srgb,var(--kc-section-icon,#ffda80) 28%,white);
+  color:var(--kc-section-action,#8d6100);
+}
+.kc-app .crm-internal[data-entity=contacts] .crm-contact-empty h2{
+  color:var(--kc-section-action,#8d6100)!important;
+}
+
