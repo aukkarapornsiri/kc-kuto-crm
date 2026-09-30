@@ -1,0 +1,66 @@
+KC KuTo CRM verification — 2026-10-01
+
+Baseline: main de0f2d800b90a0a1d24b2d418e7efd6a1f3dea37.
+Account 360 reference: release/account-site-20260922,
+a926cbe36e552512e460e232a28224d9cc040cb1. Reference checkout unchanged.
+
+Implemented
+- Quotation dialog, customer billing prefill, editable document fields,
+  line items, configurable VAT/WHT and A4 preview/print with signature fields.
+- Related customer/contact/opportunity navigation and immediate approval refresh.
+- Empty opportunity board create-button regression fix.
+- Database calculation now respects configured rates (previously fixed 7% VAT,
+  zero WHT/net despite persisted rate fields). Composite foreign keys prevent
+  cross-customer quotation/contact/opportunity links, including parent moves.
+- Linked records require a customer; quotation validity cannot precede issue date.
+- Existing persisted quotations remain authoritative in document previews.
+
+Executed locally
+- 48 source regression tests passed; source syntax and diff whitespace passed.
+- All 11 browser smoke suites passed, including quotation workflow at 1440px
+  and 390px. QA/E2E customer/contact/opportunity/quotation create, edit, Reload
+  readback, related navigation, cancel, totals and document preview passed.
+  These browser suites use demo mode: they do NOT prove authenticated HTTP
+  persistence or browser-refresh persistence against Supabase.
+- PDF visually checked: one A4 page, complete totals/signatures, no blank page.
+- Real Supabase rollback transactions passed quotation-e2e-rls.sql,
+  internal-processes-rls.sql and record-profile-rls.sql. SQL sets authenticated
+  role/claims for existing test principals; this does NOT exercise browser login.
+  Coverage includes totals/rate edits, invalid inputs, optimistic stale writes,
+  FK isolation, cycles, versions, ordered approval, self-approval rejection,
+  locked financial fields, sent/accepted transitions, conversion/renewal and
+  anonymous isolation. Every test transaction rolled back.
+- Account 360 reference source tests: 171 passed (read-only run).
+
+Applied database migrations
+- quotation_account360_bridge was already applied before this work; its exact
+  SQL was recovered into source, not reapplied.
+- quotation_e2e_integrity and quotation_e2e_constraints applied successfully.
+  Core CRM RLS remains enabled; no privilege expansion or business-row rewrite.
+- Existing core records unchanged, before/after count and sorted-row MD5:
+  customers     3  be0a56783254c987375929a93c4b0140
+  contacts      2  576d72f90f7d2d12f8306ab7d885c932
+  opportunities 2  7b67e200509415edca576053337a3f41
+  quotations    2  f868a164e24e7b981bf5e4ccd72c6dc9
+
+Remaining gates — do not describe this as complete production E2E
+- CRM published session is Demo Mode; authenticated browser/database workflow
+  requires a signed-in test account. No credentials requested or fabricated.
+- Account 360 sign-in returned HTTP 400, then security verification. Actual
+  quotation creation there remains unverified. Reference app/page.tsx uses
+  chatGPTSignInPath("/"), so preservation of ?page=ar across login also needs work.
+- Current Account 360 reference accepts page=ar but has no CRM quotation-prefill
+  receiver. CRM link explicitly offers manual handoff; no prefill is claimed.
+- Sites workflow helper became unavailable in the installed plugin directory;
+  no Account 360 source modification or deployment was attempted without its
+  required workflow. Reference source is untouched.
+- Supabase advisor reports unrelated public.example without RLS. This table is
+  outside CRM and was not changed. Review separately before shared-project use.
+- Frontend changes are on the review branch until merged/deployed. Database
+  migrations above are already applied. CI results are recorded on the PR.
+
+Reproduce
+  node --test tests/*.test.mjs
+  node tests/quotation-workflow-smoke.mjs
+  Run each SQL regression as a rollback transaction in the intended Supabase
+  project with an administrative test executor. Never omit BEGIN/ROLLBACK.

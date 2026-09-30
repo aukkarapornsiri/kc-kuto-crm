@@ -1,0 +1,40 @@
+import {quotationTotals,ACCOUNT360_QUOTATIONS_URL} from './quotation-model.mjs';
+export function createQuotationDocument({React}) {
+ const h=React.createElement;
+ return function QuotationDocument({record,company={},lang='th'}) {
+  const t=(th,en)=>lang==='th'?th:en,money=n=>Number(n||0).toLocaleString(lang==='th'?'th-TH':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  let totals;try{totals=quotationTotals(record.items,record.tax_rate??7,record.wht_rate??0);}catch{totals=record;}
+  // Persisted/approved amounts are authoritative; never silently reprice history.
+  if(record.id)totals={...totals,...record};
+  const address=typeof company.company_details==='string'?company.company_details:company.company_details?.[lang==='th'?'address_th':'address_en']||company.company_details?.address_th||'';
+  const info=(name,value)=>h('div',{key:name},h('span',null,name),h('strong',null,value||'—'));
+  return h('article',{id:'crm-quotation-print',className:'crm-quotation-sheet',lang},
+   h('header',{className:'crm-quote-brand'},h('div',null,h('h2',null,company.company_name||'KC KuTo CRM'),h('p',null,company.company_name_en),h('p',null,address),h('p',null,[company.phone,company.email,company.website].filter(Boolean).join(' • ')),h('p',null,t('เลขผู้เสียภาษี ','Tax ID ')+(company.tax_id||'—'))),h('div',null,h('h1',null,t('ใบเสนอราคา','Quotation')),h('p',null,record.status||'draft'),info(t('เลขที่เอกสาร','Document no.'),record.code||t('ร่าง — ออกเลขเมื่อบันทึก','Draft — numbered on save')),info(t('วันที่','Issue date'),record.issue_date),info(t('วันครบกำหนด','Valid until'),record.valid_until))),
+   h('section',{className:'crm-quote-parties'},h('div',null,h('h3',null,t('ข้อมูลลูกค้า','Customer information')),h('strong',null,record.customer_name),h('p',null,record.counterparty_address),info(t('เลขผู้เสียภาษี','Tax ID'),record.counterparty_tax_id),info(t('ผู้ติดต่อ','Contact'),record.contact_name)),h('div',null,h('h3',null,t('ข้อมูลผู้จัดทำ','Preparer contact')),info(t('ผู้จัดทำ','Prepared by'),record.prepared_by||record.owner_name),info(t('อีเมล','Email'),record.prepared_by_email),info(t('โทรศัพท์','Phone'),record.prepared_by_phone),info(t('โครงการ','Project'),record.project_name),info(t('เครดิต (วัน)','Credit term (days)'),String(record.payment_terms??30)))),
+   h('div',{className:'crm-quote-table-wrap'},h('table',{className:'crm-quote-document-table'},h('thead',null,h('tr',null,...[t('รายละเอียด','Description'),t('จำนวน','Qty'),t('หน่วย','Unit'),t('ราคา/หน่วย','Unit price'),t('ส่วนลด','Discount'),t('มูลค่า','Amount')].map(x=>h('th',{key:x},x)))),h('tbody',null,(totals.items||[]).map((x,i)=>h('tr',{key:i},h('td',null,x.name,h('p',null,x.desc)),h('td',null,x.qty),h('td',null,x.unit),h('td',null,money(x.price)),h('td',null,money(x.discount)),h('td',null,money(x.total))))))),
+   h('section',{className:'crm-quote-bottom'},h('div',null,h('h3',null,t('หมายเหตุ / เงื่อนไข','Notes / terms')),h('p',null,record.note),h('p',null,record.payment_instructions)),h('dl',null,...[[t('รวมก่อนส่วนลด','Subtotal'),totals.subtotal],[t('ส่วนลด','Discount'),totals.discount],['VAT '+(record.tax_rate??7)+'%',totals.vat],[t('รวมทั้งสิ้น','Total'),totals.total],['WHT '+(record.wht_rate??0)+'%',totals.withholding_tax],[t('ยอดชำระสุทธิ','Net payable'),totals.net_total]].map(([k,v])=>h('div',{key:k},h('dt',null,k),h('dd',null,money(v)+' THB'))))),
+   h('footer',{className:'crm-quote-signatures'},...[[t('ผู้จัดทำ','Prepared by'),record.prepared_by||record.owner_name],[t('ผู้ตรวจสอบ','Reviewed by'),''],[t('ผู้อนุมัติ','Approved by'),'']].map(([k,v])=>h('div',{key:k},h('p',null,v||' '),h('span',null,k)))));
+ };
+}
+export function createQuotationEditor({React}) {
+ const h=React.createElement;
+ return function QuotationEditor({editing,setEditing,formField,fields,lookup,busy,error,save,close,lang,company}) {
+  const ref=React.useRef(null),t=(th,en)=>lang==='th'?th:en;
+  React.useEffect(()=>{ref.current?.showModal();return()=>ref.current?.close();},[]);
+  const section=(title,keys)=>h('section',{className:'crm-profile-section'},h('h3',null,title),h('div',{className:'crm-profile-grid'},keys.map(k=>formField(fields.find(f=>f.key===k)))));
+  let totals;try{totals=quotationTotals(editing.items,editing.tax_rate,editing.wht_rate);}catch{}
+  const button=(name,onClick)=>h('button',{type:'button',disabled:busy,onClick},name);
+  return h('dialog',{ref,className:'crm-profile-dialog crm-quotation-dialog','aria-label':t('ใบเสนอราคา','Quotation'),onCancel:e=>{e.preventDefault();if(!busy)close();}},h('form',{'aria-label':t('แบบฟอร์มรายการ','Record form'),onSubmit:save},
+   h('header',{className:'crm-profile-header'},h('div',null,h('h2',null,t(editing.id?'แก้ไขใบเสนอราคา':'สร้างใบเสนอราคา',editing.id?'Edit Quotation':'Create Quotation')),h('p',null,company?.company_name||'KC KuTo CRM')),button('×',close)),
+   h('div',{className:'crm-profile-body'},error&&h('p',{role:'alert',className:'crm-error'},error),h('p',null,t('เลขที่เอกสาร: ','Document no.: ')+(editing.code||t('ออกเลขเมื่อบันทึก','Assigned on save'))),
+    section(t('ข้อมูลเอกสาร','Document information'),['issue_date','valid_until','document_language','project_name']),
+    section(t('ข้อมูลลูกค้า','Customer information'),['customer_id','contact_id','opportunity_id','counterparty_address','counterparty_tax_id']),
+    section(t('ข้อมูลผู้จัดทำ','Preparer contact'),['owner_id','prepared_by','prepared_by_email','prepared_by_phone']),
+    h('section',{className:'crm-profile-section'},h('h3',null,t('สินค้าและบริการ','Items')),h('label',{className:'crm-field'},t('เลือกจากราคาสินค้า','Choose price item'),h('select',{'aria-label':t('เลือกจากราคาสินค้า','Choose price item'),value:'',onChange:e=>{const item=lookup.prices?.find(x=>x.id===e.target.value);if(item)setEditing(v=>({...v,items:[...v.items.filter(x=>x.name),{name:item.name,desc:item.description,qty:1,price:item.price,discount:0,unit:item.unit}]}));}},h('option',{value:''},'—'),(lookup.prices||[]).filter(x=>x.status==='active').map(x=>h('option',{key:x.id,value:x.id},x.name)))),editing.items.map((item,i)=>h('div',{className:'crm-quote-edit-line',key:i},...['name','desc','qty','unit','price','discount'].map((k,j)=>h('label',{className:'crm-field',key:k},h('span',null,[t('รายการ','Description'),t('รายละเอียด','Details'),t('จำนวน','Qty'),t('หน่วย','Unit'),t('ราคา/หน่วย','Unit price'),t('ส่วนลด (บาท)','Discount (THB)')][j]),h('input',{'aria-label':k+' '+(i+1),value:item[k]??'',type:['qty','price','discount'].includes(k)?'number':'text',min:k==='qty'?0.000001:0,step:'any',required:['name','qty','price'].includes(k),disabled:busy,onChange:e=>setEditing(v=>({...v,items:v.items.map((x,n)=>i===n?{...x,[k]:e.target.value}:x)}))}))),button(t('ลบแถว','Remove row'),()=>setEditing(v=>({...v,items:v.items.filter((_,n)=>n!==i)}))))),button(t('เพิ่มสินค้า','Add item'),()=>setEditing(v=>({...v,items:[...v.items,{name:'',qty:1,price:0,discount:0,unit:'Unit'}]})))),
+    section(t('ภาษีและเงื่อนไขการชำระเงิน','Tax and payment terms'),['tax_rate','wht_rate','payment_terms','payment_instructions','note']),
+    h('label',{className:'crm-field'},t('ใช้ข้อความจากแม่แบบ','Apply template text'),h('select',{'aria-label':t('ใช้ข้อความจากแม่แบบ','Apply template text'),value:'',onChange:e=>{const item=lookup.templates?.find(x=>x.id===e.target.value);if(item)setEditing(v=>({...v,note:[item.header,item.description,item.footer].filter(Boolean).join('\n')}));}},h('option',{value:''},'—'),(lookup.templates||[]).filter(x=>x.status==='active').map(x=>h('option',{key:x.id,value:x.id},x.name)))),
+    h('p',{'aria-live':'polite'},totals?`VAT: ${totals.vat.toFixed(2)} • WHT: ${totals.withholding_tax.toFixed(2)} • ${t('ยอดชำระสุทธิ','Net payable')}: ${totals.net_total.toFixed(2)} THB`:t('กรอกสินค้าและจำนวนให้ครบ','Complete item descriptions and quantities'))),
+   h('footer',{className:'crm-profile-footer'},button(t('ยกเลิก','Cancel'),close),h('button',{type:'submit',className:'crm-save',disabled:busy},t('บันทึก','Save')))));
+ };
+}
+export {ACCOUNT360_QUOTATIONS_URL};

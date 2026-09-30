@@ -39,6 +39,12 @@ DO $$DECLARE r jsonb;BEGIN
  BEGIN INSERT INTO public.crm_approval_policies(name,approver_ids) VALUES('Denied',ARRAY[current_setting('test.admin')::uuid]);RAISE EXCEPTION 'Member policy write';EXCEPTION WHEN insufficient_privilege THEN NULL;END;
 END $$;
 SELECT set_config('request.jwt.claim.sub',current_setting('test.admin'),true);
+DO $$BEGIN
+ UPDATE public.quotations SET status='sent',updated_at=clock_timestamp() WHERE id=current_setting('test.quote')::uuid;
+ IF (SELECT status FROM public.quotations WHERE id=current_setting('test.quote')::uuid)<>'sent' THEN RAISE EXCEPTION 'Sent status not saved';END IF;
+ UPDATE public.quotations SET status='accepted',updated_at=clock_timestamp() WHERE id=current_setting('test.quote')::uuid;
+ IF (SELECT status FROM public.quotations WHERE id=current_setting('test.quote')::uuid)<>'accepted' THEN RAISE EXCEPTION 'Accepted status not saved';END IF;
+END $$;
 DO $$DECLARE test_record_id uuid;c uuid;r record;BEGIN
  INSERT INTO public.customers(name,type,tier,status) VALUES('QA forms','Company','Standard','Active') RETURNING customers.id INTO c;
  INSERT INTO public.contacts(name,customer_id,company,role,influence_level,status) VALUES('QA contact',c,'QA forms','User','medium','active');
