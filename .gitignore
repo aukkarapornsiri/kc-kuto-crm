@@ -1,0 +1,4 @@
+node_modules/
+test-artifacts/
+.qa-tmp/
+supabase/.temp/
