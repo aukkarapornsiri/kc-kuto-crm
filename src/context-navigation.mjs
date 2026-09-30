@@ -2,7 +2,7 @@ import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs?v=2
 
 const RAIL_LABELS={
   dashboard:{th:'หน้าหลัก',en:'Home'},leads:{th:'ลีด',en:'Leads'},
-  contacts:{th:'ผู้ติดต่อ',en:'Contacts'},customers:{th:'ลูกค้า',en:'Accounts'},
+  contacts:{th:'ผู้ติดต่อ',en:'Contacts'},customers:{th:'บัญชี',en:'Accounts'},
   sales:{th:'การขาย',en:'Sales'},service:{th:'บริการ',en:'Service'},
   activities:{th:'กิจกรรม',en:'Activities'},documents:{th:'เอกสาร',en:'Documents'},
   insights:{th:'วิเคราะห์',en:'Analytics'},settings:{th:'ตั้งค่า',en:'Settings'},
@@ -135,3 +135,4 @@ export function createContextNavigation({React,logo,useApp}){
 
   return {PrimaryRail,ContextNav};
 }
+

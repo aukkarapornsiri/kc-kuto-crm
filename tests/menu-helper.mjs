@@ -1,5 +1,5 @@
 const railFor={
-  Dashboard:'Home',Leads:'Leads',Contacts:'Contacts',Customers:'Accounts',
+  Dashboard:'Home',Leads:'Leads',Contacts:'Contacts',Accounts:'Accounts',
   Opportunities:'Sales',Quotations:'Sales','Contracts & Renewal':'Sales',
   'Assets / Installed Base':'Service','Tickets / Service Desk':'Service',
   Activities:'Activities',Documents:'Documents',

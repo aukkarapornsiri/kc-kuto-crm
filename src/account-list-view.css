@@ -1,0 +1,52 @@
+.crm-internal[data-entity=customers]{max-width:none}
+.crm-account-list{--account-accent:var(--kc-section-action,#2e64aa);color:var(--crm-surface-ink,#203550)}
+.crm-account-header{display:flex;align-items:center;gap:15px;min-height:108px;padding:18px 15px 22px;flex-wrap:wrap}
+.crm-account-icon{display:grid;place-items:center;width:45px;height:45px;flex:none;border-radius:13px;background:linear-gradient(145deg,#78b6ff,#4775db);color:white;box-shadow:0 5px 14px #4775db25}
+.crm-account-title{flex:1;min-width:200px}.crm-account-title>span{font-size:12px;color:#62758d}
+.crm-account-view-control{display:flex;align-items:center;gap:15px;position:relative;width:max-content;max-width:100%}
+.crm-account-view-control h1{margin:2px 0;font-size:26px;line-height:1.3}
+.crm-account-view-button{font:inherit;font-weight:650;color:#163352;border:0;background:transparent;padding:2px 0;text-align:left}
+.crm-account-pin{display:grid;place-items:center;width:30px;height:30px;border:1px solid #d3deee;border-radius:50%;background:white;color:var(--account-accent)}
+.crm-account-pin[aria-pressed=true]{background:#e8f1ff;border-color:#a9c9f5}
+.crm-account-view-menu{position:absolute;z-index:60;left:0;top:calc(100% + 9px);width:280px;max-width:calc(100vw - 50px);padding:7px;background:var(--crm-surface,#fff);border:1px solid #d6e0ef;border-radius:12px;box-shadow:0 12px 32px #183b6429}
+.crm-account-view-menu button{display:block;width:100%;padding:12px 14px;text-align:left;font-size:14px;border-radius:7px;color:#244669;background:transparent}
+.crm-account-view-menu button:hover,.crm-account-view-menu button[aria-selected=true]{background:#eaf2ff;color:var(--account-accent)}
+.crm-account-actions{display:flex;align-items:center;margin-left:auto;flex-wrap:wrap;gap:0}
+.crm-account-actions button{min-height:39px;padding:8px 17px;border:1px solid #bdcce0;margin-left:-1px;background:var(--crm-surface,#fff);color:var(--account-accent);font:inherit;font-size:13px;font-weight:600}
+.crm-account-actions button:first-child{border-radius:22px 0 0 22px;margin-left:0}.crm-account-actions button:last-child{border-radius:0 22px 22px 0}
+.crm-account-actions .crm-save{background:var(--account-accent);color:white;border-color:var(--account-accent)}
+.crm-account-list button{cursor:pointer}.crm-account-list button:disabled{opacity:.45;cursor:not-allowed}
+.crm-account-toolbar{display:flex;align-items:flex-end;gap:14px;padding:0 15px 14px;flex-wrap:wrap}
+.crm-account-count{margin:0 0 7px;color:#657891;font-size:12px;flex:1;min-width:250px}
+.crm-account-tools{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin-left:auto}
+.crm-account-search{display:flex;align-items:center;gap:9px;width:min(290px,30vw);height:39px;border:1px solid #bfcddd;background:var(--crm-surface,#fff);color:#687c94;border-radius:9px;padding:0 11px}
+.crm-account-search input{border:0;background:transparent;width:100%;min-width:0;padding:0;outline:none;font:inherit;font-size:13px}
+.crm-account-search:focus-within{outline:2px solid var(--account-accent);outline-offset:2px}
+.crm-account-tool{display:grid;place-items:center;width:38px;height:38px;flex:none;border:1px solid #c6d3e3;background:var(--crm-surface,#fff);color:var(--account-accent);border-radius:50%}
+.crm-account-tool[aria-pressed=true],.crm-account-tool[aria-expanded=true]{background:#e2edff;border-color:#8eb4e9}
+.crm-account-table-wrap{border:1px solid #dce4ee;border-radius:10px;overflow-x:auto;background:var(--crm-surface,#fff)}
+.crm-account-table{width:100%;min-width:980px;border-collapse:collapse;font-size:13px}
+.crm-account-table th{padding:0;border-bottom:1px solid #c7d2df;border-right:1px solid #e0e6ef;background:#f3f6fa;white-space:nowrap;text-align:left;font-weight:600;color:#3e5876}
+.crm-account-table th button{width:100%;text-align:left;min-height:42px;padding:11px 13px;background:transparent;color:inherit;font:inherit}
+.crm-account-table td{padding:13px;border-bottom:1px solid #edf1f6;color:#334d69}
+.crm-account-table .crm-account-check{width:46px;padding:12px 14px;text-align:center}
+.crm-account-check input{width:16px;height:16px;accent-color:var(--account-accent)}
+.crm-account-table tr[data-selected=true]{background:#eef5ff}
+.crm-account-table .crm-account-name{font:inherit;font-weight:600;text-align:left;padding:0;background:transparent;color:var(--account-accent)}
+.crm-account-table a{color:var(--account-accent);text-decoration:none}.crm-account-table a:hover,.crm-account-name:hover{text-decoration:underline}
+.crm-account-empty-cell{padding:0!important;background:#fafbfd}
+.crm-account-empty{min-height:405px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center;gap:12px}
+.crm-account-illustration{position:relative;width:205px;height:155px;display:grid;place-items:center;margin-bottom:5px}
+.crm-account-orbit{position:absolute;width:139px;height:139px;border-radius:50%;background:linear-gradient(135deg,#c4d9ff,#9baef0);right:18px;top:2px}
+.crm-account-building{position:relative;display:grid;place-items:center;width:132px;height:112px;border-radius:13px;background:white;box-shadow:0 7px 28px #5578a51a;color:#7196d1;transform:translate(-12px,10px)}
+.crm-account-spark{position:absolute;right:2px;bottom:5px;color:#f2b365;font-size:38px}
+.crm-account-empty h2{margin:4px 0;font-size:22px;font-weight:600;color:#455b75!important}.crm-account-empty p{margin:0;font-size:13px;color:#728297;max-width:480px}
+.crm-account-empty .crm-save{margin-top:9px;padding:10px 20px;border:0;border-radius:22px;background:var(--account-accent);color:white;font-weight:600}
+.crm-account-filters,.crm-account-assignment{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 15px 16px;padding:14px;background:#eef5ff;border:1px solid #d6e5fa;border-radius:9px}
+.crm-account-filters label{display:flex;align-items:center;gap:8px;font-size:12px}
+.crm-account-filters select,.crm-account-assignment select{background:white;border:1px solid #c7d6e9;border-radius:6px;padding:7px 10px;max-width:100%}
+.crm-account-filters button,.crm-account-assignment button,.crm-account-selection button{padding:7px 11px;color:var(--account-accent);border:1px solid #c7d6e9;border-radius:7px;background:white}
+.crm-account-selection{display:flex;gap:12px;align-items:center;padding:0 15px;font-size:13px}
+.crm-account-pagination{display:flex;justify-content:flex-end;align-items:center;gap:13px;padding:15px 4px;font-size:12px;color:#64758b}
+.crm-account-pagination button{border:1px solid #d6e1ee;background:white;border-radius:7px;padding:7px 12px;color:var(--account-accent)}
+@media(max-width:760px){.crm-account-header{padding:14px 0 20px;gap:12px}.crm-account-view-control h1{font-size:22px}.crm-account-actions{width:100%;margin:6px 0 0}.crm-account-actions button{flex:1;padding:8px 10px;font-size:12px}.crm-account-toolbar{padding:0 0 13px;flex-direction:column-reverse;align-items:stretch}.crm-account-count{min-width:0;margin:0}.crm-account-tools{margin:0;flex-wrap:wrap;justify-content:flex-end;width:100%}.crm-account-search{width:100%;flex-basis:100%;box-sizing:border-box}.crm-account-table{min-width:900px}.crm-account-empty{align-items:flex-start;text-align:left;padding:24px;min-height:355px}.crm-account-empty h2,.crm-account-empty p{max-width:calc(100vw - 100px)}.crm-account-filters,.crm-account-assignment{margin-left:0;margin-right:0}.crm-account-filters label{flex-wrap:wrap}}

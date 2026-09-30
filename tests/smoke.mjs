@@ -9,7 +9,7 @@ const results = [];
 const groups = [
   { parent: 'Dashboard', children: [] },
   { parent: 'Leads', children: ['Lead Inbox'] },
-  { parent: 'Customers', children: ['Customer List', 'Branches'] },
+  { parent: 'Accounts', children: ['Account List', 'Branches'] },
   { parent: 'Contacts', children: ['Contact List'] },
   { parent: 'Opportunities', children: ['Pipeline Kanban', 'Forecast'] },
   { parent: 'Quotations', children: ['Quotation List', 'Quotation Approval', 'Price Book'] },
