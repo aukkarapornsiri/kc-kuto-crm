@@ -1,0 +1,7 @@
+.crm-internal:is([data-entity="leads"],[data-entity="customers"]) .crm-list-primary-actions{justify-content:flex-end;align-items:center}
+.crm-internal:is([data-entity="leads"],[data-entity="customers"]) .crm-list-filter-actions{align-items:center}
+.crm-internal:is([data-entity="leads"],[data-entity="customers"]) .crm-list-view-controls{display:flex;gap:8px;margin-left:auto;flex:none}
+@media(max-width:640px){
+  .crm-internal:is([data-entity="leads"],[data-entity="customers"]) .crm-list-primary-actions input{flex-basis:100%;width:100%}
+  .crm-internal:is([data-entity="leads"],[data-entity="customers"]) .crm-list-view-controls button{flex:none}
+}
