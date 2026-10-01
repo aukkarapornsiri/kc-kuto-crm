@@ -16,7 +16,7 @@ try{for(const width of [1440,390]){
   assert.equal(await page.locator('.crm-settings').getByRole('button',{name:'ข้อมูลบริษัท',exact:true}).count(),1);
   assert.equal(await page.locator('.crm-settings').getByRole('button',{name:'ผู้ใช้งาน',exact:true}).count(),0);
   await breadcrumb.getByRole('button',{name:'ไปที่ ตั้งค่าระบบ',exact:true}).focus();await page.keyboard.press('Enter');
-  assert.equal(await page.locator('.crm-category-card').count(),6);
+  assert.equal(await page.locator('.crm-category-card').count(),7);
   await page.locator('.crm-category-card').getByText('องค์กร',{exact:true}).click();
   await page.locator('.crm-settings').getByRole('button',{name:'ข้อมูลบริษัท',exact:true}).click();
  }
