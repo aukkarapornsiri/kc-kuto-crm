@@ -1,4 +1,4 @@
-import {createInventory} from './src/inventory.mjs?v=20261001-master-popup';
+import {createInventory} from './src/inventory.mjs?v=20261002-account360';
 import {createDashboardSalesMap} from './src/sales-map.mjs?v=20261001-so';
 import {LoginLayout as KCLoginLayout} from './src/login-layout.mjs?v=20260930-login';
 import {createInternalReports} from './src/internal-reports.mjs?v=20261001-master-popup';
