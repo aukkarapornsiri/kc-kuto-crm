@@ -12,7 +12,8 @@ export const DEMO_RECORDS=Object.fromEntries(Object.keys(ENTITIES).map(x=>[x,[]]
 export function createInternalWorkspace({React,client,useApp}){
  const h=React.createElement,demo=DEMO_RECORDS,AccountList=createAccountList({React}),{QuotationDialog,TemplateSettingsDialog}=createQuotationDocumentComponents({React,client,useApp});
  const unwrap=async q=>{const {data,error}=await q;if(error)throw error;return data;};
- async function all(table){let rows=[];for(let n=0;n<20000;n+=500){const data=await unwrap(client.from(table).select('*').order('id').range(n,n+499));rows.push(...data);if(data.length<500)return rows;}throw Error('More than 20,000 records: narrow the database query before loading');}\n async function priceCatalog(){const data=await unwrap(client.rpc('crm_price_catalog'));return Array.isArray(data)?data:[];}
+ async function all(table){let rows=[];for(let n=0;n<20000;n+=500){const data=await unwrap(client.from(table).select('*').order('id').range(n,n+499));rows.push(...data);if(data.length<500)return rows;}throw Error('More than 20,000 records: narrow the database query before loading');}
+ async function priceCatalog(){const data=await unwrap(client.rpc('crm_price_catalog'));return Array.isArray(data)?data:[];}
  function download(name,rows,columns){const url=URL.createObjectURL(new Blob([toCSV(rows,columns)],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
  const btn=(text,onClick,disabled=false,props={})=>h('button',{type:'button',onClick,disabled,...props},text);
  return function Workspace({lang,entity,route,params={}}){
