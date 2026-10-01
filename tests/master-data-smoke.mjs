@@ -19,7 +19,7 @@ try {
    const code='QA_'+index;
    await form.getByLabel('Code',{exact:true}).fill(code.toLowerCase());
    await form.getByLabel('ชื่อ (ไทย)',{exact:true}).fill('รายการทดสอบ '+index);
-   await form.getByLabel('ชื่อ (EN)',{exact:true}).fill('Test item '+index);await form.getByLabel('รายละเอียด',{exact:true}).fill('รายละเอียด '+index);if(index===4||index===11)await page.screenshot({path:`test-artifacts/master-popup-${index}-${width}.png`,fullPage:true});
+   await form.getByLabel('ชื่อ (EN)',{exact:true}).fill('Test item '+index);await form.getByLabel('รายละเอียด',{exact:true}).fill('รายละเอียด '+index);if(width===1440&&index===11){const box=await page.locator('.crm-master-dialog').boundingBox();assert.ok(Math.abs(box.x-(width-box.width)/2)<3,'dialog centered');assert.ok(box.height<750,'compact dialog uses content height');assert.ok(box.y>50,'dialog vertically centered');}if(index===4||index===11)await page.screenshot({path:`test-artifacts/master-popup-${index}-${width}.png`,fullPage:true});
    await form.getByRole('button',{name:'บันทึก',exact:true}).click();
    await page.getByRole('status').filter({hasText:'บันทึกเฉพาะโหมดทดลอง'}).waitFor();
    const row=page.getByRole('row').filter({hasText:code});await row.waitFor();
