@@ -12,7 +12,7 @@ export function summarize(deals,sellerCount){
  const revenue=sum(won),target=sellerCount*2500000,pipeline=sum(open),weighted=open.reduce((n,r)=>n+r.amount*r.probability,0),profit=won.reduce((n,r)=>n+r.amount-r.cost,0);
  return {revenue,target,pipeline,weighted,forecast:revenue+weighted,profit,margin:revenue?profit/revenue:0,attainment:target?revenue/target:0,winRate:won.length+lost.length?won.length/(won.length+lost.length):0,won:won.length,lost:lost.length,open:open.length};
 }
-export function createExecutiveDashboard({React,Legacy}){
+export function createExecutiveDashboard({React,Legacy,client,useApp}){
  const h=React.createElement;
  function Sample({lang}){
   const t=(th,en)=>lang==='th'?th:en;

@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir -p test-artifacts
           task_status=0
-          for suite in dashboard-layout-smoke internal-workspace-smoke opportunity-dialog-smoke navigation-smoke smoke settings-cards-smoke settings-smoke master-data-smoke settings-workspace-smoke workspace-theme-smoke executive-smoke; do
+          for suite in dashboard-layout-smoke internal-workspace-smoke opportunity-dialog-smoke navigation-smoke smoke settings-cards-smoke settings-smoke master-data-smoke settings-workspace-smoke workspace-theme-smoke executive-smoke marketing-map-smoke; do
             SITE_URL=http://127.0.0.1:4173/kc-kuto-crm/ node tests/$suite.mjs > test-artifacts/$suite.log 2>&1 || task_status=1
             cat test-artifacts/$suite.log
           done
