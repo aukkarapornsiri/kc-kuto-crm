@@ -42,6 +42,9 @@ jobs:
         run: node tests/integration-contract.mjs
       - name: Validate settings source and input boundaries
         run: |
+          node --check src/marketing-email.mjs
+          node --check src/sales-map.mjs
+          node --test tests/marketing-model.test.mjs tests/sales-map-model.test.mjs
           node --check src/internal-workspace.mjs
           node --check src/quotation-document.mjs
           node --check src/internal-reports.mjs
@@ -64,3 +67,5 @@ jobs:
         run: |
           npx -y esbuild supabase/functions/server/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/kuto-server.js
           npx -y esbuild supabase/functions/stripe-webhook/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/stripe-webhook.js
+
+          npx -y esbuild supabase/functions/marketing-email/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/marketing-email.js

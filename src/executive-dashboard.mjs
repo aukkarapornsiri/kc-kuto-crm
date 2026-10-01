@@ -1,3 +1,5 @@
+import {createSalesMap} from './sales-map.mjs?v=20261001';
+import {DEMO_RECORDS} from './internal-workspace.mjs?v=20261001-marketing';
 // Explicitly fictional dashboard fixture. Never persisted or sent to CRM APIs.
 export const SELLERS=[['S01','ฝ่ายขาย 01','Sales 01','Enterprise'],['S02','ฝ่ายขาย 02','Sales 02','Enterprise'],['S03','ฝ่ายขาย 03','Sales 03','Commercial'],['S04','ฝ่ายขาย 04','Sales 04','Commercial'],['S05','ฝ่ายขาย 05','Sales 05','Solutions'],['S06','ฝ่ายขาย 06','Sales 06','Solutions']];
 export const PRODUCTS=['Client & Devices','Infrastructure','Cloud & Software','IT Services'];
@@ -12,8 +14,8 @@ export function summarize(deals,sellerCount){
  const revenue=sum(won),target=sellerCount*2500000,pipeline=sum(open),weighted=open.reduce((n,r)=>n+r.amount*r.probability,0),profit=won.reduce((n,r)=>n+r.amount-r.cost,0);
  return {revenue,target,pipeline,weighted,forecast:revenue+weighted,profit,margin:revenue?profit/revenue:0,attainment:target?revenue/target:0,winRate:won.length+lost.length?won.length/(won.length+lost.length):0,won:won.length,lost:lost.length,open:open.length};
 }
-export function createExecutiveDashboard({React,Legacy}){
- const h=React.createElement;
+export function createExecutiveDashboard({React,Legacy,client,useApp}){
+ const h=React.createElement,SalesMap=createSalesMap({React,client,useApp,records:DEMO_RECORDS});
  function Sample({lang}){
   const t=(th,en)=>lang==='th'?th:en;
   const [quarter,Q]=React.useState(3),[team,T]=React.useState('all'),[seller,S]=React.useState('all'),[selected,D]=React.useState(null),[notice,N]=React.useState('');
@@ -45,5 +47,5 @@ export function createExecutiveDashboard({React,Legacy}){
    selected&&h('section',{className:'exec-detail',role:'region','aria-label':t('รายละเอียดดีลตัวอย่าง','Sample deal details')},h('div',{className:'exec-panel-head'},h('h3',null,lang==='th'?selected.customer:selected.customerEn),btn(t('ปิดรายละเอียด','Close details'),()=>D(null))),h('p',null,selected.id+' · '+selected.product+' · '+baht(selected.amount)+' THB'),h('p',null,t('ผู้รับผิดชอบ: ','Owner: ')+name(selected.seller)+' · '+selected.stage+' ('+pct(selected.probability)+')'),h('p',null,t('ขั้นตอนถัดไป: ','Next step: ')+(selected.nextStep==='confirm'?t('ยืนยันงบประมาณและนัดหมายวันตัดสินใจกับลูกค้า','Confirm budget and the customer decision date'):t('ติดตามข้อเสนอและอัปเดตวันคาดว่าจะปิด','Follow up on the proposal and update the expected close date')))),
    h('details',{className:'exec-definitions'},h('summary',null,t('ที่มาและนิยามตัวชี้วัด','Data source and metric definitions')),h('p',null,t('ข้อมูลจำลองสร้างเพื่อสาธิตเท่านั้น ไม่มีการอ่านหรือเขียนฐานข้อมูลลูกค้า เป้าหมายตัวอย่าง 2.5 ล้านบาทต่อพนักงานต่อไตรมาส','Synthetic demonstration data only. No customer database reads or writes. Sample target is THB 2.5 million per seller per quarter.')),h('p',null,t('ยอดขาย = มูลค่าโอกาสการขายที่ชนะ ไม่ใช่ยอดรายได้ลงบัญชี • กำไรขั้นต้น = ยอดชนะ − ต้นทุนจำลอง • Win Rate = จำนวนดีลชนะ ÷ จำนวนดีลชนะและแพ้','Sales = closed-won opportunity value, not recognized accounting revenue. Gross profit = won value − sample cost. Win rate = won count / (won + lost count).')),h('p',null,t('คาดการณ์ = ยอดชนะ + ผลรวมมูลค่าดีลเปิด × โอกาสชนะ (Qualified 25%, Proposal 50%, Negotiation 75%) • ทุกกราฟใช้ตัวกรองเดียวกัน','Forecast = won value + sum of open deal value × probability (Qualified 25%, Proposal 50%, Negotiation 75%). All charts share the same filters.'))));
  }
- return function ExecutiveDashboard({lang}){const [sample,S]=React.useState(true),t=(th,en)=>lang==='th'?th:en;return h('section',{className:'kc-executive'},h('div',{className:'exec-mode'},h('button',{type:'button','aria-pressed':sample,onClick:()=>S(true)},t('ข้อมูลตัวอย่างผู้บริหาร','Executive sample data')),h('button',{type:'button','aria-pressed':!sample,onClick:()=>S(false)},t('แดชบอร์ดระบบเดิม','Existing system dashboard'))),sample?h(Sample,{lang}):h(Legacy,{lang}));};
+ return function ExecutiveDashboard({lang}){const [sample,S]=React.useState(true),t=(th,en)=>lang==='th'?th:en;return h('section',{className:'kc-executive'},h('div',{className:'exec-mode'},h('button',{type:'button','aria-pressed':sample,onClick:()=>S(true)},t('ข้อมูลตัวอย่างผู้บริหาร','Executive sample data')),h('button',{type:'button','aria-pressed':!sample,onClick:()=>S(false)},t('แดชบอร์ดระบบเดิม','Existing system dashboard'))),sample?h(Sample,{lang}):h(Legacy,{lang}),h(SalesMap,{lang}));};
 }
