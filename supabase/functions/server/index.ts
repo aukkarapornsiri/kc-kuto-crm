@@ -93,8 +93,14 @@ function publicHttpsBase(value:string){
   return url.toString().replace(/\/$/,"");
 }
 async function account360Config(){
-  const c=await config("kc_account_360");
-  return{baseUrl:publicHttpsBase(String(c.base_url??"https://kc-account-360-preview.saelim-m.chatgpt.site")),apiKey:await secret("KC_ACCOUNT360_API_KEY")};
+  const {data}=await adminClient.from("integration_connections").select("config,enabled,status").eq("provider","kc_account_360").maybeSingle();
+  const c=(data?.config??{}) as Record<string,unknown>;
+  return{
+    baseUrl:publicHttpsBase(String(c.base_url??"https://kc-account-360-preview.saelim-m.chatgpt.site")),
+    apiKey:await secret("KC_ACCOUNT360_API_KEY"),
+    enabled:Boolean(data?.enabled),
+    status:String(data?.status??"not_configured")
+  };
 }
 async function googleToken(){
   const clientId=await secret("GOOGLE_CLIENT_ID"),clientSecret=await secret("GOOGLE_CLIENT_SECRET"),refreshToken=await secret("GOOGLE_REFRESH_TOKEN");
@@ -361,7 +367,15 @@ async function handleAccount360Quotation(req:Request){
   if(qError||!q)return json({error:qError?.message??"Quotation not found"},404);
   if(!["approved","accepted"].includes(String(q.status??"")))return json({error:"Only approved or accepted quotations can be sent to KC Account 360"},409);
   const c=await account360Config();
-  if(!c.apiKey)return json({ok:false,provider:"kc_account_360",status:"not_configured",error:"KC Account 360 API key is not configured"},409);
+  if(!c.apiKey){
+    await adminClient.from("quotations").update({account360_sync_status:"not_configured",account360_last_error:"KC Account 360 API key is not configured",updated_at:new Date().toISOString()}).eq("id",q.id);
+    return json({ok:false,provider:"kc_account_360",status:"not_configured",error:"KC Account 360 API key is not configured"},409);
+  }
+  if(!c.enabled){
+    await adminClient.from("quotations").update({account360_sync_status:"not_configured",account360_last_error:"KC Account 360 connector is disabled",updated_at:new Date().toISOString()}).eq("id",q.id);
+    return json({ok:false,provider:"kc_account_360",status:"disabled",error:"KC Account 360 connector is disabled"},409);
+  }
+  await adminClient.from("quotations").update({account360_sync_status:"syncing",account360_last_error:"",updated_at:new Date().toISOString()}).eq("id",q.id);
   const run=await startRun("kc_account_360","quotation","push",access.user.id),eventId=`quotation:${q.id}:approved:v${Number(q.version??1)}`;
   const items=Array.isArray(q.items)?q.items:[],description=(items.map((x:any)=>String(x.name??"")).filter(Boolean).join(", ")||String(q.note??"Quotation")).slice(0,500);
   const payload={
@@ -376,13 +390,21 @@ async function handleAccount360Quotation(req:Request){
     const endpoint=`${c.baseUrl}/api/integrations/cuto`,r=await fetch(endpoint,{method:"POST",headers:{Authorization:`Bearer ${c.apiKey}`,"Content-Type":"application/json","Idempotency-Key":eventId},body:JSON.stringify(payload)});
     const raw=await r.text();let result:any={};try{result=raw?JSON.parse(raw):{};}catch{result={raw:raw.slice(0,500)};}
     if(!r.ok)throw new Error(String(result.error??`KC Account 360 returned ${r.status}`));
-    const accountDocumentNo=("CUTO-"+String(q.code??q.id)).slice(0,40);
-    await adminClient.from("quotations").update({account360_document_no:accountDocumentNo,account360_url:c.baseUrl,updated_at:new Date().toISOString()}).eq("id",q.id);
-    await finishRun(run,"success",{seen:1,updated:1},{quotation_id:q.id,event_id:eventId,account360_document_no:accountDocumentNo,financial_record_id:result.financialRecordId??null,integration_event_id:result.eventId??null,duplicate:result.status==="Duplicate"});
+    const financialRecordId=String(result.financialRecordId??"").trim(),integrationEventId=String(result.eventId??"").trim(),syncedAt=new Date().toISOString();
+    await adminClient.from("quotations").update({
+      account360_financial_record_id:financialRecordId,
+      account360_event_id:integrationEventId,
+      account360_sync_status:"synced",
+      account360_synced_at:syncedAt,
+      account360_last_error:"",
+      account360_url:c.baseUrl,
+      updated_at:syncedAt
+    }).eq("id",q.id);
+    await finishRun(run,"success",{seen:1,updated:1},{quotation_id:q.id,event_id:eventId,financial_record_id:financialRecordId||null,integration_event_id:integrationEventId||null,duplicate:result.status==="Duplicate"});
     await setStatus("kc_account_360","connected",null);
-    return json({ok:true,provider:"kc_account_360",quotation_id:q.id,account360_document_no:accountDocumentNo,duplicate:result.status==="Duplicate",financial_record_id:result.financialRecordId??null});
+    return json({ok:true,provider:"kc_account_360",quotation_id:q.id,duplicate:result.status==="Duplicate",financial_record_id:financialRecordId||null,integration_event_id:integrationEventId||null});
   }catch(e){
-    const message=e instanceof Error?e.message:"KC Account 360 sync failed";await finishRun(run,"failed",{seen:1,failed:1},{quotation_id:q.id,event_id:eventId},message);await setStatus("kc_account_360","error",message);return json({ok:false,provider:"kc_account_360",error:message},502);
+    const message=e instanceof Error?e.message:"KC Account 360 sync failed";await adminClient.from("quotations").update({account360_sync_status:"error",account360_last_error:message.slice(0,500),updated_at:new Date().toISOString()}).eq("id",q.id);await finishRun(run,"failed",{seen:1,failed:1},{quotation_id:q.id,event_id:eventId},message);await setStatus("kc_account_360","error",message);return json({ok:false,provider:"kc_account_360",error:message},502);
   }
 }
 async function handleReset(req:Request){const admin=await requireAdmin(req);if("error"in admin)return admin.error;const body=await req.json().catch(()=>({})),userId=String(body.user_id??"").trim();if(!userId)return json({error:"user_id is required"},400);const password=tempPassword(),{error}=await adminClient.auth.admin.updateUserById(userId,{password});if(error)return json({error:error.message},400);return json({ok:true,temporary_password:password});}
@@ -405,7 +427,7 @@ Deno.serve(async(req:Request)=>{
     if(path.endsWith("/ai-insight"))return await handleAi(req);
     if(path.endsWith("/admin/invite-user"))return await handleInvite(req);
     if(path.endsWith("/admin/reset-password"))return await handleReset(req);
-    if(path.endsWith("/health")||path.endsWith("/server"))return json({ok:true,service:"kc-kuto-server",version:10});
+    if(path.endsWith("/health")||path.endsWith("/server"))return json({ok:true,service:"kc-kuto-server",version:11});
     return json({error:"Not found",path},404);
   }catch(e){return json({error:e instanceof Error?e.message:"Unexpected server error"},500);}
 });
