@@ -28,8 +28,9 @@ try{
       demo.contacts=[{id:'ca',name:'Alpha Contact',customer_id:'a',status:'active'},{id:'cb',name:'Beta Contact',customer_id:'b',status:'active'}];
       demo.opportunities=[];
     },moduleUrl);
-    await open('Opportunities','Opportunity List');
+    await open('Opportunities',width>=1024?'Opportunity List':'Pipeline Kanban');
     const root=page.locator('[data-entity="opportunities"]');
+    if(width<1024)await root.getByRole('button',{name:'Table',exact:true}).click();
     await root.getByRole('button',{name:'Create opportunity',exact:true}).click();
     let form=root.getByRole('form',{name:'Opportunity form'});
     await form.waitFor();
