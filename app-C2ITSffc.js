@@ -1,14 +1,14 @@
-import {createInventory} from './src/inventory.mjs?v=20261001-inventory';
+import {createInventory} from './src/inventory.mjs?v=20261001-master-popup';
 import {createDashboardSalesMap} from './src/sales-map.mjs?v=20261001-so';
 import {LoginLayout as KCLoginLayout} from './src/login-layout.mjs?v=20260930-login';
-import {createInternalReports} from './src/internal-reports.mjs?v=20261001-inventory';
-import {createInternalWorkspace,createInternalQuickMenu,DEMO_RECORDS} from './src/internal-workspace.mjs?v=20261001-inventory';
+import {createInternalReports} from './src/internal-reports.mjs?v=20261001-master-popup';
+import {createInternalWorkspace,createInternalQuickMenu,DEMO_RECORDS} from './src/internal-workspace.mjs?v=20261001-master-popup';
 import {createSidebarToggle} from "./src/sidebar-toggle.mjs?v=20260927-layout";
 import {createGroupedNavigation} from "./src/grouped-navigation.mjs?v=20260927-service";
 import {createContextNavigation} from "./src/context-navigation.mjs?v=20261001-service";
 import {createExecutiveDashboard} from "./src/executive-dashboard.mjs?v=20261001-sales-map";
 import {createSettingsWorkspace} from "./src/settings-workspace.mjs?v=20260927-hide-demo-notices";
-import {createMasterData} from "./src/master-data.mjs?v=20261001-settings-inventory";
+import {createMasterData} from "./src/master-data.mjs?v=20261001-master-popup";
 import {createExperience} from "./src/experience.mjs?v=20261001-settings-inventory";
 (function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))a(n);new MutationObserver(n=>{for(const i of n)if(i.type==="childList")for(const o of i.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&a(o)}).observe(document,{childList:!0,subtree:!0});function s(n){const i={};return n.integrity&&(i.integrity=n.integrity),n.referrerPolicy&&(i.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?i.credentials="include":n.crossOrigin==="anonymous"?i.credentials="omit":i.credentials="same-origin",i}function a(n){if(n.ep)return;n.ep=!0;const i=s(n);fetch(n.href,i)}})();function Q_(t){return t&&t.__esModule&&Object.prototype.hasOwnProperty.call(t,"default")?t.default:t}var Jx={exports:{}},xc={},Zx={exports:{}},Dt={};/**
  * @license React
