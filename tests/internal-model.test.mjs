@@ -1,5 +1,14 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {validateRecord,quoteTotals,duplicateIds,filterRows,summarizePipeline} from '../src/internal-model.mjs';
+test('activities require schedule and preserve timezone, reminder and links',()=>{
+ assert.throws(()=>validateRecord('activities',{subject:'Call'}),/Required: scheduled_at/);
+ assert.throws(()=>validateRecord('activities',{subject:'Call',scheduled_at:'invalid'}),/Invalid date/);
+ const input={subject:'Call',scheduled_at:'2026-10-15T10:30:00+07:00',reminder_at:'2026-10-15T10:00:00+07:00',customer_id:'account',contact_id:'contact',owner_id:'owner',meeting_url:'https://example.test',description:'Notes',next_action:'Follow up'};
+ const output=validateRecord('activities',input);
+ assert.equal(output.scheduled_at,'2026-10-15T03:30:00.000Z');
+ assert.equal(output.reminder_at,'2026-10-15T03:00:00.000Z');
+ for(const key of ['customer_id','contact_id','owner_id','meeting_url','description','next_action'])assert.equal(output[key],input[key]);
+});
 test('quotation quantities, discounts and VAT reconcile; invalid items rejected',()=>{const q=quoteTotals([{name:'License',qty:3,price:1200.25,discount:100,unit:'User'}]);assert.equal(q.subtotal,3600.75);assert.equal(q.vat,245.05);assert.equal(q.total,3745.8);for(const p of [-1,Infinity,NaN])assert.throws(()=>quoteTotals([{name:'Invalid',qty:1,price:p}]));assert.throws(()=>quoteTotals([{name:'Bad',qty:1,price:10,discount:11}]));});
 test('quotation totals support document discount, WHT, GP and Margin',()=>{const q=quoteTotals([{code:'SKU-1',name:'Server',qty:2,price:1000,discount:100,cost:600,unit:'Unit'}],{taxRate:7,withholdingRate:3,documentDiscount:100});assert.equal(q.subtotal,2000);assert.equal(q.discount,200);assert.equal(q.net_before_tax,1800);assert.equal(q.vat,126);assert.equal(q.withholding_tax,54);assert.equal(q.net_total,1872);assert.equal(q.gp_amount,600);assert.equal(q.gp_margin,33.33);assert.equal(q.items[0].gp,700);assert.equal(q.items[0].margin,36.84);assert.throws(()=>quoteTotals([{name:'A',qty:1,price:10}],{documentDiscount:11}));});
 test('pipeline weighted values and closed deals use different measures',()=>{const rows=[{status:'open',amount:100,probability:30},{status:'won',amount:200},{status:'lost',amount:500}];assert.deepEqual(summarizePipeline(rows),{count:3,won:200,pipeline:100,weighted:30,winRate:50,averageDeal:200});});
