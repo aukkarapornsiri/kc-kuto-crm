@@ -12,11 +12,12 @@ try{for(const width of [1440,390]){
   const breadcrumb=page.getByRole('navigation',{name:'เส้นทางนำทาง',exact:true});
   assert.equal(await breadcrumb.locator('[aria-current="page"]').textContent(),'ข้อมูลบริษัท');
   await breadcrumb.getByRole('button',{name:'ไปที่หมวด องค์กร',exact:true}).click();
-  assert.equal(await page.locator('.crm-tabs').getByRole('button',{name:'องค์กร',exact:true}).getAttribute('aria-pressed'),'true');
+  await page.getByRole('button',{name:'กลับไปหน้าตั้งค่าทั้งหมด',exact:true}).waitFor();
+  assert.equal(await page.locator('.crm-settings-hub .crm-tabs').count(),0);
   assert.equal(await page.locator('.crm-settings').getByRole('button',{name:'ข้อมูลบริษัท',exact:true}).count(),1);
   assert.equal(await page.locator('.crm-settings').getByRole('button',{name:'ผู้ใช้งาน',exact:true}).count(),0);
   await breadcrumb.getByRole('button',{name:'ไปที่ ตั้งค่าระบบ',exact:true}).focus();await page.keyboard.press('Enter');
-  assert.equal(await page.locator('.crm-category-card').count(),7);
+  assert.equal(await page.locator('.crm-category-card').count(),8);
   await page.locator('.crm-category-card').getByText('องค์กร',{exact:true}).click();
   await page.locator('.crm-settings').getByRole('button',{name:'ข้อมูลบริษัท',exact:true}).click();
  }
