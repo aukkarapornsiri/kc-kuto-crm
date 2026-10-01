@@ -90,11 +90,12 @@ export function createQuotationDocumentComponents({React,client,useApp}){
     );
   }
 
-  function QuotationDialog({lang='th',editing,setEditing,busy=false,error='',lookup={},onSave,onClose,onOpenTemplateSettings}){
-    const {demoMode,profile}=useApp(),tr=(th,en)=>lang==='th'?th:en,ref=React.useRef(null),[preview,setPreview]=React.useState(false);
+  function QuotationDialog({lang='th',editing,setEditing,busy=false,error='',lookup={},onSave,onClose,onOpenTemplateSettings,initialPreview=false}){
+    const {demoMode,profile}=useApp(),tr=(th,en)=>lang==='th'?th:en,ref=React.useRef(null),[preview,setPreview]=React.useState(!!initialPreview);
     const snapshot=editing?.template_snapshot&&typeof editing.template_snapshot==='object'&&!Array.isArray(editing.template_snapshot)?editing.template_snapshot:null;
     const [template,,templateLoading]=useTemplate(!!editing,snapshot);
     React.useEffect(()=>{const d=ref.current;if(editing&&d&&!d.open)d.showModal();return()=>{if(d?.open)d.close();};},[!!editing]);
+    React.useEffect(()=>{if(editing)setPreview(!!initialPreview);},[editing?.id,initialPreview]);
     React.useEffect(()=>{if(!editing||templateLoading)return;setEditing(old=>{if(!old)return old;const isNew=!old.id,issue=old.issue_date||isoDate(),terms=isNew?Number(template.default_payment_terms??30):Number(old.payment_terms??template.default_payment_terms??30);const next={...old,
       issue_date:issue,payment_terms:terms,tax_rate:isNew?Number(template.default_tax_rate??7):Number(old.tax_rate??template.default_tax_rate??7),wht_rate:isNew?Number(template.default_wht_rate??0):Number(old.wht_rate??template.default_wht_rate??0),
       document_discount:Number(old.document_discount??0),currency:isNew?(template.default_currency||'THB'):(old.currency||template.default_currency||'THB'),document_language:old.document_language||lang,
