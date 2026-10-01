@@ -22,18 +22,19 @@ export function bangkokOrderDate(value){
 export function salesOrderRows(orders,customers){
  const accounts=new Map(customers.map(c=>[c.id,c])),unique=new Map(),rows=[];
  let excluded_currency_count=0,invalid_order_count=0,unallocated_order_count=0;
- for(const o of orders){const key=(o.source_system||'')+':'+(o.source_so_id||o.id);const old=unique.get(key);if(!old||String(o.source_updated_at||o.synced_at||'')>=String(old.source_updated_at||old.synced_at||''))unique.set(key,o);}
+ for(const o of orders){const key=(o.source_system||'')+':'+(o.source_so_id||o.id);const old=unique.get(key);if(!old||(Date.parse(o.source_updated_at||o.synced_at||'')||0)>=(Date.parse(old.source_updated_at||old.synced_at||'')||0))unique.set(key,o);}
  for(const o of unique.values()){
   if(o.status!=='converted')continue;
   if(String(o.currency||'THB').toUpperCase()!=='THB'){excluded_currency_count++;continue;}
   const amount=Number(o.net_amount),order_date=bangkokOrderDate(o.converted_at);
-  if(o.net_amount===null||o.net_amount===undefined||!Number.isFinite(amount)||amount<0||!order_date){invalid_order_count++;continue;}
+  if(o.net_amount===null||o.net_amount===undefined||!Number.isFinite(amount)||amount<0||amount>100000000000||!order_date){invalid_order_count++;continue;}
   const total=Math.round(amount*100),customer=accounts.get(o.customer_id),province=provinceOf(customer),products=new Map();let sum=0,bad=false;
   if(!Array.isArray(o.product_lines)){invalid_order_count++;continue;}
   for(const line of o.product_lines){
+   if(!line||typeof line!=='object'){bad=true;break;}
    const n=Number(line.net_amount),name=String(line.product||'').trim(),code=String(line.code||'').trim();
-   if(line.net_amount===null||line.net_amount===undefined||!Number.isFinite(n)||n<0||(!name&&!code)){bad=true;break;}
-   const value=Math.round(n*100),key=code||name;sum+=value;
+   if(line.net_amount===null||line.net_amount===undefined||line.net_amount===''||typeof line.net_amount==='boolean'||!Number.isFinite(n)||n<0||(!name&&!code)){bad=true;break;}
+   const value=Math.round(n*100),key=code?'code:'+code:'name:'+name;sum+=value;
    const previous=products.get(key)||{product:key,product_name:name||code,product_code:code,cents:0};previous.cents+=value;products.set(key,previous);
   }
   if(bad||sum>total){invalid_order_count++;continue;}
