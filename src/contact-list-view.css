@@ -55,12 +55,22 @@
 .crm-contact-empty p{margin:0;font-size:13px}
 .crm-contact-empty button{border:0;border-radius:10px;background:#0aada9;color:#fff;padding:9px 17px}
 @media(max-width:760px){.crm-contact-header{padding:16px}.crm-contact-view-button{font-size:21px}.crm-contact-primary-actions{width:100%;margin-left:0}.crm-contact-primary-actions button{flex:1}.crm-contact-toolbar{align-items:flex-start;flex-direction:column}.crm-contact-tools{width:100%;margin-left:0}.crm-contact-search{flex:1;width:auto}.crm-contact-count{order:1}.crm-contact-filters>select{max-width:100%}}
-/* Contacts belongs to the sales workflow: keep the empty-state card on the Sales accent. */
+/* Contacts follows the purple Contacts navigation icon on desktop and mobile. */
 .kc-app .crm-internal[data-entity=contacts] .crm-contact-empty>span{
-  background:color-mix(in srgb,var(--kc-section-icon,#ffda80) 28%,white);
-  color:var(--kc-section-action,#8d6100);
+  background:color-mix(in srgb,var(--kc-section-icon,#d1adff) 28%,white);
+  color:var(--kc-section-action,#8050b3);
 }
 .kc-app .crm-internal[data-entity=contacts] .crm-contact-empty h2{
-  color:var(--kc-section-action,#8d6100)!important;
+  color:var(--kc-section-action,#8050b3)!important;
 }
 
+
+.crm-internal[data-entity=contacts]{--kc-section-icon:#d1adff;--kc-section-action:#8050b3}
+.crm-internal[data-entity=contacts] .crm-contact-header{background:color-mix(in srgb,var(--kc-section-icon) 6%,var(--crm-surface,#fff));border-color:color-mix(in srgb,var(--kc-section-icon) 45%,var(--crm-border,#dfe7ed))}
+.crm-internal[data-entity=contacts] :is(.crm-contact-view-button,.crm-contact-view-check){color:var(--kc-section-action)}
+.crm-internal[data-entity=contacts] :is(.crm-contact-icon,.crm-contact-view-icon,.crm-contact-pin,.crm-contact-tool,.crm-contact-primary-actions button,.crm-contact-duplicates){background:color-mix(in srgb,var(--kc-section-icon) 23%,var(--crm-surface,#fff));color:var(--kc-section-action);border-color:color-mix(in srgb,var(--kc-section-icon) 45%,var(--crm-border,#dfe7ed))}
+.crm-internal[data-entity=contacts] :is(.crm-contact-primary-actions .crm-save,.crm-empty-create,.crm-contact-duplicates[aria-pressed=true]){background:var(--kc-section-action);border-color:var(--kc-section-action);color:#fff}
+.crm-internal[data-entity=contacts] .crm-contact-view-menu button:is(:hover,[aria-selected=true]){background:color-mix(in srgb,var(--kc-section-icon) 16%,var(--crm-surface,#fff));color:var(--kc-section-action)}
+.crm-internal[data-entity=contacts] .crm-master-table th{background:color-mix(in srgb,var(--kc-section-icon) 10%,var(--crm-surface,#fff));color:var(--kc-section-action)}
+.crm-internal[data-entity=contacts] :is(.crm-contact-view-button:hover,.crm-contact-view-button[aria-expanded=true]){border-bottom-color:var(--kc-section-action)}
+.crm-internal[data-entity=contacts] :is(button,input,select,textarea):focus-visible,.crm-internal[data-entity=contacts] .crm-contact-search:focus-within{outline-color:var(--kc-section-action)}
