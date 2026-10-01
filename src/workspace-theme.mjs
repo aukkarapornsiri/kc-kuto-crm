@@ -5,14 +5,16 @@ export const WORKSPACE_PRESETS=[
  ['Clear Sky','#6E9DBD','#243D4C','#F3F8FC','#FFFFFF','#BCD5E7'],
  ['Fuchsia Red','#B64182','#3C2435','#FCF5FA','#FFFFFF','#EAC2DC'],
  ['Tangelo','#FF8000','#402C19','#FFF8F0','#FFFFFF','#F8D2AA'],
- ['Grenoble Green','#00A883','#113D32','#F0FAF7','#FFFFFF','#B8E1D5'],
  ['Bitter Chocolate','#604242','#312323','#FAF6F6','#FFFFFF','#DECDCD'],
  ['Asphalt','#66696B','#252729','#F5F6F7','#FFFFFF','#D4D6D8'],
- ['Teal Glow','#168B87','#092A2C','#F0FAFA','#FFFFFF','#65C8C5'],
- ['Electric Blue','#2D599A','#101828','#F0F6FC','#FFFFFF','#A6C7E3'],
  ['Indigo','#6552B8','#292440','#F7F5FC','#FFFFFF','#E2DCF1'],
- ['Mint & Deep Green','#079F8C','#073F35','#F1FBF7','#FFFFFF','#B7E2D2'],
- ['Midnight Violet','#635BFF','#27264F','#27284E','#F6F5FD','#B5AED6']
+ ['Midnight Violet','#635BFF','#27264F','#27284E','#F6F5FD','#B5AED6'],
+ // Reference palettes, in attachment order 72923–72927. Light card surfaces keep CRM forms legible.
+ ['Aurora Sunrise','#F28C45','#352243','#EAF8FB','#FFFFFF','#83D6E5'],
+ ['Emerald Orbit','#2EAD70','#091B56','#EAF8EC','#FFFFFF','#AADA86'],
+ ['Solar Flare','#D85A24','#351E4B','#FFF0E7','#FFFCF8','#EBB776'],
+ ['Saturn Gold','#E5AE38','#090A0C','#101014','#FFFBF0','#8B713E'],
+ ['Nebula Violet','#8968E8','#0D0D18','#141326','#F6F4FF','#80CBDD']
 ].map(([name,primary,sidebar,background,surface,border])=>({name,primary,sidebar,background,surface,border}));
 export const WORKSPACE_SHADOWS={none:'none',soft:'0 3px 12px rgba(15,23,42,0.08)',raised:'0 8px 24px rgba(15,23,42,0.16)'};
 export function validateWorkspace(input){

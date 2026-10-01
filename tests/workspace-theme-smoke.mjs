@@ -4,7 +4,8 @@ try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
  const open=async()=>{await page.getByRole('button',{name:'ปรับพื้นที่ทำงานของฉัน',exact:true}).click();await page.getByRole('button',{name:'โหลดค่าส่วนตัวใหม่',exact:true}).waitFor();await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).waitFor();};
- await open();await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).check();assert.equal(await page.locator('.crm-preset-grid button').count(),13);
+ await open();await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).check();assert.equal(await page.locator('.crm-preset-grid button').count(),14);
+ for(const name of ['Teal Glow','Grenoble Green','Mint & Deep Green','Electric Blue'])assert.equal(await page.getByRole('button',{name,exact:true}).count(),0);
  await page.getByRole('button',{name:'Clear Sky',exact:true}).click();
  await page.getByLabel('พื้นกล่อง',{exact:true}).fill('#FFF4E8');await page.getByLabel('เส้นกรอบ',{exact:true}).fill('#CC8844');
  await page.getByLabel('ความโค้งของกล่อง',{exact:true}).selectOption('24');await page.getByLabel('มิติและเงา',{exact:true}).selectOption('raised');
@@ -19,12 +20,16 @@ try{for(const width of [1440,390]){
  await page.getByRole('button',{name:'ยกเลิกสีส่วนตัวที่แก้ไข',exact:true}).click();await page.screenshot({path:`test-artifacts/workspace-theme-${width}.png`,fullPage:true});
  await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'hidden'});assert.equal(await page.getByRole('dialog').count(),0);
  await page.reload();await open();assert.equal(await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).isChecked(),true);assert.equal(await page.getByLabel('พื้นกล่อง',{exact:true}).inputValue(),'#FFF4E8');assert.deepEqual(await snapshot(),saved);
- await page.getByRole('button',{name:'Mint & Deep Green',exact:true}).click();assert.equal(await page.getByLabel('สีพื้นปุ่ม',{exact:true}).inputValue(),'#079F8C');assert.equal(await page.getByLabel('แถบเมนู',{exact:true}).inputValue(),'#073F35');
- await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.waitForFunction(()=>document.documentElement.style.getPropertyValue('--crm-primary')==='#079F8C');await page.screenshot({path:`test-artifacts/workspace-mint-${width}.png`});
  await page.getByRole('button',{name:'Midnight Violet',exact:true}).click();assert.equal(await page.getByLabel('พื้นหลัง',{exact:true}).inputValue(),'#27284E');assert.equal(await page.locator('.crm-personal-preview').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(39, 40, 78)');
  await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.waitForFunction(()=>document.documentElement.style.getPropertyValue('--crm-primary')==='#635BFF');await page.screenshot({path:`test-artifacts/workspace-violet-${width}.png`});
  await page.reload();await open();assert.equal(await page.getByLabel('สีพื้นปุ่ม',{exact:true}).inputValue(),'#635BFF');assert.equal(await page.getByLabel('แถบเมนู',{exact:true}).inputValue(),'#27264F');
+ for(const [name,primary,background] of [['Aurora Sunrise','#F28C45','#EAF8FB'],['Emerald Orbit','#2EAD70','#EAF8EC'],['Solar Flare','#D85A24','#FFF0E7'],['Saturn Gold','#E5AE38','#101014'],['Nebula Violet','#8968E8','#141326']]){
+  await page.getByRole('button',{name,exact:true}).click();assert.equal(await page.getByLabel('สีพื้นปุ่ม',{exact:true}).inputValue(),primary);assert.equal(await page.getByLabel('พื้นหลัง',{exact:true}).inputValue(),background);
+  await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.waitForFunction(color=>document.documentElement.style.getPropertyValue('--crm-primary')===color,primary);
+  await page.reload();await open();assert.equal(await page.getByLabel('สีพื้นปุ่ม',{exact:true}).inputValue(),primary);assert.equal(await page.getByRole('button',{name,exact:true}).getAttribute('aria-pressed'),'true');
+  await page.getByRole('button',{name,exact:true}).scrollIntoViewIfNeeded();await page.screenshot({path:`test-artifacts/workspace-${name.toLowerCase().replaceAll(' ','-')}-${width}.png`});
+ }
  await page.getByRole('button',{name:'คืนค่าตามบริษัท',exact:true}).click();await page.getByRole('button',{name:'บันทึกพื้นที่ทำงานส่วนตัว',exact:true}).click();await page.getByRole('status').filter({hasText:'บันทึกสีส่วนตัว'}).waitFor();assert.equal(await page.locator('html').getAttribute('data-crm-personal'),null);
  await page.reload();await open();assert.equal(await page.getByLabel('ใช้สีส่วนตัว',{exact:true}).isChecked(),false);assert.equal(await page.locator('html').getAttribute('data-crm-personal'),null);
  assert.deepEqual(errors,[]);await page.close();
-}console.log('PASS personal themes: 11 presets, custom colors, radius/shadow, rendered styles, discard, invalid input, reload persistence, restore company, desktop/mobile');}finally{await browser.close();}
+}console.log('PASS personal themes: 14 presets (five reference palettes saved and reloaded), custom colors, radius/shadow, rendered styles, discard, invalid input, reload persistence, restore company, desktop/mobile');}finally{await browser.close();}
