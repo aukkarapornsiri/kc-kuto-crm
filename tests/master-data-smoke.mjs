@@ -15,18 +15,18 @@ try {
   for(const [index,category] of categories.entries()){
    await page.getByRole('button',{name:category,exact:true}).click();
    await page.getByRole('button',{name:'เพิ่มรายการ',exact:true}).click();
-   const form=page.getByRole('form',{name:'แบบฟอร์มข้อมูลหลัก'});
+   const form=page.getByRole('form',{name:'แบบฟอร์มข้อมูลหลัก'});await page.getByRole('dialog',{name:'จัดการข้อมูลหลัก'}).waitFor();assert.ok(await page.locator('.crm-master-dialog').evaluate(el=>el.open));
    const code='QA_'+index;
    await form.getByLabel('Code',{exact:true}).fill(code.toLowerCase());
    await form.getByLabel('ชื่อ (ไทย)',{exact:true}).fill('รายการทดสอบ '+index);
-   await form.getByLabel('ชื่อ (EN)',{exact:true}).fill('Test item '+index);
+   await form.getByLabel('ชื่อ (EN)',{exact:true}).fill('Test item '+index);await form.getByLabel('รายละเอียด',{exact:true}).fill('รายละเอียด '+index);if(index===4||index===11)await page.screenshot({path:`test-artifacts/master-popup-${index}-${width}.png`,fullPage:true});
    await form.getByRole('button',{name:'บันทึก',exact:true}).click();
    await page.getByRole('status').filter({hasText:'บันทึกเฉพาะโหมดทดลอง'}).waitFor();
    const row=page.getByRole('row').filter({hasText:code});await row.waitFor();
    await page.getByRole('button',{name:'โหลดใหม่',exact:true}).click();await row.waitFor();
-   assert.equal(await page.locator('tbody tr').count(),1,'category isolation');
+   assert.equal(await page.getByRole('row').filter({hasText:/QA_/}).count(),1,'category isolation');
    await page.getByRole('button',{name:'แก้ไข '+code,exact:true}).click();
-   await form.getByLabel('ชื่อ (EN)',{exact:true}).fill('Updated item '+index);
+   assert.equal(await form.getByLabel('รายละเอียด',{exact:true}).inputValue(),'รายละเอียด '+index);await form.getByLabel('ชื่อ (EN)',{exact:true}).fill('Updated item '+index);
    await form.getByLabel('สถานะ',{exact:true}).selectOption('inactive');
    await form.getByRole('button',{name:'บันทึก',exact:true}).click();
    await row.filter({hasText:'Updated item '+index}).waitFor();
@@ -41,9 +41,11 @@ try {
    await page.getByRole('cell',{name:'ไม่พบรายการ',exact:true}).waitFor();
    await page.getByRole('searchbox',{name:'ค้นหาข้อมูลหลัก'}).fill('');
   }
+  await page.getByRole('button',{name:'หมวดหมู่สินค้า',exact:true}).click();await page.getByRole('button',{name:'แก้ไข PC',exact:true}).click();const categoryForm=page.getByRole('form',{name:'แบบฟอร์มข้อมูลหลัก'});assert.ok(await categoryForm.getByLabel('บัญชีรายได้',{exact:true}).inputValue());await categoryForm.getByLabel('รายละเอียด',{exact:true}).fill('ข้อมูลหมวดตามภาพ');await categoryForm.getByRole('button',{name:'บันทึก',exact:true}).click();await page.getByRole('button',{name:'แก้ไข PC',exact:true}).click();assert.equal(await categoryForm.getByLabel('รายละเอียด',{exact:true}).inputValue(),'ข้อมูลหมวดตามภาพ');await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
+  await page.getByRole('button',{name:'ยี่ห้อสินทรัพย์',exact:true}).click();await page.getByRole('button',{name:'เพิ่มรายการ',exact:true}).click();await categoryForm.getByLabel('ชื่อ (ไทย)',{exact:true}).fill('แบรนด์ตัวอย่างใหม่');await categoryForm.getByRole('button',{name:'บันทึก',exact:true}).click();await page.getByRole('row').filter({hasText:'แบรนด์ตัวอย่างใหม่'}).waitFor();assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
   assert.deepEqual(errors,[]);
   await page.screenshot({path:`test-artifacts/master-data-${width}.png`,fullPage:true});
   await page.close();
  }
- console.log('PASS: ten categories × desktop/mobile: create, canonical code, reload, category isolation, edit, inactive, duplicate rejection, cancel, search; demo data only.');
+ console.log('PASS: master popup, auto code, optional English, descriptions, category account links, Escape and reference categories × desktop/mobile: create, canonical code, reload, category isolation, edit, inactive, duplicate rejection, cancel, search; demo data only.');
 }finally{await browser.close();}

@@ -25,3 +25,9 @@ VAT เริ่มต้น รอบ Subscription และบัญชีล�
 ระบบยังไม่ตัดสต็อกอัตโนมัติจากใบเสนอราคาหรือ Sales Order เพราะยังไม่มีขั้นตอนส่งมอบที่ผู้ใช้กำหนด การบันทึกรับ–จ่ายเป็นรายการคลังโดยตรง มีเลขเอกสาร/เหตุผลบังคับและผู้ทำรายการ/เวลาจากเซิร์ฟเวอร์
 
 ทดสอบ: `node --test tests/inventory-model.test.mjs`; `tests/inventory-rls.sql` เป็น rollback-only; `tests/inventory-smoke.mjs` ทดสอบ desktop/mobile ใน demo memory ไม่มีการสร้างสต็อกจริง
+
+## Master data popups
+
+Products & Inventory includes linked Product kinds, Categories, Units and Brands tabs. Add/edit reference records opens a native modal with automatic height and compact/medium/large widths based on form fields; all dialogs are bounded by the viewport. Categories hold business-line and account references. Selecting a category on a product copies its configured accounts into the editable product draft; saved documents retain their existing data. Descriptions and references persist in master_data_items with existing admin permissions, audit logging and optimistic versions. Blank reference codes are generated; an omitted English name uses the entered Thai name.
+
+Demo mode contains representative reference records and the two visible products from the uploaded screenshot (ADA-01 and PRD-000001). Examples are in-memory only; no production master, price or stock records are seeded. Counts in screenshots are not asserted as a complete supplied catalog.
