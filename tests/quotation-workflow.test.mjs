@@ -18,5 +18,9 @@ test('quotation financial fields are approval-gated and contract handoff stays w
   assert.match(workspace,/sourceOpportunityId:selected\.opportunity_id/);
   assert.match(workspace,/sourceCustomerId:selected\.customer_id/);
   assert.match(workspace,/sourceValue:Number\(selected\.total\|\|selected\.net_total\|\|0\)/);
+  assert.match(workspace,/contractCreateAllowed/);
+  assert.match(workspace,/module','contracts'/);
+  assert.match(workspace,/existingQuoteContract/);
+  assert.match(workspace,/renewal_owner_id:profile\?\.id/);
   assert.match(workspace,/canViewFinancials:can\('approve'\)/);
 });
