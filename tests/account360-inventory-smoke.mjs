@@ -9,7 +9,7 @@ try{for(const width of [1440,390]){
  page.on('pageerror',e=>errors.push(e.message));
  // Inject a fake session only into the isolated test module. Never contact or write production data.
  await page.route('**/src/inventory.mjs?*',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('src/inventory.mjs','utf8').replace('Account=createAccountInventory(deps)','Account=createAccountInventory({...deps,client:{auth:{getSession:async()=>({data:{session:{access_token:"qa-only"}}})}}})').replace('demoMode?Local:Account','Account')}));
- await page.route('https://kc-account-360-preview.saelim-m.chatgpt.site/api/integrations/cuto/inventory',route=>route.fulfill({status:fail?502:200,headers:{'access-control-allow-origin':'*'},json:fail?{error:'Source unavailable'}:fixture}));
+ await page.route('https://kc-account-360-preview.saelim-m.chatgpt.site/api/integrations/cuto/inventory',route=>route.fulfill({status:fail?502:200,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'authorization','access-control-allow-methods':'GET, OPTIONS'},json:fail?{error:'Source unavailable'}:fixture}));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();await openThaiSettings(page,width);
  await page.locator('.crm-settings-hub').getByRole('button',{name:'สินค้าและคลัง',exact:true}).click();
  await page.getByRole('button',{name:'Account Product',exact:true}).click();await page.getByRole('dialog').getByText('Source specification',{exact:true}).waitFor();await page.keyboard.press('Escape');
