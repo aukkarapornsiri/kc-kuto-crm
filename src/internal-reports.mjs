@@ -1,5 +1,5 @@
 import {ENTITIES,LABELS,summarizePipeline} from './internal-model.mjs';
-import {DEMO_RECORDS} from './internal-workspace.mjs?v=20261001-quote-numbers';
+import {DEMO_RECORDS} from './internal-workspace.mjs?v=20261001-template-assets';
 import {toCSV} from './settings-model.mjs';
 export function createInternalReports({React,client,useApp}){
  const h=React.createElement;

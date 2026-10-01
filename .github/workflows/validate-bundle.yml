@@ -49,6 +49,7 @@ jobs:
           node --check src/opportunity-dialog.mjs
           node --test tests/opportunity-form.test.mjs
           node --test tests/quotation-workflow.test.mjs
+          node --test tests/quotation-template.test.mjs
           node --test tests/account360-connector.test.mjs
           node --check src/experience.mjs
           node --test tests/experience.test.mjs
