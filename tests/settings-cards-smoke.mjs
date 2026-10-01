@@ -8,7 +8,7 @@ try{for(const width of [1555,820,390]){
  await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
  await openThaiSettings(page,width);
  const hub=page.locator('.crm-settings-hub');await hub.waitFor();
- assert.equal(await hub.locator('.crm-category-card').count(),6);
+ assert.equal(await hub.locator('.crm-category-card').count(),7);
  assert.equal(await hub.locator('.crm-hub-grid').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width>1199?4:width>600?2:1);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  await page.screenshot({path:`test-artifacts/settings-cards-${width}.png`,fullPage:true});
@@ -16,13 +16,16 @@ try{for(const width of [1555,820,390]){
   await hub.getByRole('button',{name,exact:true}).click();assert.ok(await hub.locator('.crm-settings-card').count()>0);
   await hub.getByRole('button',{name:'ทั้งหมด',exact:true}).click();
  }
+ await hub.getByRole('searchbox').fill('ใบเสนอราคา');await hub.getByRole('button',{name:'ตั้งค่าใบเสนอราคา',exact:true}).click();
+ const quoteSettings=page.getByRole('dialog',{name:'ตั้งค่าแม่แบบใบเสนอราคา'});await quoteSettings.waitFor();await quoteSettings.getByRole('button',{name:'ปิด',exact:true}).click();await quoteSettings.waitFor({state:'hidden'});
+ await openThaiSettings(page,width);await hub.waitFor();
  await hub.getByRole('searchbox').fill('บริษัท');await hub.getByRole('button',{name:'ข้อมูลบริษัท',exact:true}).click();
  await page.getByRole('heading',{name:'ข้อมูลบริษัท',exact:true}).waitFor();
  if(width>=640)await page.getByRole('navigation',{name:'เส้นทางนำทาง'}).getByRole('button',{name:'ไปที่ ตั้งค่าระบบ',exact:true}).click();
  else await openThaiSettings(page,width);
  await hub.getByRole('searchbox').fill('no-match-123');await hub.getByRole('status').filter({hasText:'ไม่พบเมนู'}).waitFor();await hub.getByRole('searchbox').fill('');
  await page.getByRole('button',{name:'เปลี่ยนเป็นภาษาอังกฤษ',exact:true}).click();await hub.getByRole('heading',{name:'Settings',exact:true}).waitFor();
- assert.equal(await hub.locator('.crm-category-card').count(),6);await hub.getByRole('button',{name:'Organization',exact:true}).focus();await page.keyboard.press('Enter');
+ assert.equal(await hub.locator('.crm-category-card').count(),7);await hub.getByRole('button',{name:'Organization',exact:true}).focus();await page.keyboard.press('Enter');
  await hub.getByRole('button',{name:'Company Profile',exact:true}).waitFor();
  assert.deepEqual(errors,[]);await page.close();
 }console.log('PASS settings cards: category drill-down, search, no results, breadcrumbs, bilingual, keyboard, desktop/tablet/mobile');}finally{await browser.close();}
