@@ -29,8 +29,11 @@ export async function checkCustomerProfile(form) {
   assert.equal(await form.getByRole('button',{name:'Save & New',exact:true}).count(),0,'Existing records must not offer Save & New');
 }
 
-// Runs after all 14 entity forms have created their isolated demo records.
+// Creates a linked service case through the Service Desk, then checks every Customer 360 return link.
 export async function checkCustomerWorkflow(page,open,width) {
+  await open('Tickets / Service Desk','All Tickets');
+  const service=page.locator('[data-service-desk]').first();await service.getByRole('button',{name:'+ สร้างเคส / Create case',exact:true}).click();
+  const caseDialog=page.getByRole('dialog');await caseDialog.getByLabel('Subject',{exact:true}).fill('QA linked service ticket');await caseDialog.getByLabel('Customer',{exact:true}).selectOption({index:1});await caseDialog.getByLabel('Asset / Serial number',{exact:true}).selectOption({index:1});await caseDialog.getByRole('button',{name:'บันทึก / Save',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('dialog[open]')||document.querySelector('dialog[open] [role=alert]'));assert.equal(await caseDialog.getByRole('alert').count(),0,await caseDialog.getByRole('alert').allTextContents());await caseDialog.waitFor({state:'hidden'});
   await open('Accounts','Account List');
   const accounts=page.locator('[data-entity="customers"]');
   await accounts.getByRole('button',{name:/^Details /}).first().click();
@@ -40,6 +43,7 @@ export async function checkCustomerWorkflow(page,open,width) {
   for(const [title,entity] of linked){
     const section=detail.getByRole('heading',{name:`${title} (1)`,exact:true}).locator('..');
     await section.getByRole('button').first().click();
+    if(entity==='tickets'){await service.getByRole('button',{name:'Customer',exact:true}).click();await service.getByRole('button',{name:'เปิดบัญชีลูกค้า / Customer 360',exact:true}).click();await detail.getByRole('heading',{name:accountCode,exact:true}).waitFor();continue;}
     const linkedDetail=page.locator(`[data-entity="${entity}"]`).getByRole('region',{name:'Record details'});
     await linkedDetail.waitFor();
     await linkedDetail.getByRole('button',{name:'Open Account',exact:true}).click();

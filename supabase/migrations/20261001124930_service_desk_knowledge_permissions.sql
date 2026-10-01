@@ -1,0 +1,4 @@
+create policy service_engineer_article_create on public.crm_knowledge_articles for insert to authenticated with check(service_ticket_id is not null and private.crm_service_access(service_ticket_id,'edit') and exists(select 1 from public.tickets where id=service_ticket_id and status='closed'));
+create function private.crm_service_article_guard() returns trigger language plpgsql set search_path='' as $$ begin
+ if new.service_ticket_id is not null and not exists(select 1 from public.tickets where id=new.service_ticket_id and status='closed') then raise exception 'Knowledge article requires an accessible closed ticket';end if;return new;end $$;
+create trigger service_article_guard before insert or update on public.crm_knowledge_articles for each row execute function private.crm_service_article_guard();

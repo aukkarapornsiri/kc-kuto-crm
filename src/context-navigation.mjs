@@ -10,6 +10,7 @@ const RAIL_LABELS={
 
 export function firstPage(module){
   if(!module)return null;
+  if(module.id==='tickets'&&module.subs?.some(x=>x.id==='tk-overview'))return {moduleId:'tickets',pageId:'tk-overview'};
   if(module.id==='settings')return {moduleId:'settings',pageId:'set-hub'};
   if(module.id==='opportunities'&&module.subs?.some(page=>page.id==='opp-list'))return {moduleId:'opportunities',pageId:'opp-list'};
   return {moduleId:module.id,pageId:module.subs?.find(page=>page.visibleInSidebar!==false)?.id||module.subs?.[0]?.id||module.id};
@@ -42,14 +43,8 @@ export function contextEntries(modules,activeModule){
       return {title:group.label,items,extra:[]};
     }
     if(group.id==='service'){
-      const ids=['tickets','contacts','customers','assets','tickets','reports','tickets'];
-      const labels=[{th:'เคส',en:'Cases'},null,null,{th:'สินทรัพย์',en:'Assets'},null,{th:'การวิเคราะห์',en:'Analytics'},null];
-      const items=ids.map((id,index)=>{
-        const item=byId.get(id);
-        if(!item)return null;
-        const page=index===2?item.subs?.find(x=>x.id==='accounts'):index===4?item.subs?.find(x=>x.id==='tk-sla'):index===6?item.subs?.find(x=>x.id==='tk-kb'):null;
-        return {module:item,page:page||null,label:labels[index]};
-      }).filter(Boolean);
+      const specs=[['tickets','tk-overview'],['tickets','tk-all'],['tickets','tk-repairs'],['tickets','tk-claims'],['contacts',null],['customers','accounts'],['assets',null],['contracts',null],['tickets','tk-sla'],['tickets','tk-assign'],['tickets','tk-report'],['tickets','tk-kb']];
+      const items=specs.map(([id,pageId])=>{const item=byId.get(id);if(!item)return null;const page=pageId?item.subs?.find(x=>x.id===pageId):null;if(pageId&&!page)return null;return {module:item,page:page||null};}).filter(Boolean);
       return {title:group.label,items,extra:[]};
     }
     return {title:group.label,items:group.modules.map(id=>byId.get(id)).filter(Boolean).map(item=>({module:item,page:null})),extra:[]};
@@ -117,7 +112,7 @@ export function createContextNavigation({React,logo,useApp}){
       h('nav',{'aria-label':lang==='th'?'เมนูของหมวด':'Section navigation',className:'kc-context-tabs'},
         items.map(({module,page,label:tabLabel})=>{
           const id=module.id, label=localized(tabLabel||page?.label||module.label,lang), selected=activeModule===id&&(!page?!(id==='quotations'&&activeSub==='quot-pricebook')&&!(id==='tickets'&&['tk-sla','tk-kb'].includes(activeSub)):activeSub===page.id);
-          const pages=!page?(module.subs||[]):[];
+          const pages=!page||page.id==='tk-overview'?(module.subs||[]):[];
           return h('div',{key:page?.id||id,className:'kc-context-tab-wrap'},
             h('button',{type:'button',className:'kc-context-tab','aria-current':selected?'page':undefined,
               'data-active':selected,onClick:()=>go(module,page)},label),

@@ -1,0 +1,1 @@
+do $$ declare fn regprocedure;begin foreach fn in array array['private.crm_service_audit()'::regprocedure,'private.crm_service_sla_alerts()'::regprocedure] loop execute replace(pg_get_functiondef(fn),'''service''','''ticket''');end loop;end $$;
