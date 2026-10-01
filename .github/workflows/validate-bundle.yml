@@ -43,6 +43,7 @@ jobs:
       - name: Validate settings source and input boundaries
         run: |
           node --check src/internal-workspace.mjs
+          node --check src/quotation-document.mjs
           node --check src/internal-reports.mjs
           node --test tests/internal-model.test.mjs
           node --check src/experience.mjs
