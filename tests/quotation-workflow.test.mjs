@@ -23,4 +23,8 @@ test('quotation financial fields are approval-gated and contract handoff stays w
   assert.match(workspace,/existingQuoteContract/);
   assert.match(workspace,/renewal_owner_id:profile\?\.id/);
   assert.match(workspace,/canViewFinancials:can\('approve'\)/);
+  assert.match(workspace,/server\/account360\/quotation/);
+  assert.match(workspace,/quotation_id:selected\.id/);
+  assert.match(workspace,/ส่งไป KC Account 360/);
+  assert.match(workspace,/account360_document_no/);
 });
