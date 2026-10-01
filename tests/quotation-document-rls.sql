@@ -52,10 +52,15 @@ begin
       and q.contact_id is not distinct from v_contact_id
       and q.opportunity_id is not distinct from v_opp_id
       and q.template_id=v_tid
-      and q.net_total=197.60 and q.gp_amount=70 and q.gp_margin=36.84
+      and q.net_total=197.60 and q.gp_amount=0 and q.gp_margin=0
       and q.document_discount=10
       and q.template_snapshot ? 'accent_color'
   ) then raise exception 'Quotation links/totals/snapshot failed'; end if;
+
+  if not exists(
+    select 1 from public.crm_quotation_financials f
+    where f.quotation_id=v_qid and f.cost_total=120 and f.gp_amount=70 and f.gp_margin=36.84
+  ) then raise exception 'Private quotation financials failed'; end if;
 
   if not exists(
     select 1 from public.crm_record_versions rv
@@ -92,4 +97,4 @@ end $$;
 reset role;
 rollback;
 
-select 'PASS: quotation admin template, CRM links, totals, versioning, approval function and anonymous isolation; fixtures rolled back' as result;
+select 'PASS: quotation template, CRM links, private financials, totals, versioning, approval and anonymous isolation; fixtures rolled back' as result;
