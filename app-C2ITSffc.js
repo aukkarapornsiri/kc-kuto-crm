@@ -1,7 +1,7 @@
-import {createDashboardSalesMap} from './src/sales-map.mjs?v=20261001';
+import {createDashboardSalesMap} from './src/sales-map.mjs?v=20261001-so';
 import {LoginLayout as KCLoginLayout} from './src/login-layout.mjs?v=20260930-login';
-import {createInternalReports} from './src/internal-reports.mjs?v=20261001-marketing';
-import {createInternalWorkspace,createInternalQuickMenu,DEMO_RECORDS} from './src/internal-workspace.mjs?v=20261001-marketing';
+import {createInternalReports} from './src/internal-reports.mjs?v=20261001-so';
+import {createInternalWorkspace,createInternalQuickMenu,DEMO_RECORDS} from './src/internal-workspace.mjs?v=20261001-so';
 import {createSidebarToggle} from "./src/sidebar-toggle.mjs?v=20260927-layout";
 import {createGroupedNavigation} from "./src/grouped-navigation.mjs?v=20260927-service";
 import {createContextNavigation} from "./src/context-navigation.mjs?v=20260930-customers";

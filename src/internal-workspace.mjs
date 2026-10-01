@@ -10,7 +10,7 @@ import {SALES_VIEWS,filterSalesView} from './sales-list-view.mjs';
 import {SERVICE_VIEWS,filterServiceView,sortServiceRows} from './service-list-view.mjs';
 import {createQuotationDocumentComponents} from './quotation-document.mjs?v=20261001-template-assets';
 const copy=x=>JSON.parse(JSON.stringify(x));
-export const DEMO_RECORDS=Object.fromEntries(Object.keys(ENTITIES).map(x=>[x,[]]));
+export const DEMO_RECORDS={...Object.fromEntries(Object.keys(ENTITIES).map(x=>[x,[]])),sales_orders:[]};
 export function createInternalWorkspace({React,client,useApp}){
  const h=React.createElement,MarketingEmails=createMarketingEmails({React,client,useApp,records:DEMO_RECORDS}),demo=DEMO_RECORDS,AccountList=createAccountList({React}),OpportunityDialog=createOpportunityDialog({React}),{QuotationDialog,TemplateSettingsDialog}=createQuotationDocumentComponents({React,client,useApp});
  const unwrap=async q=>{const {data,error}=await q;if(error)throw error;return data;};
