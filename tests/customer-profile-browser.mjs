@@ -33,7 +33,7 @@ export async function checkCustomerProfile(form) {
 export async function checkCustomerWorkflow(page,open,width) {
   await open('Tickets / Service Desk','All Tickets');
   const service=page.locator('[data-service-desk]').first();await service.getByRole('button',{name:'+ สร้างเคส / Create case',exact:true}).click();
-  const caseDialog=page.getByRole('dialog');await caseDialog.getByLabel('Subject',{exact:true}).fill('QA linked service ticket');await caseDialog.getByLabel('Customer',{exact:true}).selectOption({index:1});await caseDialog.getByLabel('Asset / Serial number',{exact:true}).selectOption({index:1});await caseDialog.getByRole('button',{name:'บันทึก / Save',exact:true}).click();await caseDialog.waitFor({state:'hidden'});
+  const caseDialog=page.getByRole('dialog');await caseDialog.getByLabel('Subject',{exact:true}).fill('QA linked service ticket');await caseDialog.getByLabel('Customer',{exact:true}).selectOption({index:1});await caseDialog.getByLabel('Asset / Serial number',{exact:true}).selectOption({index:1});await caseDialog.getByRole('button',{name:'บันทึก / Save',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('dialog[open]')||document.querySelector('dialog[open] [role=alert]'));assert.equal(await caseDialog.getByRole('alert').count(),0,await caseDialog.getByRole('alert').allTextContents());await caseDialog.waitFor({state:'hidden'});
   await open('Accounts','Account List');
   const accounts=page.locator('[data-entity="customers"]');
   await accounts.getByRole('button',{name:/^Details /}).first().click();

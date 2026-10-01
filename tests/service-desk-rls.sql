@@ -48,15 +48,19 @@ end $workflow$;
 reset role;
 -- Simulate elapsed time in the rollback-only fixture without altering production data.
 alter table public.tickets disable trigger aa_service_ticket_guard;
-update public.tickets set created_at=now()-interval '10 hours',sla_deadline=now()-interval '2 hours' where id=current_setting('qa.sla_ticket')::uuid;
+update public.tickets set created_at=now()-interval '12 hours',sla_deadline=now()-interval '4 hours',paused_at=now()-interval '2 hours',status='waiting-customer' where id=current_setting('qa.sla_ticket')::uuid;
 alter table public.tickets enable trigger aa_service_ticket_guard;
+update public.tickets set status='diagnosing' where id=current_setting('qa.sla_ticket')::uuid;
+do $$ begin if exists(select 1 from public.tickets where id=current_setting('qa.sla_ticket')::uuid and sla_deadline>now()-interval '90 minutes') then raise exception 'Resume incorrectly erased the existing SLA breach';end if;end $$;
 select private.crm_service_sla_alerts();select private.crm_service_sla_alerts();
 do $$ begin if (select count(*) from private.crm_service_alerts where ticket_id=current_setting('qa.sla_ticket')::uuid)<>4 then raise exception 'SLA alerts missing or duplicated';end if;end $$;
+insert into public.tickets(subject,customer_id) values('QA hidden unassigned',current_setting('qa.customer')::uuid);
 select set_config('request.jwt.claim.sub',current_setting('qa.engineer'),true);
 set local role authenticated;
 do $scope$ declare n int;begin
- select count(*) into n from public.tickets where customer_id=current_setting('qa.customer')::uuid;if n<>4 then raise exception 'Engineer cannot read assigned tickets';end if;
+ select count(*) into n from public.tickets where customer_id=current_setting('qa.customer')::uuid;if n<>4 then raise exception 'Engineer visibility must include four assigned cases and exclude the unassigned case';end if;
  begin update public.tickets set assigned_to_id=current_setting('qa.admin')::uuid where id=current_setting('qa.sla_ticket')::uuid;raise exception 'BAD: engineer reassigned ticket';exception when raise_exception then if sqlerrm like 'BAD:%' then raise;end if;end;
+ insert into public.crm_knowledge_articles(name,service_ticket_id,root_cause,solution) values('QA engineer article',current_setting('qa.ticket')::uuid,'QA','QA solution');
  begin insert into public.crm_service_sla_policies(name,response_minutes,resolution_minutes) values('Forbidden',1,1);raise exception 'BAD: engineer edited SLA policy';exception when insufficient_privilege then null;end;
 end $scope$;
 reset role;
