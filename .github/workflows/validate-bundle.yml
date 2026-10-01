@@ -45,6 +45,8 @@ jobs:
           node --check src/marketing-email.mjs
           node --check src/sales-map.mjs
           node --test tests/marketing-model.test.mjs tests/sales-map-model.test.mjs
+          npm install --no-save --no-package-lock sanitize-html@2.17.0
+          node --test tests/marketing-edge.test.mjs
           node --check src/internal-workspace.mjs
           node --check src/quotation-document.mjs
           node --check src/internal-reports.mjs
