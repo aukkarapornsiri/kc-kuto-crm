@@ -31,3 +31,10 @@ export function createSalesMap({React,client,useApp,records}){
    h('details',{className:'sales-map-definitions'},h('summary',null,t('ที่มาและการคำนวณแผนที่','Map source and definitions')),h('p',null,t('ยอดขาย = มูลค่าโอกาสขายที่ปิดชนะ ไม่ใช่รายได้ลงบัญชีหรือยอด Sales Order ตัวกรองสินค้าและพนักงานขายใช้ร่วมกัน พร้อมช่วงวันปิดขายและช่วงมูลค่าต่อดีล','Sales = closed-won opportunity value, not recognized accounting revenue or Sales Order totals. Product and seller filters combine with close dates and per-deal value range.')),h('p',null,t('จับคู่จังหวัดจากช่องจังหวัดลูกค้า หรือชื่อจังหวัดที่ระบุในที่อยู่ ไม่เดาตำแหน่งจากรหัสไปรษณีย์ ที่อยู่ต่างประเทศและรายการที่จับคู่ไม่ได้อยู่ในยอดยังระบุจังหวัดไม่ได้','Provinces come from the customer province field or an explicit province name in the address. Postal codes are not used to guess locations. Foreign and unmatched locations appear in unresolved totals.')),h('p',null,t('ยอดรวม = ยอดบนแผนที่ + ยอดยังระบุจังหวัดไม่ได้ อ่านเฉพาะรายการที่บัญชีของคุณมีสิทธิ์เห็น','Total = mapped + unresolved value. Only records your account can access are included.'))));
  };
 }
+export function createDashboardSalesMap(dependencies){
+ const {React}=dependencies,h=React.createElement,SalesMap=createSalesMap(dependencies);
+ return function DashboardSalesMap({lang,Component}){
+  const target=React.useRef(null);
+  return h(React.Fragment,null,h('div',{className:'sales-map-jump'},h('button',{type:'button',onClick:()=>target.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})},lang==='th'?'แผนที่ยอดขาย':'Sales map')),h(Component,{lang}),h('div',{ref:target},h(SalesMap,{lang})));
+ };
+}

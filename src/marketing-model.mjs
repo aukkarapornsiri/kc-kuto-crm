@@ -15,6 +15,11 @@ export function audience(customers,contacts){
  return [...customers.filter(c=>marketable(c)).map(c=>({id:'customers:'+c.id,source_type:'customers',source_id:c.id,name:c.name,email:emailAddress(c.email),customer_name:c.name,tier:c.tier||'',industry:c.industry||''})),...contacts.filter(c=>marketable(c)&&marketable(accounts.get(c.customer_id))).map(c=>({id:'contacts:'+c.id,source_type:'contacts',source_id:c.id,name:c.name,email:emailAddress(c.email),customer_name:accounts.get(c.customer_id)?.name||'',tier:accounts.get(c.customer_id)?.tier||'',industry:accounts.get(c.customer_id)?.industry||''}))].filter(c=>validEmail(c.email));
 }
 export function uniqueRecipients(rows){const result=new Map();for(const row of rows){const email=emailAddress(row.email);if(validEmail(email)&&!result.has(email))result.set(email,{...row,email});}return [...result.values()];}
+export function emailBodyHTML(layout,text,subject){
+ if(layout==='plain')return '';
+ const body=String(text||'').split(/\n\s*\n/).map(p=>'<p style="line-height:1.7">'+escapeHTML(p).replaceAll('\n','<br>')+'</p>').join('');
+ return '<div style="background:#f6f4f3;padding:24px;font-family:Arial,sans-serif"><div style="max-width:600px;margin:auto;background:white;padding:32px;border-top:6px solid #a34347"><h1>'+escapeHTML(subject)+'</h1>'+body+'</div></div>';
+}
 export function starterEmail(layout,lang='th'){
  const l=EMAIL_LAYOUTS.find(x=>x[0]===layout)||EMAIL_LAYOUTS[0],th=lang==='th',title=l[th?3:4],greeting=th?'เรียน {{name}}':'Hello {{name}}';
  const text=greeting+'\n\n'+title+'\n\n'+(th?'เพิ่มข้อความของคุณที่นี่':'Add your message here');
