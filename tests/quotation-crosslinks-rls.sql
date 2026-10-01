@@ -43,6 +43,12 @@ begin
   where p.id=auth.uid()
   returning id into v_quote;
 
+  perform set_config('crm.approval_transition','yes',true);
+  update public.quotations
+     set approval_status='approved',status='approved',updated_at=clock_timestamp()
+   where id=v_quote;
+  perform set_config('crm.approval_transition','',true);
+
   insert into public.contracts(
     name,customer_id,customer_name,quotation_id,opportunity_id,type,product,value,start_date,end_date,status,owner_id,owner_name
   )
@@ -71,4 +77,4 @@ end $$;
 reset role;
 rollback;
 
-select 'PASS: Customer -> Contact/Opportunity -> Quotation -> Contract cross-links and quotation versioning; fixtures rolled back' as result;
+select 'PASS: Customer -> Contact/Opportunity -> approved Quotation -> Contract cross-links and versioning; fixtures rolled back' as result;
