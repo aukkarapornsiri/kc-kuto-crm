@@ -46,6 +46,7 @@ jobs:
           node --check src/quotation-document.mjs
           node --check src/internal-reports.mjs
           node --test tests/internal-model.test.mjs
+          node --test tests/quotation-workflow.test.mjs
           node --check src/experience.mjs
           node --test tests/experience.test.mjs
           node --test tests/experience-access.test.mjs
