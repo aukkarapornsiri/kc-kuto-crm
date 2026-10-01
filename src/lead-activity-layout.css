@@ -5,11 +5,11 @@
 .crm-internal:is([data-entity=leads],[data-entity=activities],[data-entity=documents],[data-entity=prices],[data-entity=quotations],[data-entity=contracts],[data-entity=branches],[data-entity=assets],[data-entity=templates],[data-entity=knowledge]) .crm-master-table td{padding:13px 14px}
 .crm-task-header .crm-contact-icon,.crm-task-empty>span{background:color-mix(in srgb,var(--kc-section-icon,#e6ac4c) 18%,white);color:var(--kc-section-action,#aa771d)}.crm-task-header .crm-save,.crm-task-empty button{background:var(--kc-section-action,#aa771d);border-color:var(--kc-section-action,#aa771d);color:white}.crm-task-view{font-size:26px;font-weight:700;color:var(--crm-surface-ink,#16243b);border:0;background:transparent;max-width:100%;padding:0 22px 0 0;cursor:pointer}.crm-internal:is([data-entity=leads],[data-entity=activities],[data-entity=documents],[data-entity=prices],[data-entity=quotations],[data-entity=contracts],[data-entity=branches],[data-entity=assets],[data-entity=templates],[data-entity=knowledge])>.crm-grid{margin-bottom:18px}.crm-internal:is([data-entity=leads],[data-entity=activities],[data-entity=documents],[data-entity=prices],[data-entity=quotations],[data-entity=contracts],[data-entity=branches],[data-entity=assets],[data-entity=templates],[data-entity=knowledge]) .crm-contact-tool[aria-pressed=true]{background:var(--kc-section-action,#aa771d);color:white}@media(max-width:760px){.crm-task-view{font-size:22px}.crm-internal[data-entity=activities] .crm-contact-tools{flex-wrap:wrap}.crm-internal[data-entity=activities] .crm-contact-search{flex-basis:100%}}
 
-html[data-crm-personal=true] .kc-app .crm-master-table .crm-task-empty button{color:var(--crm-primary-ink,#fff)!important}
+html[data-crm-personal=true] .kc-app .crm-master-table .crm-task-empty button{color:#fff!important}
 
-.crm-internal[data-entity=leads] .crm-master-table .crm-task-empty button.crm-lead-empty-create{color:#fff!important;font-size:14px;font-weight:600;min-width:112px;min-height:42px}
+.crm-internal[data-entity=leads] .crm-master-table .crm-task-empty button.crm-lead-empty-create{color:#fff!important;font-size:14px;font-weight:400;min-width:112px;min-height:42px}
 
-.crm-internal[data-entity=quotations] .crm-master-table .crm-task-empty button.crm-quotation-empty-create{display:inline-flex;align-items:center;justify-content:center;min-width:150px;min-height:42px;padding:9px 18px;white-space:nowrap;color:#fff!important;font-size:14px;font-weight:600;line-height:1.2}
+.crm-internal[data-entity=quotations] .crm-master-table .crm-task-empty button.crm-quotation-empty-create{display:inline-flex;align-items:center;justify-content:center;min-width:150px;min-height:42px;padding:9px 18px;white-space:nowrap;color:#fff!important;font-size:14px;font-weight:400;line-height:1.2}
 /* Shared empty-state CTA: always show the page-specific action text and follow the active menu accent. */
 .kc-app .crm-empty-create{
   display:inline-flex!important;
@@ -23,7 +23,7 @@ html[data-crm-personal=true] .kc-app .crm-master-table .crm-task-empty button{co
   background:var(--kc-section-action,#8d6100)!important;
   color:#fff!important;
   font-size:14px!important;
-  font-weight:600!important;
+  font-weight:400!important;
   line-height:1.2;
   white-space:nowrap;
   text-indent:0;
