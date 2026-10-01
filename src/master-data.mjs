@@ -1,8 +1,10 @@
+import {createInventory,setInventoryMasterRows} from './inventory.mjs?v=20261001-inventory';
 export const CATEGORIES = [
  ['customer_type','ประเภทลูกค้า','Customer Type'],['industry','ประเภทธุรกิจ','Industry'],
  ['lead_source','แหล่งที่มาของลูกค้า','Lead Source'],['sales_stage','ขั้นตอนการขาย','Sales Stage'],
  ['product_category','หมวดหมู่สินค้า','Product Category'],['region','ภูมิภาค','Region'],
  ['tier','ระดับ','Tier'],['unit','หน่วย','Unit'],['tag','แท็ก','Tag'],['loss_reason','เหตุผลที่แพ้','Loss Reason'],
+ ['product_type','ประเภทสินค้าและบริการ','Product type'],['product_kind','ชนิดสินค้าและบริการ','Product kind'],['accounting_account','บัญชีลงรายการ','Accounting account'],
  ['asset_type','ประเภทสินทรัพย์','Asset type'],['asset_brand','ยี่ห้อสินทรัพย์','Asset brand'],['asset_model','รุ่นสินทรัพย์','Asset model'],['asset_status','สถานะสินทรัพย์','Asset status'],['warranty_status','สถานะประกัน','Warranty status'],['license_status','สถานะไลเซนส์','License status'],['asset_location','ที่ตั้งสินทรัพย์','Asset location']
 ];
 export function validateMaster(input) {
@@ -15,12 +17,13 @@ export function validateMaster(input) {
  return out;
 }
 export function createMasterData({React,client,useApp}) {
- const h=React.createElement;
+ const h=React.createElement,Inventory=createInventory({React,client,useApp});
  let demoRows=[];
  return function MasterDataPage({lang,scope}) {
   const tr=(th,en)=>lang==='th'?th:en;
   const {demoMode,profile}=useApp();
   const canEdit=demoMode||profile?.role==='admin';
+  const [inventoryOpen,InventoryOpen]=React.useState(false);
   const [category,setCategory]=React.useState(scope==='assets'?'asset_type':scope==='stages'?'sales_stage':'customer_type'),[rows,setRows]=React.useState([]),[query,setQuery]=React.useState('');
   const [loading,setLoading]=React.useState(true),[busy,setBusy]=React.useState(false),[error,setError]=React.useState(''),[message,setMessage]=React.useState('');
   const [editing,setEditing]=React.useState(null);
@@ -42,7 +45,7 @@ export function createMasterData({React,client,useApp}) {
     const value=validateMaster(editing);
     if(demoMode){
      if(demoRows.some(row=>row.category===value.category&&row.code===value.code&&row.id!==editing.id))throw Error(tr('Code ซ้ำในหมวดหมู่นี้','Duplicate code in this category'));
-     const row={...value,id:editing.id??crypto.randomUUID(),version:(editing.version??0)+1};demoRows=demoRows.filter(r=>r.id!==row.id).concat(row);
+     const row={...value,id:editing.id??crypto.randomUUID(),version:(editing.version??0)+1};demoRows=demoRows.filter(r=>r.id!==row.id).concat(row);setInventoryMasterRows(demoRows);
     }else{
      const request=editing.id?client.from('master_data_items').update(value).eq('id',editing.id).eq('version',editing.version):client.from('master_data_items').insert(value);
      const {data,error:failure}=await request.select('id').maybeSingle();
@@ -54,7 +57,9 @@ export function createMasterData({React,client,useApp}) {
   }
   const visible=rows.filter(row=>`${row.code} ${row.name_th} ${row.name_en}`.toLowerCase().includes(query.trim().toLowerCase()));
   const field=(key,label,type='text')=>h('label',{className:'crm-field',key},h('span',null,label),h('input',{type,'aria-label':label,value:editing[key],required:true,maxLength:key==='code'?40:200,min:type==='number'?0:undefined,max:type==='number'?9999:undefined,disabled:busy,onChange:e=>setEditing(old=>({...old,[key]:e.target.value}))}));
+  if(inventoryOpen)return h(Inventory,{lang,onClose:()=>InventoryOpen(false)});
   return h('section',{className:'crm-settings'},h('h1',null,scope==='assets'?tr('ตั้งค่าสินทรัพย์','Asset settings'):scope==='stages'?tr('ตั้งค่า Sales Stage','Sales stage settings'):tr('ข้อมูลหลัก','Master Data')),
+   !scope&&h('button',{type:'button',className:'crm-save',onClick:()=>{setInventoryMasterRows(demoRows);InventoryOpen(true);}},tr('สินค้าและคลัง','Products & Inventory')),
    h('p',null,tr('จัดการรายการอ้างอิงแยกตามหมวดหมู่ การเปลี่ยนแปลงนี้ไม่แก้ข้อมูลในเอกสารเดิม','Manage reference records by category. Changes do not rewrite existing documents.')),
    scope&&h('p',{className:'crm-notice'},tr('รายการอ้างอิงนี้บันทึกลงฐานข้อมูลได้ แต่ยังไม่เปลี่ยนตัวเลือกและกฎในฟอร์มธุรกิจเดิมโดยอัตโนมัติ','These reference records persist in the database; existing business-form options and rules are not automatically changed.')),
 
