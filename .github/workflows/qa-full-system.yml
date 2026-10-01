@@ -1,0 +1,32 @@
+name: Extended isolated QA
+on:
+  push:
+    branches: [qa/full-system-20261002]
+jobs:
+  responsive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        round: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser tooling
+        run: |
+          npm install --no-save --no-package-lock playwright@1.63.0 sanitize-html@2.17.0
+          npx playwright install --with-deps chromium
+      - name: Run isolated QA
+        run: |
+          mkdir -p test-artifacts
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/qa-http.log 2>&1 &
+          node --test --test-reporter=tap tests/*.test.mjs > test-artifacts/unit.tap
+          SITE_URL=http://127.0.0.1:4173/ node tests/qa-responsive-focus.mjs > test-artifacts/qa-responsive.log 2>&1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: extended-qa-round-${{ matrix.round }}
+          path: test-artifacts
