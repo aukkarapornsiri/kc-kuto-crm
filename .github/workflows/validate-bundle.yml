@@ -44,7 +44,7 @@ jobs:
         run: |
           node --check src/marketing-email.mjs
           node --check src/sales-map.mjs
-          node --test tests/marketing-model.test.mjs tests/sales-map-model.test.mjs
+          node --test tests/marketing-model.test.mjs tests/sales-map-model.test.mjs tests/sales-order-sync-model.test.mjs tests/sales-order-sync-edge.test.mjs
           npm install --no-save --no-package-lock sanitize-html@2.17.0
           node --test tests/marketing-edge.test.mjs
           node --check src/internal-workspace.mjs
@@ -71,3 +71,4 @@ jobs:
           npx -y esbuild supabase/functions/stripe-webhook/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/stripe-webhook.js
 
           npx -y esbuild supabase/functions/marketing-email/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/marketing-email.js
+          npx -y esbuild supabase/functions/kc-dw-sales-sync/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/kc-dw-sales-sync.js
