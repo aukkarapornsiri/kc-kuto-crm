@@ -1,4 +1,4 @@
-import {createInventory,setInventoryMasterRows} from './inventory.mjs?v=20261001-inventory';
+import {setInventoryMasterRows} from './inventory.mjs?v=20261001-inventory';
 export const CATEGORIES = [
  ['customer_type','ประเภทลูกค้า','Customer Type'],['industry','ประเภทธุรกิจ','Industry'],
  ['lead_source','แหล่งที่มาของลูกค้า','Lead Source'],['sales_stage','ขั้นตอนการขาย','Sales Stage'],
@@ -17,13 +17,12 @@ export function validateMaster(input) {
  return out;
 }
 export function createMasterData({React,client,useApp}) {
- const h=React.createElement,Inventory=createInventory({React,client,useApp});
+ const h=React.createElement;
  let demoRows=[];
  return function MasterDataPage({lang,scope}) {
   const tr=(th,en)=>lang==='th'?th:en;
   const {demoMode,profile}=useApp();
   const canEdit=demoMode||profile?.role==='admin';
-  const [inventoryOpen,InventoryOpen]=React.useState(false);
   const [category,setCategory]=React.useState(scope==='assets'?'asset_type':scope==='stages'?'sales_stage':'customer_type'),[rows,setRows]=React.useState([]),[query,setQuery]=React.useState('');
   const [loading,setLoading]=React.useState(true),[busy,setBusy]=React.useState(false),[error,setError]=React.useState(''),[message,setMessage]=React.useState('');
   const [editing,setEditing]=React.useState(null);
@@ -57,9 +56,7 @@ export function createMasterData({React,client,useApp}) {
   }
   const visible=rows.filter(row=>`${row.code} ${row.name_th} ${row.name_en}`.toLowerCase().includes(query.trim().toLowerCase()));
   const field=(key,label,type='text')=>h('label',{className:'crm-field',key},h('span',null,label),h('input',{type,'aria-label':label,value:editing[key],required:true,maxLength:key==='code'?40:200,min:type==='number'?0:undefined,max:type==='number'?9999:undefined,disabled:busy,onChange:e=>setEditing(old=>({...old,[key]:e.target.value}))}));
-  if(inventoryOpen)return h(Inventory,{lang,onClose:()=>InventoryOpen(false)});
   return h('section',{className:'crm-settings'},h('h1',null,scope==='assets'?tr('ตั้งค่าสินทรัพย์','Asset settings'):scope==='stages'?tr('ตั้งค่า Sales Stage','Sales stage settings'):tr('ข้อมูลหลัก','Master Data')),
-   !scope&&h('button',{type:'button',className:'crm-save',onClick:()=>{setInventoryMasterRows(demoRows);InventoryOpen(true);}},tr('สินค้าและคลัง','Products & Inventory')),
    h('p',null,tr('จัดการรายการอ้างอิงแยกตามหมวดหมู่ การเปลี่ยนแปลงนี้ไม่แก้ข้อมูลในเอกสารเดิม','Manage reference records by category. Changes do not rewrite existing documents.')),
    scope&&h('p',{className:'crm-notice'},tr('รายการอ้างอิงนี้บันทึกลงฐานข้อมูลได้ แต่ยังไม่เปลี่ยนตัวเลือกและกฎในฟอร์มธุรกิจเดิมโดยอัตโนมัติ','These reference records persist in the database; existing business-form options and rules are not automatically changed.')),
 
