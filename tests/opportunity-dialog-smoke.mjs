@@ -1,12 +1,14 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
-import {mkdir} from 'node:fs/promises';
+import {mkdir,readFile} from 'node:fs/promises';
 import {openDesktopMenu} from './menu-helper.mjs';
 import {fillOpportunityProfile} from './opportunity-profile-browser.mjs';
 const browser=await chromium.launch({headless:true});
 await mkdir('test-artifacts',{recursive:true});
 const site=process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/';
-const moduleUrl=new URL('src/internal-workspace.mjs?v=20261001-opportunity-popup',site).href;
+const bundle=await readFile(new URL('../app-C2ITSffc.js',import.meta.url),'utf8');
+const workspacePath=bundle.match(/from ['"]([^'"]*src\/internal-workspace\.mjs[^'"]*)['"]/)[1];
+const moduleUrl=new URL(workspacePath,site).href;
 try{
   for(const width of [1440,390]){
     const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];
