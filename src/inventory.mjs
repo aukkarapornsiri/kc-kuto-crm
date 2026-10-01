@@ -1,3 +1,4 @@
+import {createAccountInventory} from './account360-inventory.mjs?v=20261002';
 import {createMasterData} from './master-data.mjs?v=20261001-master-popup';
 import {masterDemo,ensureMasterSamples,SAMPLE_PRODUCTS} from './master-data-model.mjs?v=20261001-master-popup';
 import {ITEM_DEFAULTS,validateInventoryItem,validateMovement,stockSummary,postDemoMovement} from './inventory-model.mjs?v=20261001-inventory';
@@ -5,7 +6,7 @@ export function setInventoryMasterRows(rows){masterDemo.rows=rows;}
 let sharedRecords={prices:[],products:[],service_parts:[]};
 export function bindInventoryRecords(records){sharedRecords=records;}
 export const inventoryDemo={items:[],warehouses:[],balances:[],movements:[],levels:[],settings:{enabled:false,allow_negative:false,default_warehouse_id:''}};
-export function createInventory({React,client,useApp}){
+function createLocalInventory({React,client,useApp}){
  const MasterData=createMasterData({React,client,useApp}),h=React.createElement,unwrap=async q=>{const {data,error}=await q;if(error)throw error;return data;};
  async function all(table){let rows=[];for(let n=0;n<20000;n+=500){const batch=await unwrap(client.from(table).select('*').order('id').range(n,n+499));rows.push(...batch);if(batch.length<500)return rows;}throw Error('เกิน 20,000 รายการ กรุณาจำกัดข้อมูลก่อนโหลด');}
  return function Inventory({lang='th',onClose}){
@@ -51,3 +52,5 @@ export function createInventory({React,client,useApp}){
   );
  };
 }
+
+export function createInventory(deps){const Local=createLocalInventory(deps),Account=createAccountInventory(deps);return function Inventory(props){const {demoMode}=deps.useApp();return deps.React.createElement(demoMode?Local:Account,props);};}

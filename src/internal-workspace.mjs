@@ -1,4 +1,4 @@
-import {createInventory,bindInventoryRecords} from './inventory.mjs?v=20261001-master-popup';
+import {createInventory,bindInventoryRecords} from './inventory.mjs?v=20261002-account360';
 import {createServiceDesk} from './service-desk.mjs?v=20261001-service';
 import {createMarketingEmails} from './marketing-email.mjs?v=20261001-marketing';
 import {createOpportunityDialog} from './opportunity-dialog.mjs?v=20261001';
