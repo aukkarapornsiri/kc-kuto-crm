@@ -79,13 +79,14 @@ reset role;
 
 select set_config('request.jwt.claim.sub',(select id::text from public.profiles where role='sales_user' and is_active limit 1),true);
 set local role authenticated;
-do $
+do $check$
 declare v_count integer;
 begin
   update public.crm_quotation_templates set default_payment_terms=99 where is_default=true;
   get diagnostics v_count = row_count;
   if v_count<>0 then raise exception 'Non-admin must not update quotation templates'; end if;
-end $;
+end
+$check$;
 
 reset role;
 set local role anon;
