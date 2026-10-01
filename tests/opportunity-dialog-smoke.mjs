@@ -18,7 +18,8 @@ try{
       if(width>=1024)return openDesktopMenu(page,parent,child);
       await page.locator('button.lg\\:hidden').first().click();
       const sidebar=page.locator('div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden');
-      if(!await sidebar.getByText(child,{exact:true}).count())await sidebar.getByText(parent,{exact:true}).click();
+      if(!await sidebar.getByText(parent,{exact:true}).isVisible())await sidebar.getByRole('button',{name:'Sales',exact:true}).click();
+      if(!await sidebar.getByText(child,{exact:true}).isVisible())await sidebar.getByText(parent,{exact:true}).click();
       await sidebar.getByText(child,{exact:true}).click();
     };
     await page.evaluate(async url=>{
