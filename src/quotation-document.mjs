@@ -41,14 +41,14 @@ export function createQuotationDocumentComponents({React,client,useApp}){
   function useTemplate(open,existingSnapshot){
     const {demoMode}=useApp();
     const [template,setTemplate]=React.useState(()=>existingSnapshot&&Object.keys(existingSnapshot).length?{...DEFAULT_QUOTATION_TEMPLATE,...existingSnapshot}:copy(DEFAULT_QUOTATION_TEMPLATE));
-    const [loading,setLoading]=React.useState(false);
-    React.useEffect(()=>{if(!open)return;let live=true;(async()=>{setLoading(true);try{
+    const [ready,setReady]=React.useState(false);
+    React.useEffect(()=>{if(!open){setReady(false);return;}let live=true;setReady(false);(async()=>{try{
       if(existingSnapshot&&Object.keys(existingSnapshot).length){if(live)setTemplate({...DEFAULT_QUOTATION_TEMPLATE,...existingSnapshot});return;}
       if(demoMode){if(live)setTemplate(copy(demoTemplate));return;}
       const row=await unwrap(client.from('crm_quotation_templates').select('*').eq('is_default',true).eq('status','active').maybeSingle());
       if(live)setTemplate({...DEFAULT_QUOTATION_TEMPLATE,...(row||{})});
-    }catch{if(live)setTemplate(copy(DEFAULT_QUOTATION_TEMPLATE));}finally{if(live)setLoading(false);}})();return()=>{live=false;};},[open,demoMode,JSON.stringify(existingSnapshot||{})]);
-    return [template,setTemplate,loading];
+    }catch{if(live)setTemplate(copy(DEFAULT_QUOTATION_TEMPLATE));}finally{if(live)setReady(true);}})();return()=>{live=false;};},[open,demoMode,JSON.stringify(existingSnapshot||{})]);
+    return [template,setTemplate,!ready];
   }
 
   function TemplateSettingsDialog({lang='th',open,onClose}){
@@ -95,9 +95,9 @@ export function createQuotationDocumentComponents({React,client,useApp}){
     const snapshot=editing?.template_snapshot&&typeof editing.template_snapshot==='object'&&!Array.isArray(editing.template_snapshot)?editing.template_snapshot:null;
     const [template,,templateLoading]=useTemplate(!!editing,snapshot);
     React.useEffect(()=>{const d=ref.current;if(editing&&d&&!d.open)d.showModal();return()=>{if(d?.open)d.close();};},[!!editing]);
-    React.useEffect(()=>{if(!editing||templateLoading)return;setEditing(old=>{if(!old)return old;const issue=old.issue_date||isoDate(),terms=old.payment_terms??template.default_payment_terms??30;const next={...old,
-      issue_date:issue,payment_terms:terms,tax_rate:old.tax_rate??template.default_tax_rate??7,wht_rate:old.wht_rate??template.default_wht_rate??0,
-      document_discount:old.document_discount??0,currency:old.currency||template.default_currency||'THB',document_language:old.document_language||lang,
+    React.useEffect(()=>{if(!editing||templateLoading)return;setEditing(old=>{if(!old)return old;const isNew=!old.id,issue=old.issue_date||isoDate(),terms=isNew?Number(template.default_payment_terms??30):Number(old.payment_terms??template.default_payment_terms??30);const next={...old,
+      issue_date:issue,payment_terms:terms,tax_rate:isNew?Number(template.default_tax_rate??7):Number(old.tax_rate??template.default_tax_rate??7),wht_rate:isNew?Number(template.default_wht_rate??0):Number(old.wht_rate??template.default_wht_rate??0),
+      document_discount:Number(old.document_discount??0),currency:isNew?(template.default_currency||'THB'):(old.currency||template.default_currency||'THB'),document_language:old.document_language||lang,
       payment_instructions:old.payment_instructions||template.default_payment_instructions||'',prepared_by:old.prepared_by||profile?.display_name||'',
       prepared_by_email:old.prepared_by_email||profile?.email||'',valid_until:old.valid_until||addDays(issue,terms),
       items:Array.isArray(old.items)&&old.items.length?old.items.map(normalizeQuotationItem):[normalizeQuotationItem()],
