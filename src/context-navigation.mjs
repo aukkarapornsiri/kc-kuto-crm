@@ -33,11 +33,12 @@ export function contextEntries(modules,activeModule){
   const module=byId.get(activeModule);
   if(group){
     if(group.id==='sales'){
-      const ids=['leads','contacts','customers','opportunities','quotations','quotations','contracts','activities','reports'];
-      const items=ids.map((id,index)=>{
+      const specs=[['opportunities',null],['quotations','quot-pricebook'],['quotations',null],['contracts',null]];
+      const items=specs.map(([id,pageId])=>{
         const item=byId.get(id);
         if(!item)return null;
-        const page=index===2?item.subs?.find(x=>x.id==='accounts'):index===4?item.subs?.find(x=>x.id==='quot-pricebook'):index===7?item.subs?.find(x=>x.id==='act-calendar'):null;
+        const page=pageId?item.subs?.find(x=>x.id===pageId):null;
+        if(pageId&&!page)return null;
         return {module:item,page:page||null};
       }).filter(Boolean);
       return {title:group.label,items,extra:[]};
