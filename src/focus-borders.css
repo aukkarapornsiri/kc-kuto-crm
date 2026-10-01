@@ -1,0 +1,31 @@
+/* A single focus stroke lies on the existing edge, without an outer ring. */
+@media screen {
+  :is(input,select,textarea,button,a[href],[tabindex],[role=button],[role=combobox],[role=checkbox],[role=radio],[role=tab],[contenteditable=true]):is(:focus,:focus-visible) {
+    --tw-ring-shadow:0 0 #0000;
+    --tw-ring-offset-shadow:0 0 #0000;
+    outline:2px solid var(--crm-focus-accent,var(--kc-section-action,var(--crm-primary,#0aada9)))!important;
+    outline-offset:-2px!important;
+    border-color:var(--crm-focus-accent,var(--kc-section-action,var(--crm-primary,#0aada9)))!important;
+    box-shadow:none!important;
+  }
+  html[data-crm-personal=true] {--crm-focus-accent:var(--crm-primary,#0aada9)}
+  /* Search fields with an enclosing border highlight the enclosing box only. */
+  :is(.crm-account-search,.crm-contact-search,.crm-sales-search,.crm-service-search,.crm-hub-search):focus-within {
+    outline:2px solid var(--crm-focus-accent,var(--kc-section-action,var(--crm-primary,#0aada9)))!important;
+    outline-offset:-2px!important;
+    border-color:var(--crm-focus-accent,var(--kc-section-action,var(--crm-primary,#0aada9)))!important;
+    box-shadow:none!important;
+  }
+  :is(.crm-account-search,.crm-contact-search,.crm-sales-search,.crm-service-search,.crm-hub-search) :is(input,select,textarea):is(:focus,:focus-visible) {
+    outline:none!important;
+    border-color:transparent!important;
+    box-shadow:none!important;
+  }
+}
+@media (forced-colors:active) {
+  :is(input,select,textarea,button,a[href],[tabindex],[role=button],[role=combobox],[role=checkbox],[role=radio],[role=tab],[contenteditable=true]):is(:focus,:focus-visible),
+  :is(.crm-account-search,.crm-contact-search,.crm-sales-search,.crm-service-search,.crm-hub-search):focus-within {
+    outline-color:Highlight!important;
+    border-color:Highlight!important;
+  }
+}
