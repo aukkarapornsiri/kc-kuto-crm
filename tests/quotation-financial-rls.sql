@@ -4,11 +4,10 @@ begin;
 
 select set_config('request.jwt.claim.sub',(select id::text from public.profiles where role='admin' and is_active limit 1),true);
 set local role authenticated;
-
 insert into public.crm_price_items(name,code,category,unit,price,cost,description,status)
 values('QA Secure Price','QA-SEC-COST','Hardware','Unit',100,60,'Rollback fixture','active');
-
 reset role;
+
 select set_config('request.jwt.claim.sub',(select id::text from public.profiles where role='sales_user' and is_active limit 1),true);
 set local role authenticated;
 
@@ -50,9 +49,21 @@ begin
 
   if not exists(
     select 1 from public.quotations
-    where id=v_quote and gp_amount=80 and gp_margin=40
+    where id=v_quote and gp_amount=0 and gp_margin=0
       and not ((items->0) ? 'cost') and not ((items->0) ? 'gp') and not ((items->0) ? 'margin')
-  ) then raise exception 'Authoritative Price Book cost / sanitized quotation items failed'; end if;
+  ) then raise exception 'Raw quotation financial masking failed'; end if;
+
+  if exists(select 1 from public.crm_quotation_financials where quotation_id=v_quote) then
+    raise exception 'Sales user read private quotation financials';
+  end if;
+
+  begin
+    perform * from public.crm_quotation_financial_summary(v_quote);
+    raise exception 'Sales user financial summary unexpectedly allowed';
+  exception when insufficient_privilege then null;
+  end;
+
+  perform set_config('test.fin_quote',v_quote::text,true);
 end $$;
 
 reset role;
@@ -60,13 +71,17 @@ select set_config('request.jwt.claim.sub',(select id::text from public.profiles 
 set local role authenticated;
 
 do $$
-declare v_cost numeric;
+declare v_cost numeric;v_fin record;
 begin
   select cost into v_cost from public.crm_price_catalog() where code='QA-SEC-COST';
   if v_cost<>60 then raise exception 'Financial role must receive Price Book cost'; end if;
+  select * into v_fin from public.crm_quotation_financial_summary(current_setting('test.fin_quote')::uuid);
+  if v_fin.cost_total<>120 or v_fin.gp_amount<>80 or v_fin.gp_margin<>40 then
+    raise exception 'Private quotation financial summary mismatch';
+  end if;
 end $$;
 
 reset role;
 rollback;
 
-select 'PASS: sales cost masking, Price Book write protection, authoritative GP trigger and admin cost visibility; fixtures rolled back' as result;
+select 'PASS: sales cost/GP masking, authoritative Price Book cost, private financial RLS and admin financial visibility; fixtures rolled back' as result;
