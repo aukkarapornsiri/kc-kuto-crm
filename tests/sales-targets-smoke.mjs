@@ -44,6 +44,10 @@ try { for(const width of [1440,390]) {
  await page.getByRole('button',{name:'รายงานเป้ายอดขาย',exact:true}).click();
  await page.getByLabel('ปีเป้าหมาย (ค.ศ.)',{exact:true}).fill('2026');
  await page.locator('.crm-target-kpis article').first().getByText('1,200,000.01',{exact:true}).waitFor();
+ await page.locator('.dash-month').last().click();
+ assert.equal(await page.getByLabel('ตั้งแต่เดือน',{exact:true}).inputValue(),'2027-03');
+ await page.getByRole('button',{name:'แสดงช่วงทั้งหมด',exact:true}).click();
+ assert.equal(await page.locator('.dash-month').count(),12);
  await page.getByLabel('ตั้งแต่เดือน',{exact:true}).fill('2027-03');
  await page.locator('.crm-target-kpis article').first().getByText('100,000.01',{exact:true}).waitFor();
  const download=page.waitForEvent('download');
