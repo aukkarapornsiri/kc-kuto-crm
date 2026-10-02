@@ -53,6 +53,8 @@ jobs:
           node --test tests/marketing-edge.test.mjs
           node --check src/internal-workspace.mjs
           node --check src/quotation-document.mjs
+          node --check src/sales-targets.mjs
+          node --test tests/sales-targets.test.mjs
           node --check src/internal-reports.mjs
           node --test tests/internal-model.test.mjs
           node --check src/opportunity-dialog.mjs
@@ -98,3 +100,8 @@ jobs:
         run: |
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c 'create role authenticated; create role anon;'
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f tests/role-access-fixture.sql -f supabase/migrations/20261002100115_effective_role_access.sql -f tests/role-access-db.sql
+
+      - name: Check sales target allocation, atomic saves and scoped reads
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f tests/sales-target-fixture.sql -f supabase/migrations/20261002102807_sales_target_planning.sql -f tests/sales-targets-db.sql
