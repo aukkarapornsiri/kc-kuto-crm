@@ -1,5 +1,6 @@
 // Keep the existing module and page registry as the source of truth. This layer
 // changes only how those modules are presented in the sidebar.
+import {filterModules} from './role-access.mjs?v=20261002-live-access';
 export const SIDEBAR_GROUPS = Object.freeze([
   {id:'sales', label:{th:'การขาย',en:'Sales'}, icon:'opportunities', modules:['opportunities','quotations','contracts']},
   {id:'service', label:{th:'บริการ',en:'Service'}, icon:'tickets', modules:['tickets','assets']},
@@ -10,9 +11,10 @@ export const SIDEBAR_PRIMARY_ORDER = Object.freeze([
   'activities','documents','insights','settings',
 ]);
 
-export function createGroupedNavigation({React}){
+export function createGroupedNavigation({React,useAccess}){
   const h=React.createElement;
   return function GroupedNavigation({lang,activeModule,modules,renderModule}){
+    const access=useAccess();modules=filterModules(modules,access);
     const [open,setOpen]=React.useState(()=>new Set(['sales']));
     React.useEffect(()=>{
       const active=SIDEBAR_GROUPS.find(group=>group.modules.includes(activeModule));
@@ -21,6 +23,7 @@ export function createGroupedNavigation({React}){
     const byId=new Map(modules.map(module=>[module.id,module]));
     const grouped=new Set(SIDEBAR_GROUPS.flatMap(group=>group.modules));
     const renderGroup=group=>{
+      if(!group.modules.some(id=>byId.has(id)))return null;
       const expanded=open.has(group.id), active=group.modules.includes(activeModule);
       const label=group.label[lang]||group.label.en;
       const Icon=byId.get(group.icon)?.icon;

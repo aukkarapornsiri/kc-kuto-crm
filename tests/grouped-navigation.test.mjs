@@ -9,7 +9,7 @@ const React={Fragment:'fragment',createElement:(type,props,...children)=>({type,
   if(state.value===null)state.value=init();
   return [state.value,update=>{state.value=update(state.value);}];
 },useEffect:()=>{}};
-const Grouped=createGroupedNavigation({React});
+const Grouped=createGroupedNavigation({React,useAccess:()=>({profile:{role:'admin',is_active:true},dashboards:[],can:()=>true})});
 const render=(lang='en',activeModule='dashboard')=>Grouped({lang,activeModule,modules,renderModule:module=>({type:'module',props:{id:module.id},children:[]})});
 const children=node=>node.children.flatMap(child=>Array.isArray(child)?child:[child]).filter(Boolean);
 const buttons=node=>children(node).flatMap(child=>child.type==='button'?[child]:child.children?buttons(child):[]);
