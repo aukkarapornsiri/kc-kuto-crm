@@ -36,3 +36,9 @@
 @media(max-width:900px){.dash-mascot{width:205px;height:205px}.dash-mascot-robot{width:220px;height:205px}}
 @media(max-width:600px){[data-dashboard-role=ai] .dash-hero{flex-direction:column;align-items:stretch}.dash-mascot{align-self:center;width:200px;height:190px;margin:8px 0 0}.dash-mascot-robot{width:210px;height:190px}}
 @media print{.dash-mascot{display:none}}
+.kc-ai-robot{display:inline-block;flex-shrink:0;overflow:visible;vertical-align:middle}
+.kc-ai-wave-hand{transform-origin:395px 760px;animation:kc-ai-greeting 1.8s ease-in-out infinite}
+@keyframes kc-ai-greeting{0%,100%{transform:rotate(-8deg)}25%{transform:rotate(13deg)}50%{transform:rotate(-8deg)}75%{transform:rotate(13deg)}}
+.kc-ai-robot[data-robot-motion=off] .kc-ai-wave-hand{animation:none!important}
+@media(prefers-reduced-motion:reduce){.kc-ai-wave-hand{animation:none!important}}
+@media print{.kc-ai-wave-hand{animation:none!important}}
