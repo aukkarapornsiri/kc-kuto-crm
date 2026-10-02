@@ -13,12 +13,15 @@ try{
   await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
   await page.getByRole('button',{name:'แดชบอร์ดผู้บริหาร',exact:true}).click();
   const executive=await page.locator('.exec-kpi').first().evaluate(el=>({padding:getComputedStyle(el).padding,borderRadius:getComputedStyle(el).borderRadius}));
-  const heading=await page.locator('.exec-heading h1').evaluate(el=>getComputedStyle(el).fontSize);
+  const heading=await page.locator('.dash-hero h1').evaluate(el=>getComputedStyle(el).fontSize);
+  await page.getByRole('button',{name:'หยุดการเคลื่อนไหว',exact:true}).click();
   for(const [index,role] of roles.entries()){
    await page.getByRole('button',{name:'แดชบอร์ด'+(role==='AI'?' ':'')+role,exact:true}).click();
-   const root=page.locator('.kc-role-dashboard');await root.locator('h1').waitFor();
+   const root=page.locator('.kc-role-dashboard');await page.locator('.dash-hero h1').waitFor();
+   assert.equal(await page.locator('.kc-dashboard-studio').getAttribute('data-motion'),'off');
+   assert.equal(await page.locator('.dash-orbit-ring').first().evaluate(el=>getComputedStyle(el).animationName),'none');
    assert.equal(await root.count(),1,role);
-   assert.equal(await root.locator('h1').evaluate(el=>getComputedStyle(el).fontSize),heading,role+' heading');
+   assert.equal(await page.locator('.dash-hero h1').evaluate(el=>getComputedStyle(el).fontSize),heading,role+' heading');
    const cards=root.locator('.kc-dash-kpis>div');assert.ok(await cards.count()>=6,role+' preserves KPIs');
    const cardStyle=await cards.first().evaluate(el=>({padding:getComputedStyle(el).padding,borderRadius:getComputedStyle(el).borderRadius}));
    assert.deepEqual(cardStyle,executive,role+' executive card style');
