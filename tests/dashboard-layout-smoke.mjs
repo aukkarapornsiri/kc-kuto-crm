@@ -35,6 +35,9 @@ try{
   await page.locator('.kc-role-dashboard table').waitFor();
   await page.getByRole('button',{name:'เปลี่ยนเป็นภาษาอังกฤษ',exact:true}).click();
   await page.getByRole('heading',{name:'Service Dashboard',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Enable motion',exact:true}).click();
+  await page.emulateMedia({reducedMotion:'reduce'});
+  assert.equal(await page.locator('.dash-orbit-ring').first().evaluate(el=>getComputedStyle(el).animationName),'none');
   assert.deepEqual(errors,[]);await page.close();
  }
  console.log('PASS all dashboard roles share executive layout, retain KPIs/filters and service tabs; desktop/mobile and language switch');
