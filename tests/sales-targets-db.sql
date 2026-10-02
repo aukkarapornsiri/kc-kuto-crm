@@ -1,0 +1,36 @@
+\set ON_ERROR_STOP on
+begin;
+select set_config('request.jwt.claim.sub','11111111-1111-4111-8111-111111111111',true);
+set local role authenticated;
+do $$declare p jsonb;d jsonb;v_total numeric;v_input jsonb:='[{"profile_id":"22222222-2222-4222-8222-222222222222","amount":300.01,"start_month":"2026-04-01","end_month":"2026-06-01"},{"profile_id":"44444444-4444-4444-8444-444444444444","amount":600,"start_month":"2026-04-01","end_month":"2027-03-01"}]';begin
+ p:=crm_save_sales_targets(2026,'2026-04-01','2027-03-01',1000.01,v_input,null);
+ d:=crm_get_sales_targets(2026);
+ if jsonb_array_length(d->'months')<>12 or jsonb_array_length(d->'employees')<>2 then raise exception 'Wrong plan readback';end if;
+ select sum((value->>'company_target')::numeric) into v_total from jsonb_array_elements(d->'months');if v_total<>1000.01 then raise exception 'Monthly targets do not conserve cents';end if;
+ if (d->'months'->0->>'company_actual')::numeric<>600.01 then raise exception 'Actual SO basis includes cancelled/foreign currency or omits valid records';end if;
+ if not exists(select 1 from audit_logs where changes->>'year'='2026') then raise exception 'Audit missing';end if;
+ begin perform crm_save_sales_targets(2026,'2026-04-01','2027-03-01',2000,v_input,null);raise exception 'Stale update accepted';exception when serialization_failure then null;end;
+ begin perform crm_save_sales_targets(2027,'2027-01-01','2027-12-01',2000,'[]',null);raise exception 'Overlapping plan accepted';exception when exclusion_violation then null;end;
+ begin perform crm_save_sales_targets(2026,'2026-04-01','2027-03-01',1000,'[{"profile_id":"22222222-2222-4222-8222-222222222222","amount":3,"start_month":"2026-03-01","end_month":"2026-06-01"}]',(p->>'updated_at')::timestamptz);raise exception 'Invalid employee range accepted';exception when raise_exception then if sqlerrm='Invalid employee range accepted' then raise;end if;end;
+ if (crm_get_sales_targets(2026)->'plan'->>'company_target')::numeric<>1000.01 then raise exception 'Invalid save partly persisted';end if;
+ begin update crm_sales_target_plans set company_target=500;raise exception 'Direct writes allowed';exception when insufficient_privilege then null;end;
+end $$;
+select set_config('request.jwt.claim.sub','22222222-2222-4222-8222-222222222222',true);
+do $$declare d jsonb;begin d:=crm_get_sales_targets(2026);
+ if d->>'scope'<>'self' or jsonb_array_length(d->'employees')<>1 or jsonb_array_length(d->'people')<>1 or d->'plan'->'company_target'<>'null'::jsonb then raise exception 'Salesperson scope leak';end if;
+ if (d->'months'->0->'employees'->0->>'actual')::numeric<>100.01 then raise exception 'Wrong own actual';end if;
+ if (d->'months'->2->'employees'->0->>'target')::numeric<>100.01 then raise exception 'Rounding remainder incorrect';end if;
+ if exists(select 1 from crm_sales_target_plans) or (select count(*) from crm_sales_employee_targets)<>1 then raise exception 'Direct table read leak';end if;
+ begin perform crm_save_sales_targets(2026,'2026-04-01','2027-03-01',1,'[]',null);raise exception 'Salesperson can change targets';exception when insufficient_privilege then null;end;
+end $$;
+select set_config('request.jwt.claim.sub','55555555-5555-4555-8555-555555555555',true);
+do $$declare d jsonb;begin d:=crm_get_sales_targets(2026);if d->>'scope'<>'team' or jsonb_array_length(d->'employees')<>1 or d->'plan'->'company_target'<>'null'::jsonb then raise exception 'Manager scope leak';end if;end $$;
+select set_config('request.jwt.claim.sub','66666666-6666-4666-8666-666666666666',true);
+do $$declare d jsonb;begin d:=crm_get_sales_targets(2026);if d->>'scope'<>'company' or jsonb_array_length(d->'employees')<>2 then raise exception 'Executive cannot read company';end if;begin perform crm_save_sales_targets(2026,'2026-04-01','2027-03-01',1,'[]',null);raise exception 'Executive can change targets';exception when insufficient_privilege then null;end;end $$;
+select set_config('request.jwt.claim.sub','33333333-3333-4333-8333-333333333333',true);
+do $$begin begin perform crm_get_sales_targets(2026);raise exception 'Inactive user allowed';exception when insufficient_privilege then null;end;end $$;
+reset role;
+set local role anon;
+do $$begin begin perform public.crm_get_sales_targets(2026);raise exception 'Anonymous allowed';exception when insufficient_privilege then null;end;end $$;
+rollback;
+select 'Sales target database checks passed' as result;

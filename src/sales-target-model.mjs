@@ -1,0 +1,20 @@
+export const TARGET_EVENT='crm-sales-targets-changed';
+export const monthKey=value=>String(value||'').slice(0,7);
+export function monthNumber(value){const s=monthKey(value);if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(s))throw Error('เดือนหรือปีไม่ถูกต้อง / Invalid month');const [y,m]=s.split('-').map(Number);return y*12+m-1;}
+export function monthsBetween(start,end){const a=monthNumber(start),b=monthNumber(end);if(b<a||b-a>11)throw Error('เลือกช่วงเป้า 1–12 เดือน / Select 1–12 months');return Array.from({length:b-a+1},(_,i)=>`${Math.floor((a+i)/12)}-${String((a+i)%12+1).padStart(2,'0')}`);}
+export function cents(value){const s=String(value??'').trim();if(!/^\d{1,13}(\.\d{1,2})?$/.test(s))throw Error('กรอกยอดตั้งแต่ 0 และทศนิยมไม่เกิน 2 ตำแหน่ง / Enter a nonnegative amount with up to two decimals');const [whole,decimal='']=s.split('.');const n=Number(whole)*100+Number(decimal.padEnd(2,'0'));if(n>100000000000000)throw Error('ยอดเป้าสูงเกินกำหนด / Target is too large');return n;}
+export function allocateMonths(amount,start,end){const months=monthsBetween(start,end),total=cents(amount),base=Math.floor(total/months.length);return months.map((month,i)=>({month,amount:(i===months.length-1?total-base*i:base)/100}));}
+export function validateTargets(draft){
+ const year=Number(draft.year),period=monthsBetween(draft.start,draft.end);if(!Number.isInteger(year)||year<2000||year>2200||Number(period[0].slice(0,4))!==year)throw Error('เดือนเริ่มต้องอยู่ในปีเป้าหมาย / Start month must be in the plan year');
+ const seen=new Set(),employees=[];
+ for(const row of draft.employees){if(String(row.amount??'').trim()==='')continue;if(seen.has(row.profile_id))throw Error('พนักงานซ้ำ / Duplicate employee');seen.add(row.profile_id);monthsBetween(row.start,row.end);if(row.start<draft.start||row.end>draft.end)throw Error('ช่วงเป้าพนักงานต้องอยู่ภายในช่วงเป้าบริษัท / Employee period must be within company period');employees.push({profile_id:row.profile_id,amount:cents(row.amount)/100,start_month:row.start+'-01',end_month:row.end+'-01'});}
+ return {p_year:year,p_start:draft.start+'-01',p_end:draft.end+'-01',p_company:cents(draft.company)/100,p_employees:employees,p_expected:draft.updated_at||null};
+}
+export function targetDraft(data,year){const p=data?.plan;return {year,start:monthKey(p?.start_month)||`${year}-01`,end:monthKey(p?.end_month)||`${year}-12`,company:p?.company_target??'',updated_at:p?.updated_at||null,employees:(data?.people||[]).map(person=>{const row=data.employees.find(e=>e.profile_id===person.id);return {profile_id:person.id,name:person.name,active:person.active,amount:row?.amount??'',start:monthKey(row?.start_month)||monthKey(p?.start_month)||`${year}-01`,end:monthKey(row?.end_month)||monthKey(p?.end_month)||`${year}-12`};})};}
+export function targetMetrics(data,{from='',to='',scope='company'}={}){
+ const months=(data?.months||[]).filter(m=>(!from||monthKey(m.month)>=from)&&(!to||monthKey(m.month)<=to));
+ const rows=months.map(m=>{const employees=scope==='team'?m.employees:m.employees.filter(e=>e.profile_id===scope);const configured=employees.some(e=>e.target!==null);return {month:monthKey(m.month),target:scope==='company'?m.company_target:configured?employees.reduce((n,e)=>n+Number(e.target||0),0):null,actual:scope==='company'?Number(m.company_actual||0):employees.reduce((n,e)=>n+Number(e.actual||0),0)};});
+ const target=rows.some(r=>r.target!==null)?Math.round(rows.reduce((n,r)=>n+Number(r.target||0),0)*100)/100:null,actual=Math.round(rows.reduce((n,r)=>n+r.actual,0)*100)/100;
+ return {rows,target,actual,remaining:target===null?null:Math.max(0,target-actual),attainment:target>0?actual/target:null};
+}
+export function sameSavedTargets(data,payload){if(!data?.plan||data.plan.plan_year!==payload.p_year||data.plan.start_month!==payload.p_start||data.plan.end_month!==payload.p_end||Number(data.plan.company_target)!==payload.p_company)return false;const key=rows=>JSON.stringify(rows.map(r=>({profile_id:r.profile_id,amount:Number(r.amount),start_month:r.start_month,end_month:r.end_month})).sort((a,b)=>a.profile_id.localeCompare(b.profile_id)));return key(data.employees)===key(payload.p_employees);}
