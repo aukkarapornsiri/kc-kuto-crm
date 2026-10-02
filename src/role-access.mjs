@@ -7,7 +7,7 @@ export function canAccess(profile,rows,module,action='view'){
 }
 export function pageAction(page=''){
  if(page.startsWith('import-'))return 'import';
- if(['opp-new','quot-create','lead-create','customer-create','contact-create'].includes(page))return 'create';
+ if(['opp-new','quot-create','lead-create','new-lead','customer-create','contact-create','tk-create'].includes(page))return 'create';
  if(page==='quot-approval')return 'approve';
  return 'view';
 }
@@ -24,7 +24,7 @@ export function createRoleAccess({React,client,useApp}){
  const h=React.createElement,empty={profile:null,rows:[],dashboards:[],loading:true,error:'',can:()=>false};
  const Context=React.createContext(empty);
  function Provider({children}){
-  const {session,demoMode,profile:appProfile}=useApp();
+  const {session,demoMode,profile:appProfile,syncProfile}=useApp();
   const [state,setState]=React.useState(empty),[revision,setRevision]=React.useState(0);
   React.useEffect(()=>{const refresh=()=>setRevision(n=>n+1);const timer=setInterval(refresh,30000);window.addEventListener('focus',refresh);window.addEventListener(ACCESS_CHANGED,refresh);return()=>{clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener(ACCESS_CHANGED,refresh);};},[]);
   React.useEffect(()=>{
@@ -36,10 +36,10 @@ export function createRoleAccess({React,client,useApp}){
     const role=effectiveRole(profile);if(!role)throw Error('บัญชีไม่มีสิทธิ์ใช้งาน / Account access is disabled');
     const [permissions,dashboards]=await Promise.all([client.from('role_permissions').select('*').eq('role_key',role).order('module'),client.from('dashboard_type_access').select('*').eq('role_key',role).order('dashboard_type')]);
     if(permissions.error||dashboards.error)throw permissions.error||dashboards.error;
-    if(active)setState({profile,rows:permissions.data||[],dashboards:dashboards.data||[],loading:false,error:''});
-   }catch(error){if(active)setState({...empty,loading:false,error:error.message||String(error)});}})();
+    if(active){syncProfile?.(profile);setState({profile,rows:permissions.data||[],dashboards:dashboards.data||[],loading:false,error:''});}
+   }catch(error){if(active){syncProfile?.(null);setState({...empty,loading:false,error:error.message||String(error)});}}})();
    return()=>{active=false;};
-  },[session?.user?.id,demoMode,appProfile,revision]);
+  },[session?.user?.id,demoMode,revision]);
   const value={...state,can:(module,action='view')=>demoMode||canAccess(state.profile,state.rows,module,action),refresh:()=>setRevision(n=>n+1)};
   return h(Context.Provider,{value},children);
  }
