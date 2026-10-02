@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {stripTypeScriptTypes} from 'node:module';import sanitize from 'sanitize-html';import {webcrypto} from 'node:crypto';
-const raw=fs.readFileSync('supabase/functions/marketing-email/index.ts','utf8').replace(/^import .*;\n/gm,'').replace('export function cleanHTML','function cleanHTML');
+const raw=fs.readFileSync('supabase/functions/marketing-email/index.ts','utf8').replace(/^import .*;\r?\n/gm,'').replace('export function cleanHTML','function cleanHTML');
 const code=stripTypeScriptTypes(raw,{mode:'strip'});
 function harness({providerStatus=200,providerError=false,optedOut=false,enabled=true}={}){
  const mutations=[],calls=[];const campaign={id:'campaign',owner_id:'user',status:'queued',subject:'News',preview_text:'Preview',html:'<p>Hello {{name}}</p>',text:'Hello {{name}}'},recipient={id:'recipient',campaign_id:'campaign',name:'<Alice>',email:'alice@example.invalid',unsubscribe_token:'00000000-0000-4000-8000-000000000001',attempts:1};
