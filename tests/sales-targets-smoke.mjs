@@ -29,6 +29,8 @@ try { for(const width of [1440,390]) {
   await page.getByRole('navigation',{name:'หมวดหลัก'}).getByRole('button',{name:'วิเคราะห์',exact:true}).click();
  } else {
   await page.locator('button.lg\\:hidden').first().click();
+  const group=page.getByRole('button',{name:'วิเคราะห์ข้อมูล',exact:true}).filter({visible:true});
+  if(await group.getAttribute('aria-expanded')!=='true')await group.click();
   await page.getByRole('button',{name:'รายงานและการวิเคราะห์',exact:true}).filter({visible:true}).click();
  }
  await page.getByRole('button',{name:'รายงานเป้ายอดขาย',exact:true}).click();
