@@ -66,11 +66,12 @@ jobs:
           node --check src/master-data.mjs
           node --test tests/master-data.test.mjs
           node --check src/settings-workspace.mjs
-          node --test tests/settings-model.test.mjs
+          node --test tests/settings-model.test.mjs tests/delete-user.test.mjs
           node --check src/workspace-theme.mjs
           node --test tests/workspace-theme.test.mjs
       - name: Parse Edge Function TypeScript
         run: |
+          npx -y esbuild supabase/functions/crm-user-admin/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/crm-user-admin.js
           npx -y esbuild supabase/functions/server/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/kuto-server.js
           npx -y esbuild supabase/functions/stripe-webhook/index.ts --bundle --platform=neutral --format=esm --external:npm:* --outfile=/tmp/stripe-webhook.js
 
