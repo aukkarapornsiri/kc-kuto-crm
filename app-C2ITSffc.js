@@ -1,4 +1,4 @@
-import {createDashboardStudio} from './src/dashboard-studio.mjs?v=20261002-studio';
+import {createDashboardStudio} from './src/dashboard-studio.mjs?v=20261002-robot';
 import {createNumberPresentation} from './src/number-format.mjs?v=20261002-commas';
 import {MicrosoftLogin} from "./src/microsoft-login.mjs?v=20261002-live";
 import {createInventory} from './src/inventory.mjs?v=20261002-account360';
@@ -11,7 +11,7 @@ import {createGroupedNavigation} from "./src/grouped-navigation.mjs?v=20261002-c
 import {createContextNavigation} from "./src/context-navigation.mjs?v=20261002-commas";
 import {createExecutiveDashboard} from "./src/executive-dashboard.mjs?v=20261002-commas";
 import {createRoleAccess} from "./src/role-access.mjs?v=20261002-commas";
-import {createSalesTargets} from "./src/sales-targets.mjs?v=20261002-studio";
+import {createSalesTargets} from "./src/sales-targets.mjs?v=20261002-robot";
 import {createSettingsWorkspace} from "./src/settings-workspace.mjs?v=20261002-commas";
 import {createMasterData} from "./src/master-data.mjs?v=20261001-master-popup";
 import {createExperience} from "./src/experience.mjs?v=20261001-settings-inventory";
