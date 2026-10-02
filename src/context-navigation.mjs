@@ -1,4 +1,5 @@
-import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs?v=20260927-service';
+import {filterModules} from './role-access.mjs?v=20261002-live-access';
+import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs?v=20261002-live-access';
 
 const RAIL_LABELS={
   dashboard:{th:'หน้าหลัก',en:'Home'},leads:{th:'ลีด',en:'Leads'},
@@ -20,7 +21,7 @@ export function railEntries(modules){
   const byId=new Map(modules.map(module=>[module.id,module]));
   const groups=new Map(SIDEBAR_GROUPS.map(group=>[group.id,group]));
   return SIDEBAR_PRIMARY_ORDER.map(id=>{
-    const group=groups.get(id), module=byId.get(group?.modules[0]||id);
+    const group=groups.get(id), module=byId.get(group?group.modules.find(key=>byId.has(key)):id);
     if(!module)return null;
     return {id,label:RAIL_LABELS[id],icon:byId.get(group?.icon)?.icon||module.icon,
       moduleIds:group?.modules||[id],target:firstPage(module)};
@@ -56,12 +57,13 @@ export function contextEntries(modules,activeModule){
   return {title:module.label,items:visible.length?visible.map(page=>({module,page})):[{module,page:null}],extra};
 }
 
-export function createContextNavigation({React,logo,useApp}){
+export function createContextNavigation({React,logo,useApp,useAccess}){
   const h=React.createElement;
   const localized=(label,lang)=>label?.[lang]||label?.en||'';
 
   function PrimaryRail({lang,activeModule,modules,onNavigate,onSignOut,demoMode}){
     const {profile}=useApp();
+    const access=useAccess();modules=filterModules(modules,access);
     const [section,setSection]=React.useState(null);
     React.useEffect(()=>{const select=event=>setSection(['sales','service'].includes(event.detail)?event.detail:null);window.addEventListener('kc-crm-section',select);return()=>window.removeEventListener('kc-crm-section',select);},[]);
     const name=profile?.display_name||profile?.email||(lang==='th'?'ผู้ใช้งาน':'User');
@@ -84,6 +86,7 @@ export function createContextNavigation({React,logo,useApp}){
   }
 
   function ContextNav({lang,activeModule,activeSub,modules,onNavigate}){
+    const access=useAccess();modules=filterModules(modules,access);
     const [open,setOpen]=React.useState(null);
     const [section,setSection]=React.useState(null);
     const root=React.useRef(null);
