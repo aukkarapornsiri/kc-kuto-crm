@@ -19,7 +19,8 @@ try{
    await page.getByRole('button',{name:'แดชบอร์ด'+(role==='AI'?' ':'')+role,exact:true}).click();
    const root=page.locator('.kc-role-dashboard');await page.locator('.dash-hero h1').waitFor();
    assert.equal(await page.locator('.kc-dashboard-studio').getAttribute('data-motion'),'off');
-   assert.equal(await page.locator('.dash-orbit-ring').first().evaluate(el=>getComputedStyle(el).animationName),'none');
+   assert.equal(await page.locator(role==='AI'?'.dash-mascot-robot':'.dash-orbit-ring').first().evaluate(el=>getComputedStyle(el).animationName),'none');
+   if(role==='AI')assert.ok(await page.locator('.dash-mascot-robot').evaluate(el=>el.complete&&el.naturalWidth>0),'robot image loads');
    assert.equal(await root.count(),1,role);
    assert.equal(await page.locator('.dash-hero h1').evaluate(el=>getComputedStyle(el).fontSize),heading,role+' heading');
    const cards=root.locator('.kc-dash-kpis>div');assert.ok(await cards.count()>=6,role+' preserves KPIs');
