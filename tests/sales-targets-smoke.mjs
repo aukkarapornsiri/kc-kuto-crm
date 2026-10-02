@@ -1,5 +1,6 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import {openThaiSettings} from './menu-helper.mjs';
 const browser=await chromium.launch({headless:true});
 try { for(const width of [1440,390]) {
@@ -14,18 +15,25 @@ try { for(const width of [1440,390]) {
  await page.getByRole('button',{name:'โหลดปีที่เลือก',exact:true}).click();
  await page.getByLabel('เดือนเริ่มเป้าบริษัท',{exact:true}).fill('2026-04');
  await page.getByLabel('เดือนสิ้นสุดเป้าบริษัท',{exact:true}).fill('2027-03');
- await page.getByLabel('เป้าบริษัทรวม (บาท)',{exact:true}).fill('1200.01');
- await page.getByLabel('เป้ารวม Demo User',{exact:true}).fill('300.01');
+ await page.getByLabel('เป้าบริษัทรวม (บาท)',{exact:true}).fill('1,200,000.01');
+ await page.getByLabel('เป้ารวม Demo User',{exact:true}).fill('300,000.01');
+ assert.equal(await page.getByLabel('เป้าบริษัทรวม (บาท)',{exact:true}).inputValue(),'1,200,000.01');
+ assert.equal(await page.getByLabel('ปีเป้าหมาย (ค.ศ.)',{exact:true}).inputValue(),'2026');
+ const amount=page.getByLabel('เป้ารวม Demo User',{exact:true});
+ await amount.press('End');await amount.press('Backspace');await amount.pressSequentially('1');
+ assert.equal(await amount.inputValue(),'300,000.01');
+ await amount.press('ArrowUp');assert.equal(await amount.inputValue(),'300,000.02');
+ await amount.press('ArrowDown');
  await page.getByLabel('เดือนสิ้นสุด Demo User',{exact:true}).fill('2026-06');
  await page.getByRole('button',{name:'บันทึกเป้ายอดขาย',exact:true}).click();
  await page.getByRole('status').filter({hasText:'บันทึกในโหมดทดลองแล้ว'}).waitFor();
  await page.getByRole('button',{name:'โหลดปีที่เลือก',exact:true}).click();
  assert.equal(await page.getByLabel('เดือนสิ้นสุดเป้าบริษัท',{exact:true}).inputValue(),'2027-03');
- assert.equal(await page.getByLabel('เป้ารวม Demo User',{exact:true}).inputValue(),'300.01');
+ assert.equal(await page.getByLabel('เป้ารวม Demo User',{exact:true}).inputValue(),'300,000.01');
  await page.screenshot({path:`test-artifacts/sales-target-settings-${width}.png`,fullPage:true});
  if(width>=1024) {
   await page.getByRole('navigation',{name:'หมวดหลัก'}).getByRole('button',{name:'หน้าหลัก',exact:true}).click();
-  await page.locator('.crm-target-kpis article').first().getByText('300.01',{exact:true}).waitFor();
+  await page.locator('.crm-target-kpis article').first().getByText('300,000.01',{exact:true}).waitFor();
   await page.getByRole('navigation',{name:'หมวดหลัก'}).getByRole('button',{name:'วิเคราะห์',exact:true}).click();
  } else {
   await page.locator('button.lg\\:hidden').first().click();
@@ -35,12 +43,13 @@ try { for(const width of [1440,390]) {
  }
  await page.getByRole('button',{name:'รายงานเป้ายอดขาย',exact:true}).click();
  await page.getByLabel('ปีเป้าหมาย (ค.ศ.)',{exact:true}).fill('2026');
- await page.locator('.crm-target-kpis article').first().getByText('1,200.01',{exact:true}).waitFor();
+ await page.locator('.crm-target-kpis article').first().getByText('1,200,000.01',{exact:true}).waitFor();
  await page.getByLabel('ตั้งแต่เดือน',{exact:true}).fill('2027-03');
- await page.locator('.crm-target-kpis article').first().getByText('100.01',{exact:true}).waitFor();
+ await page.locator('.crm-target-kpis article').first().getByText('100,000.01',{exact:true}).waitFor();
  const download=page.waitForEvent('download');
  await page.getByRole('button',{name:'ส่งออกเป้าและยอดจริง CSV',exact:true}).click();
- assert.match((await download).suggestedFilename(),/^sales-target-2026-company\.csv$/);
+ const file=await download;assert.match(file.suggestedFilename(),/^sales-target-2026-company\.csv$/);
+ const csv=await readFile(await file.path(),'utf8');assert.ok(csv.includes('2027-03,100000.01,0'),'CSV keeps canonical numeric values');
  assert.ok(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth+1));
  assert.deepEqual(errors,[]);
  await page.screenshot({path:`test-artifacts/sales-target-report-${width}.png`,fullPage:true});

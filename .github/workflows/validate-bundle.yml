@@ -53,6 +53,8 @@ jobs:
           node --test tests/marketing-edge.test.mjs
           node --check src/internal-workspace.mjs
           node --check src/quotation-document.mjs
+          node --check src/number-format.mjs
+          node --test tests/number-format.test.mjs
           node --check src/sales-targets.mjs
           node --test tests/sales-targets.test.mjs
           node --check src/internal-reports.mjs

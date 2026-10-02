@@ -16,6 +16,6 @@ export async function fillOpportunityProfile(form,accountName) {
 
 export async function checkOpportunityProfile(form) {
   const values={'Close Date':'2026-10-31',Amount:'120000.50',Description:'Linked opportunity description',Stage:'Proposal','Probability (%)':'60','Forecast Category':'Best Case','Next Step':'Schedule customer review'};
-  for(const [label,value] of Object.entries(values)){const actual=await form.getByLabel(label,{exact:true}).inputValue();assert.equal(['Amount','Probability (%)'].includes(label)?Number(actual):actual,['Amount','Probability (%)'].includes(label)?Number(value):value,label);}
+  for(const [label,value] of Object.entries(values)){const actual=await form.getByLabel(label,{exact:true}).inputValue();assert.equal(['Amount','Probability (%)'].includes(label)?Number(actual.replaceAll(',','')):actual,['Amount','Probability (%)'].includes(label)?Number(value):value,label);}
   assert.equal(await form.getByRole('button',{name:'Save & New',exact:true}).count(),0);
 }
