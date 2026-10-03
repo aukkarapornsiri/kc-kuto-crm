@@ -13,7 +13,7 @@ try {
    const source=await(await fetch([...document.scripts].find(s=>s.src.includes('app-C2ITSffc')).src)).text();
    const uri=source.match(/from ['"]([^'"]*internal-workspace\.mjs[^'"]*)['"]/)[1];
    const {DEMO_RECORDS}=await import(new URL(uri,location.href).href);
-   DEMO_RECORDS.quotations=Array.from({length:50},(_,i)=>({id:'quote-'+i,code:'QA-QUOTE-'+i,customer_name:'QA Company',status:i?'approved':'submitted',approval_status:i?'approved':'pending',items:[{name:'HCI Node',qty:3,unit:'EA',price:700000,total:2100000,discount:0}],subtotal:2100000,discount:0,vat:147000,total:2247000}));
+   DEMO_RECORDS.quotations=Array.from({length:50},(_,i)=>({id:'quote-'+i,code:'QA-QUOTE-'+i,customer_name:'QA Company',status:i?'approved':'submitted',approval_status:i?'approved':'pending',items:[{name:'HCI Node',qty:3,unit:'EA',price:700000,total:2100000,discount:0,cost:500000}],subtotal:2100000,discount:0,vat:147000,total:2247000}));
   });
   if(width>=1024)await openDesktopMenu(page,'Quotations','Quotation List');
   else {
@@ -29,6 +29,9 @@ try {
    await dialog.waitFor();assert.equal(await dialog.evaluate(el=>el.matches(':modal')),true);
    const box=await dialog.boundingBox();assert.ok(box.y>=0&&box.y+box.height<=901&&box.x>=0&&box.x+box.width<=width+1);
    assert.ok((await dialog.innerText()).includes('HCI Node'));
+   await dialog.locator('tfoot').getByText('600,000.00',{exact:true}).waitFor();
+   assert.equal(await dialog.locator('tbody .crm-internal-financial').first().innerText(),'600,000.00');
+   assert.equal(await dialog.locator('tfoot .crm-internal-financial').last().innerText(),'28.57');
    assert.equal(await dialog.getByRole('button',{name:'Edit',exact:true}).isDisabled(),true);
    await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
    await page.getByRole('button',{name:entry+code,exact:true}).click();

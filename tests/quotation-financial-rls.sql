@@ -79,6 +79,9 @@ begin
   if v_fin.cost_total<>120 or v_fin.gp_amount<>80 or v_fin.gp_margin<>40 then
     raise exception 'Private quotation financial summary mismatch';
   end if;
+  if not exists(select 1 from public.crm_quotation_financials where quotation_id=current_setting('test.fin_quote')::uuid and line_financials->0 @> '{"cost_total":120,"gp":80,"margin":40,"net":200}'::jsonb) then raise exception 'Line financial snapshot mismatch'; end if;
+  update public.crm_price_items set cost=90 where code='QA-SEC-COST';
+  if not exists(select 1 from public.crm_quotation_financials where quotation_id=current_setting('test.fin_quote')::uuid and line_financials->0->>'gp'='80.00') then raise exception 'Historical GP changed with catalog'; end if;
 end $$;
 
 reset role;
