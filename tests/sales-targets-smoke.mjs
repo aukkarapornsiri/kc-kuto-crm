@@ -34,6 +34,10 @@ try { for(const width of [1440,390]) {
  if(width>=1024) {
   await page.getByRole('navigation',{name:'หมวดหลัก'}).getByRole('button',{name:'หน้าหลัก',exact:true}).click();
   await page.locator('.crm-target-kpis article').first().getByText('300,000.01',{exact:true}).waitFor();
+  assert.equal(await page.locator('.dash-hero .crm-target-banner article').count(),4);
+  assert.equal(await page.locator('.dash-content .crm-target-kpis').count(),0);
+  for(const bannerWidth of [1440,390]){await page.setViewportSize({width:bannerWidth,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.locator('.dash-hero').screenshot({path:`test-artifacts/target-banner-${bannerWidth}.png`});}
+  await page.setViewportSize({width,height:1000});
   await page.getByRole('navigation',{name:'หมวดหลัก'}).getByRole('button',{name:'วิเคราะห์',exact:true}).click();
  } else {
   await page.locator('button.lg\\:hidden').first().click();
