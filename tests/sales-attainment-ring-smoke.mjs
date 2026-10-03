@@ -1,0 +1,40 @@
+import {chromium} from 'playwright';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const browser=await chromium.launch({headless:true});
+try{for(const width of [1440,390]){
+ const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ // Replace only the data-reader boundary; exercise the shipped dashboard and animation.
+ await page.route('**/app-C2ITSffc.js*',async route=>{const response=await route.fetch();let body=await response.text();body=body.replace('readTargets:(...args)=>KCTargets.readTargets(...args)','readTargets:async()=>{if(window.ringFail)throw Error("offline");return window.ringData}');await route.fulfill({response,body});});
+ await page.addInitScript(()=>{window.ringData={scope:'company',plan:{plan_year:2026},months:[{month:'2026-10-01',company_target:200,company_actual:75,employees:[]}]};});
+ await page.goto(process.env.SITE_URL||'http://127.0.0.1:4179/kc-kuto-crm/');
+ await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
+ await page.getByRole('button',{name:'แดชบอร์ดฝ่ายขาย',exact:true}).click();
+ const value=page.locator('.dash-growth-center em'),ring=page.locator('.dash-growth-progress');
+ await value.filter({hasText:'37.5%'}).waitFor();
+ assert.equal(await page.locator('.dash-growth-center').innerText(),'37.5%\nของเป้ายอดขายปีนี้');
+ assert.equal(await page.locator('.dash-orbit').isVisible(),true);
+ await page.waitForFunction(()=>Number(document.querySelector('.dash-growth-progress').getAttribute('stroke-dashoffset'))===62.5);
+ await page.getByRole('button',{name:'หยุดการเคลื่อนไหว',exact:true}).click();
+ assert.equal(await value.innerText(),'37.5%');
+ assert.equal(await ring.getAttribute('stroke-dashoffset'),'62.5');
+ assert.equal(await page.locator('.dash-growth-spark').evaluate(e=>getComputedStyle(e).animationName),'none');
+ await page.evaluate(()=>{window.ringData.months[0].company_actual=250;window.dispatchEvent(new Event('crm-sales-targets-changed'));});
+ await value.filter({hasText:'125.0%'}).waitFor();assert.equal(await ring.getAttribute('stroke-dashoffset'),'0');
+ await page.evaluate(()=>{window.ringData.months[0].company_actual=0;window.dispatchEvent(new Event('focus'));});
+ await value.filter({hasText:'0.0%'}).waitFor();assert.equal(await ring.getAttribute('stroke-dashoffset'),'100');
+ await page.evaluate(()=>{window.ringData.months[0].company_target=0;window.dispatchEvent(new Event('crm-sales-targets-changed'));});
+ await value.filter({hasText:'—'}).waitFor();
+ await page.evaluate(()=>{window.ringFail=true;window.dispatchEvent(new Event('crm-sales-targets-changed'));});
+ await page.locator('.dash-growth-center i').filter({hasText:'โหลดไม่ได้'}).waitFor();
+ await page.evaluate(()=>{window.ringFail=false;window.ringData.months[0].company_target=200;window.ringData.months[0].company_actual=75;window.dispatchEvent(new Event('crm-sales-targets-changed'));});
+ await value.filter({hasText:'37.5%'}).waitFor();
+ await page.getByRole('button',{name:'เปิดการเคลื่อนไหว',exact:true}).click();
+ assert.equal(await value.innerText(),'37.5%');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.waitForFunction(()=>Number(document.querySelector('.dash-growth-progress').getAttribute('stroke-dashoffset'))===62.5);
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+ fs.mkdirSync('test-artifacts',{recursive:true});await page.screenshot({path:`test-artifacts/sales-attainment-ring-${width}.png`,fullPage:true});
+ assert.deepEqual(errors,[]);await page.close();
+}console.log('PASS sales attainment ring: desktop/mobile, actual ratio, refresh, over target, zero, unavailable, pause/resume and reduced motion');}finally{await browser.close();}

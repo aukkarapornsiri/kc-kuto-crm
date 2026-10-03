@@ -1,4 +1,4 @@
-import {createTargetVisuals} from './dashboard-studio.mjs?v=20261003-motion';
+import {createTargetVisuals} from './dashboard-studio.mjs?v=20261004-attainment';
 import {TARGET_EVENT,monthKey,monthsBetween,allocateMonths,validateTargets,targetDraft,targetMetrics,sameSavedTargets} from './sales-target-model.mjs?v=20261002-targets';
 export function createSalesTargets({React,client,useApp}){
  const TargetVisuals=createTargetVisuals(React);
@@ -45,5 +45,5 @@ export function createSalesTargets({React,client,useApp}){
     h('h3',null,t('ผลงานรายพนักงาน','Employee performance')),h('div',{className:'crm-table-scroll'},h('table',{className:'crm-master-table'},h('thead',null,h('tr',null,...[t('พนักงาน','Employee'),t('เป้าช่วงที่เลือก','Period target'),t('ยอด SO สุทธิ','Net SO sales'),t('ทำได้ (%)','Attainment (%)')].map(x=>h('th',{key:x},x)))),h('tbody',null,data.people.filter(p=>['company','team'].includes(scope)||p.id===scope).map(p=>{const v=targetMetrics(data,{from,to,scope:p.id});return h('tr',{key:p.id},h('td',null,h('button',{onClick:()=>S(p.id)},p.name)),h('td',null,cash(v.target)),h('td',null,cash(v.actual)),h('td',null,v.attainment===null?'—':(v.attainment*100).toFixed(1)+'%'));})))),h('div',{className:'crm-actions'},h('button',{onClick:()=>R(v=>v+1),disabled:busy},t('โหลดเป้าใหม่','Reload targets')),data.can_export&&h('button',{onClick:exportCSV,disabled:busy},t('ส่งออกเป้าและยอดจริง CSV','Export targets and actuals CSV')))),
    h('small',null,t('ใช้เป้าชุดเดียวกับการตั้งค่า · ข้อมูลแสดงตามสิทธิ์ของผู้ใช้งาน','Shared with target settings · Data is scoped to your access')));
  }
- return {Settings,Summary};
+ return {Settings,Summary,readTargets:read};
 }
