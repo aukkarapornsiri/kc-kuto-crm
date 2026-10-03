@@ -32,7 +32,11 @@ try {
    assert.equal(await dialog.getByRole('button',{name:'Edit',exact:true}).isDisabled(),true);
    await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
    await page.getByRole('button',{name:entry+code,exact:true}).click();
-   await dialog.getByRole('button',{name:'Close details',exact:true}).click();await dialog.waitFor({state:'hidden'});
+   await dialog.evaluate(el=>{el.scrollTop=el.scrollHeight;});
+   const close=dialog.getByRole('button',{name:'Close quotation details',exact:true});
+   const closeBox=await close.boundingBox(),dialogBox=await dialog.boundingBox();
+   assert.ok(closeBox.y>=dialogBox.y&&closeBox.y+closeBox.height<=dialogBox.y+90,'Close stays visible after scrolling');
+   await close.click();await dialog.waitFor({state:'hidden'});
   }
   await page.getByRole('button',{name:'Details QA-QUOTE-0',exact:true}).click();
   await page.getByRole('dialog',{name:'Quotation details',exact:true}).getByRole('button',{name:'Print / Save PDF',exact:true}).click();

@@ -38,3 +38,9 @@
 .crm-quotation-detail-dialog #crm-quotation-print{overflow-x:auto}
 .crm-quotation-detail-dialog .crm-field{min-width:0;overflow-wrap:anywhere}
 .crm-quotation-code{color:var(--crm-accent,#088a87);text-decoration:underline;text-underline-offset:3px;text-align:left}
+
+.crm-quotation-detail-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;background:var(--crm-surface,#fff);border-bottom:1px solid var(--crm-border,#dfe7ed)}
+.crm-quotation-detail-close{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;min-width:78px;min-height:44px;padding:8px 14px;border:1px solid var(--crm-border,#cbd5e1);border-radius:8px;background:var(--crm-surface,#fff);color:var(--crm-text,#172033);font:inherit;cursor:pointer}
+.crm-quotation-detail-close span{font-size:26px;line-height:1}
+.crm-quotation-detail-close:hover{background:var(--crm-hover,#e6f7f7)}
+@media(max-width:640px){.crm-quotation-detail-head{padding:10px 12px}}
