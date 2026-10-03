@@ -65,3 +65,6 @@
 .kc-quote-preview-line{grid-template-columns:var(--quote-preview-columns,34px 86px minmax(310px,1fr) 70px 76px 100px 112px)}
 
 .crm-quotation-detail-table{overflow-x:auto}.crm-quotation-detail-table td:not(:first-child),.crm-quotation-detail-table th:not(:first-child){text-align:right;white-space:nowrap}.crm-quotation-detail-table tfoot{font-weight:700;background:#eef4ff}.crm-financial-note{font-size:12px;color:#64748b;margin:12px 0}@media print{.crm-internal-financial{display:none!important}}
+
+/* Keep numeric columns compact so description receives remaining width. */
+.kc-quote-line{column-gap:6px}.kc-quote-line>input{min-width:0;padding-left:6px;padding-right:6px}.kc-quote-line>input[aria-label^=qty],.kc-quote-line>input[aria-label^=price]{text-align:right}
