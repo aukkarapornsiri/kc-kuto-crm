@@ -1,3 +1,4 @@
+import {createSalesMotion} from './sales-motion.mjs?v=20261003';
 import {createAIRobot} from './ai-robot.mjs?v=20261002-wave';
 export const DASHBOARD_ROLES={
  my:{title:['แดชบอร์ดของฉัน','My Dashboard'],eyebrow:'PERSONAL WORKSPACE',accent:'#2dd4bf',description:['เริ่มจากงานสำคัญ แล้วติดตามโอกาสที่อยู่ในมือคุณ','Start with your priorities, then follow the opportunities you own.'],focus:['งานวันนี้ · งานค้าง · เป้าของฉัน','Today · Follow-ups · My targets']},
@@ -24,16 +25,4 @@ export function createDashboardStudio({React,useApp}){
  }
  return {Scene};
 }
-export function createTargetVisuals(React){
- const h=React.createElement;
- return function TargetVisuals({metrics,lang,onMonth,onReset}){
-  const th=lang==='th',max=chartDomain(metrics.rows),cash=n=>n===null?'—':new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(n),percent=metrics.attainment===null?null:metrics.attainment*100;
-  return h('div',{className:'dash-target-visuals'},
-   h('section',{className:'dash-chart','aria-label':th?'กราฟยอดขายเทียบเป้ารายเดือน':'Monthly sales versus target chart'},
-    h('div',{className:'dash-chart-heading'},h('div',null,h('h3',null,th?'เส้นทางสู่เป้าหมาย':'Progress toward target'),h('p',null,th?'กดเดือนเพื่อดูรายละเอียด · หน่วยบาท':'Select a month for detail · THB')),h('button',{type:'button',onClick:onReset},th?'แสดงช่วงทั้งหมด':'Full period')),
-    h('div',{className:'dash-legend'},h('span',null,h('i',{className:'dash-key-target'}),th?'เป้าหมาย':'Target'),h('span',null,h('i',{className:'dash-key-actual'}),th?'ยอดจริง':'Actual')),
-    h('div',{className:'dash-axis-caption'},cash(max)+' '+(th?'บาท':'THB')),
-    h('div',{className:'dash-columns'},metrics.rows.map(row=>h('button',{type:'button',className:'dash-month',key:row.month,onClick:()=>onMonth(row.month),'aria-label':`${row.month} · ${th?'เป้า':'Target'} ${cash(row.target)} · ${th?'ยอดจริง':'Actual'} ${cash(row.actual)}`,title:`${row.month}\n${th?'เป้า':'Target'}: ${cash(row.target)}\n${th?'ยอดจริง':'Actual'}: ${cash(row.actual)}`},h('span',{className:'dash-bars','aria-hidden':true},h('i',{className:'dash-bar-target',style:{height:Math.max(0,Number(row.target)||0)/max*100+'%'}}),h('i',{className:'dash-bar-actual',style:{height:Math.max(0,row.actual)/max*100+'%'}})),h('span',{className:'dash-month-label'},row.month)))),h('div',{className:'dash-axis-caption'},'0')),
-   h('section',{className:'dash-attainment','aria-label':th?'สัดส่วนยอดขายเทียบเป้า':'Target attainment'},h('h3',null,th?'ทำได้เทียบเป้า':'Target attainment'),h('div',{className:'dash-ring',style:{'--attainment':Math.max(0,Math.min(100,percent||0))+'%'}},h('strong',null,percent===null?'—':cash(percent)+'%',h('small',null,th?'ของเป้าช่วงที่เลือก':'of selected target'))),h('p',null,percent===null?(th?'ยังไม่มีเป้าสำหรับคำนวณสัดส่วน':'No positive target for comparison'):(th?'ยอดที่ยังขาดจากเป้า ':'Remaining to target ')+cash(metrics.remaining)+(th?' บาท':' THB'))));
- };
-}
+export const createTargetVisuals=createSalesMotion;
