@@ -19,7 +19,7 @@ try{
    await page.getByRole('button',{name:'แดชบอร์ด'+(role==='AI'?' ':'')+role,exact:true}).click();
    const root=page.locator('.kc-role-dashboard');await page.locator('.dash-hero h1').waitFor();
    assert.equal(await page.locator('.kc-dashboard-studio').getAttribute('data-motion'),'off');
-   assert.equal(await page.locator(role==='AI'?'.dash-mascot-robot':'.dash-orbit-ring').first().evaluate(el=>getComputedStyle(el).animationName),'none');
+   assert.equal(await page.locator(role==='AI'?'.dash-mascot-robot':'.dash-growth-spark').first().evaluate(el=>getComputedStyle(el).animationName),'none');
    if(role==='AI')assert.ok(await page.locator('.dash-mascot-robot').evaluate(el=>el.querySelectorAll('image').length===2),'robot layers present');
    assert.ok(await page.locator('.kc-ai-wave-hand').evaluateAll(els=>els.every(el=>getComputedStyle(el).animationName==='none')),'all robot instances respect pause');
    assert.equal(await root.count(),1,role);
@@ -39,7 +39,7 @@ try{
   await page.getByRole('heading',{name:'Service Dashboard',exact:true}).waitFor();
   await page.getByRole('button',{name:'Enable motion',exact:true}).click();
   await page.emulateMedia({reducedMotion:'reduce'});
-  assert.equal(await page.locator('.dash-orbit-ring').first().evaluate(el=>getComputedStyle(el).animationName),'none');
+  assert.equal(await page.locator('.dash-growth-spark').first().evaluate(el=>getComputedStyle(el).animationName),'none');
   assert.deepEqual(errors,[]);await page.close();
  }
  console.log('PASS all dashboard roles share executive layout, retain KPIs/filters and service tabs; desktop/mobile and language switch');
