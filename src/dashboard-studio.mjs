@@ -1,5 +1,5 @@
 import {TARGET_EVENT,targetMetrics} from './sales-target-model.mjs?v=20261002-targets';
-import {createSalesMotion} from './sales-motion.mjs?v=20261003';
+import {createSalesMotion} from './sales-motion.mjs?v=20261004-loop';
 import {createAIRobot} from './ai-robot.mjs?v=20261002-wave';
 export const DASHBOARD_ROLES={
  my:{title:['แดชบอร์ดของฉัน','My Dashboard'],eyebrow:'PERSONAL WORKSPACE',accent:'#2dd4bf',description:['เริ่มจากงานสำคัญ แล้วติดตามโอกาสที่อยู่ในมือคุณ','Start with your priorities, then follow the opportunities you own.'],focus:['งานวันนี้ · งานค้าง · เป้าของฉัน','Today · Follow-ups · My targets']},

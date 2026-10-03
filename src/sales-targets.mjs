@@ -1,4 +1,4 @@
-import {createTargetVisuals} from './dashboard-studio.mjs?v=20261004-attainment';
+import {createTargetVisuals} from './dashboard-studio.mjs?v=20261004-loop';
 import {TARGET_EVENT,monthKey,monthsBetween,allocateMonths,validateTargets,targetDraft,targetMetrics,sameSavedTargets} from './sales-target-model.mjs?v=20261002-targets';
 export function createSalesTargets({React,client,useApp}){
  const TargetVisuals=createTargetVisuals(React);

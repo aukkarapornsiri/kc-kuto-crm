@@ -44,6 +44,17 @@ try { for(const width of [1440,390]) {
  await page.getByRole('button',{name:'รายงานเป้ายอดขาย',exact:true}).click();
  await page.getByLabel('ปีเป้าหมาย (ค.ศ.)',{exact:true}).fill('2026');
  await page.locator('.crm-target-kpis article').first().getByText('1,200,000.01',{exact:true}).waitFor();
+ const motion=await page.locator('.sm-reveal').evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=3600;const first=getComputedStyle(el).transform;a.currentTime=6600;const second=getComputedStyle(el).transform;return {first,second,iterations:a.effect.getTiming().iterations};});
+ assert.equal(motion.iterations,Infinity);assert.notEqual(motion.first,motion.second,'chart repeats its reveal on the second cycle');
+ assert.equal(await page.locator('.sm-progress').first().evaluate(el=>getComputedStyle(el).animationIterationCount),'infinite');
+ const values=await page.locator('.sm-ring strong').allTextContents();
+ await page.getByRole('button',{name:'หยุดภาพเคลื่อนไหว',exact:true}).click();
+ assert.equal(await page.locator('.sm-progress').first().evaluate(el=>getComputedStyle(el).animationName),'none');
+ assert.deepEqual(await page.locator('.sm-ring strong').allTextContents(),values);
+ await page.getByRole('button',{name:'เล่นต่อ',exact:true}).click();
+ await page.emulateMedia({reducedMotion:'reduce'});
+ assert.equal(await page.locator('.sm-reveal').evaluate(el=>getComputedStyle(el).animationName),'none');
+ await page.emulateMedia({reducedMotion:'no-preference'});
  const monthButtons=page.locator('.sm-months button');
  await monthButtons.last().click();
  assert.equal(await page.getByLabel('ตั้งแต่เดือน',{exact:true}).inputValue(),'2027-03');
