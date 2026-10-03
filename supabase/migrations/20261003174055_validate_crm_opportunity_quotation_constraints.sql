@@ -1,0 +1,4 @@
+alter table public.opportunities validate constraint crm_opportunity_amount_nonnegative;
+alter table public.opportunities validate constraint crm_opportunity_link_requires_account;
+alter table public.quotations validate constraint crm_quote_link_requires_account;
+alter table public.quotations validate constraint crm_quote_validity_order;
