@@ -231,6 +231,17 @@ export function createInternalWorkspace({React,client,useApp}){
  return function InternalWorkspace(props){const [inventoryOpen,InventoryOpen]=React.useState(false);React.useEffect(()=>InventoryOpen(false),[props.entity,props.route]);if(props.entity==='prices')return inventoryOpen?h(Inventory,{lang:props.lang,onClose:()=>InventoryOpen(false)}):h(React.Fragment,null,h('div',{className:'crm-actions'},btn(props.lang==='th'?'สินค้าและคลัง':'Products & Inventory',()=>InventoryOpen(true))),h(Workspace,props));return props.entity==='tickets'?h(ServiceDesk,props):props.entity==='activities'&&props.route?.startsWith('act-email-')?h(MarketingEmails,props):h(Workspace,props);};
 }
 export function createInternalQuickMenu({React,useApp,useAccess}){
- const h=React.createElement;return function QuickMenu({lang,onNavigate,onClose}){const access=useAccess();const items=[['leads','new-lead'],['customers','customer-list'],['contacts','contact-list'],['opportunities','opp-new'],['quotations','quot-create'],['contracts','con-all'],['assets','asset-all'],['tickets','tk-create'],['activities','act-my'],['documents','doc-all']];return h('div',{className:'crm-crumb-pages',style:{right:0,left:'auto'},role:'group','aria-label':lang==='th'?'สร้างรายการ':'Create record'},items.filter(([entity])=>access.can(entity,'view')&&access.can(entity,'create')).map(([entity,route])=>h('button',{type:'button',key:entity,onClick:()=>{onClose();onNavigate(entity,route,{create:true});}},ENTITIES[entity].title[lang==='th'?0:1])));};
+ const h=React.createElement;
+ return function QuickMenu({lang,onNavigate,onClose}){
+  const access=useAccess(),root=React.useRef(null),[position,Position]=React.useState(null);
+  React.useLayoutEffect(()=>{const menu=root.current,wrapper=menu.parentElement,trigger=wrapper.querySelector('button');
+   const place=()=>{const r=trigger.getBoundingClientRect(),width=Math.min(288,window.innerWidth-24);Position({top:r.bottom+8,left:Math.max(12,Math.min(r.right-width,window.innerWidth-width-12)),width,maxHeight:Math.max(100,window.innerHeight-r.bottom-20)});};place();
+   const outside=e=>{if(!wrapper.contains(e.target))onClose();};
+   const key=e=>{if(e.key==='Escape'){e.preventDefault();onClose();trigger.focus();}};
+   document.addEventListener('pointerdown',outside,true);document.addEventListener('keydown',key);window.addEventListener('resize',place);window.addEventListener('scroll',place,true);
+   return()=>{document.removeEventListener('pointerdown',outside,true);document.removeEventListener('keydown',key);window.removeEventListener('resize',place);window.removeEventListener('scroll',place,true);};
+  },[onClose]);
+  const items=[['leads','new-lead'],['customers','customer-list'],['contacts','contact-list'],['opportunities','opp-new'],['quotations','quot-create'],['contracts','con-all'],['assets','asset-all'],['tickets','tk-create'],['activities','act-my'],['documents','doc-all']];
+  return h('div',{ref:root,id:'crm-quick-create-menu',className:'crm-quick-create-menu',style:position||{visibility:'hidden'},role:'group','aria-label':lang==='th'?'สร้างรายการ':'Create record'},items.filter(([entity])=>access.can(entity,'view')&&access.can(entity,'create')).map(([entity,route])=>h('button',{type:'button',key:entity,onClick:()=>{onClose();onNavigate(entity,route,{create:true});}},ENTITIES[entity].title[lang==='th'?0:1])));
+ };
 }
-
