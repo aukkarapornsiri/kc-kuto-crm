@@ -23,7 +23,7 @@ export function createSettingsWorkspace({React,client,useApp}){
  function Company({lang,languageOnly=false}){
   const {demoMode,profile,setLang}=useApp(),task=useTask(),tr=(a,b)=>lang==='th'?a:b,canEdit=demoMode||profile?.role==='admin';
   const [value,V]=React.useState(null),[saved,S]=React.useState(null),[tab,T]=React.useState(languageOnly?'defaults':'general');
-  const load=()=>task.run(async()=>{const row=demoMode?copy(demo.company_settings[0]):await unwrap(client.from('company_settings').select('*').eq('id',1).single());V(row);S(copy(row));});
+  const load=()=>task.run(async()=>{const row=demoMode?copy({...demo.company_settings[0],...(demoCompanyStore.value||{})}):await unwrap(client.from('company_settings').select('*').eq('id',1).single());V(row);S(copy(row));});
   React.useEffect(()=>{load();},[demoMode]);
   const update=(key,v)=>V(old=>({...old,[key]:v})),detail=(key,v)=>V(old=>({...old,company_details:{...old.company_details,[key]:v}}));
   const save=()=>task.run(async()=>{const patch=validateCompany(value);let row;if(demoMode){row={...value,...patch,updated_at:String(Date.now())};demo.company_settings[0]=copy(row);demoCompanyStore.value=copy(row);}else{row=await unwrap(client.from('company_settings').update({...patch,updated_at:new Date().toISOString()}).eq('id',1).eq('updated_at',saved.updated_at).select().maybeSingle());if(!row)throw Error(tr('ข้อมูลถูกแก้ไขแล้วหรือไม่มีสิทธิ์ กรุณาโหลดใหม่','Changed by another user or access denied; reload'));}V(row);S(copy(row));task.setMessage(tr(demoMode?'บันทึกเฉพาะโหมดทดลอง':'บันทึกลงฐานข้อมูลแล้ว',demoMode?'Saved for demo only':'Saved to database'));});

@@ -5,10 +5,10 @@ export async function checkQuotationTemplate(settings,page,width){
  const designer=settings.locator('.qd-preview-pane article');await designer.waitFor();await settings.getByLabel('Font family',{exact:true}).selectOption('Tahoma');await settings.getByLabel('Header style',{exact:true}).selectOption('line');await settings.getByLabel('Watermark',{exact:true}).fill('DRAFT');await settings.getByLabel('Company contact',{exact:true}).uncheck();assert.equal(await designer.getAttribute('data-design-header'),'line');assert.equal(await designer.getAttribute('data-watermark'),'DRAFT');assert.equal(await designer.getAttribute('data-design-contact'),'false');assert.match(await designer.evaluate(e=>getComputedStyle(e).fontFamily),/Tahoma/);await page.screenshot({path:'test-artifacts/quotation-designer-'+width+'.png'});
  const terms=settings.getByLabel('Default terms (days)',{exact:true});
  assert.deepEqual(await terms.locator('option').allTextContents(),['Cash','7 days','15 days','30 days','45 days','60 days','Postdated cheque 7 days','Postdated cheque 15 days','Postdated cheque 30 days','30% deposit, 70% balance on credit','50% deposit, 50% balance on credit','Cheque today']);
- await settings.getByLabel('Browse company logo',{exact:true}).setInputFiles({name:'not-image.txt',mimeType:'text/plain',buffer:Buffer.from('not image')});
+ await settings.getByLabel('Browse decorative logo',{exact:true}).setInputFiles({name:'not-image.txt',mimeType:'text/plain',buffer:Buffer.from('not image')});
  await settings.getByRole('alert').filter({hasText:'PNG, JPG or WebP required'}).waitFor();
- await settings.getByLabel('Browse company logo',{exact:true}).setInputFiles({name:'qa-logo.png',mimeType:'image/png',buffer:Buffer.from(LOGO,'base64')});
- await settings.getByAltText('Company logo preview',{exact:true}).waitFor();
+ await settings.getByLabel('Browse decorative logo',{exact:true}).setInputFiles({name:'qa-logo.png',mimeType:'image/png',buffer:Buffer.from(LOGO,'base64')});
+ await settings.getByAltText('Decorative logo preview',{exact:true}).waitFor();await settings.getByLabel('Browse top-left company logo',{exact:true}).setInputFiles({name:'company.png',mimeType:'image/png',buffer:Buffer.from(SIGNATURE,'base64')});await settings.getByRole('button',{name:'Save company logo',exact:true}).click();await settings.getByRole('status').filter({hasText:'Top-left company logo saved'}).waitFor();
  await settings.getByLabel('Browse seller signature',{exact:true}).setInputFiles({name:'qa-signature.png',mimeType:'image/png',buffer:Buffer.from(SIGNATURE,'base64')});
  await settings.getByAltText('Seller signature preview',{exact:true}).waitFor();
  assert.equal(await settings.getByLabel('Seller label (TH)',{exact:true}).inputValue(),'ผู้ขาย');
@@ -27,7 +27,7 @@ export async function checkQuotationTemplate(settings,page,width){
  await page.locator('[data-entity=quotations]').getByRole('button',{name:'Customize quotation',exact:true}).first().click();
  await terms.selectOption('cash');
  assert.equal(await settings.getByLabel('Font family',{exact:true}).inputValue(),'Tahoma');assert.equal(await settings.getByLabel('Header style',{exact:true}).inputValue(),'line');assert.equal(await settings.getByLabel('Watermark',{exact:true}).inputValue(),'DRAFT');
- await settings.getByAltText('Company logo preview',{exact:true}).locator('..').getByRole('button',{name:'Clear image',exact:true}).click();
+ const leftLogo=await settings.getByAltText('Top-left company logo preview',{exact:true}).getAttribute('src');assert.notEqual(leftLogo,await settings.getByAltText('Decorative logo preview',{exact:true}).getAttribute('src'));await settings.getByAltText('Decorative logo preview',{exact:true}).locator('..').getByRole('button',{name:'Clear image',exact:true}).click();assert.equal(await settings.getByAltText('Top-left company logo preview',{exact:true}).getAttribute('src'),leftLogo);
  await settings.getByLabel('Watermark',{exact:true}).fill('UNSAVED');await settings.getByRole('button',{name:'Cancel',exact:true}).click();
  console.log(`PASS quotation template ${width}px: file browse, logo/signature preview and read-back, exact payment choices, saved selection and cancellation`);
 }
