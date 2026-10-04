@@ -14,6 +14,10 @@ try {
   assert.ok(await header.locator('.kc-ai-robot').isVisible());
   assert.ok(await header.getByRole('button',{name:'ส่งคำถาม',exact:true}).isDisabled());
   await header.locator('input').fill('สรุป Pipeline ให้หน่อย');
+  const inputStyle=await header.locator('input').evaluate(el=>({outline:getComputedStyle(el).outlineStyle,border:getComputedStyle(el).borderWidth}));
+  assert.equal(inputStyle.outline,'none','Focus stays on the outer chat field');
+  assert.equal(inputStyle.border,'0px','No nested input border');
+  if(width===1440)assert.ok(await header.evaluate(el=>el.getBoundingClientRect().width>=450),'Desktop chat field is wider');
   await header.locator('input').press('Enter');
   await page.getByRole('dialog').waitFor();
   await page.getByRole('alert').filter({hasText:'กรุณาเข้าสู่ระบบจริง'}).waitFor();
