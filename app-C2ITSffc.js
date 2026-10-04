@@ -1,6 +1,6 @@
 import {createHeaderAIChat} from './src/header-ai-chat.mjs?v=20261004';
 import {createAIRobot} from './src/ai-robot.mjs?v=20261002-wave';
-import {createDashboardStudio} from './src/dashboard-studio.mjs?v=20261004-solar';
+import {createDashboardStudio} from './src/dashboard-studio.mjs?v=20261004-solar-v5';
 import {createNumberPresentation} from './src/number-format.mjs?v=20261002-commas';
 import {MicrosoftLogin} from "./src/microsoft-login.mjs?v=20261002-live";
 import {createInventory} from './src/inventory.mjs?v=20261003-crm-owned';
