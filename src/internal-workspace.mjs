@@ -8,13 +8,13 @@ import {createMarketingEmails} from './marketing-email.mjs?v=20261004-studio';
 import {createOpportunityDialog} from './opportunity-dialog.mjs?v=20261001';
 import {createAccountList} from './account-list-view.mjs?v=20260930-customer-card';
 import {OPTIONS} from './internal-options.mjs';
-import {ENTITIES,LABELS,MASTER_FIELDS,RELATIONS,fieldsFor,validateRecord,quoteTotals,quotationStoredTotals,filterRows,summarizePipeline} from './internal-model.mjs?v=20261004-save';
+import {ENTITIES,LABELS,MASTER_FIELDS,RELATIONS,fieldsFor,validateRecord,quoteTotals,quotationStoredTotals,filterRows,summarizePipeline} from './internal-model.mjs?v=20261004-quote-company';
 import {PROFILE_LABELS,CUSTOMER_LABELS,parentCustomerOptions,profileDraft,reportingOptions,hydrateRelations,convertDemoLead} from './record-profile.mjs?v=20260930-customer-form';
 import {toCSV} from './settings-model.mjs';
 import {CONTACT_VIEWS,filterContactView,addRecentContact} from './contact-list-view.mjs';
 import {SALES_VIEWS,filterSalesView} from './sales-list-view.mjs';
 import {SERVICE_VIEWS,filterServiceView,sortServiceRows} from './service-list-view.mjs';
-import {createQuotationDocumentComponents} from './quotation-document.mjs?v=20261004-customer-dropdown';
+import {createQuotationDocumentComponents} from './quotation-document.mjs?v=20261004-quote-company';
 const copy=x=>JSON.parse(JSON.stringify(x));
 export const DEMO_RECORDS={...Object.fromEntries(Object.keys(ENTITIES).map(x=>[x,[]])),sales_orders:[]};
 export function createInternalWorkspace({React,client,useApp}){
