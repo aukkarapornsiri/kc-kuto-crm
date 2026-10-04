@@ -1,4 +1,4 @@
-import {createSellerRanking} from './seller-ranking.mjs?v=20261004';
+import {createSellerRanking} from './seller-ranking.mjs?v=20261004-vertical';
 import {THAI_PROVINCES} from './thailand-map-data.mjs';
 import {salesOrderRows,filterSales,summarizeGeography} from './sales-map-model.mjs?v=20261001-so';
 import {toCSV} from './settings-model.mjs';
