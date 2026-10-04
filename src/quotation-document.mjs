@@ -1,5 +1,5 @@
 import {applyCompanyQuotationDefaults,demoCompanyStore} from './quotation-company.mjs?v=20261004';
-import {createQuotationCustomerPicker,recentQuotationCustomers} from './quotation-customer-picker.mjs?v=20261004-company';
+import {createQuotationCustomerPicker,recentQuotationCustomers} from './quotation-customer-picker.mjs?v=20261005-company';
 import {DESIGN_DEFAULTS,normalizeDesign,designAttributes,createDesignControls} from './quotation-designer.mjs?v=20261004';
 import {createQuotationProductPicker} from './quotation-product-picker.mjs?v=20261004-expanded';
 import {quoteTotals} from './internal-model.mjs';
