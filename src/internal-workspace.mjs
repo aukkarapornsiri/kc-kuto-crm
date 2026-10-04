@@ -1,4 +1,4 @@
-import {createCustomer360} from './customer360.mjs?v=20261004';
+import {createCustomer360} from './customer360.mjs?v=20261004-figma';
 import {createQuotationDetail} from './quotation-detail.mjs?v=20261003-compact-columns';
 import {formatNumericField} from './number-format.mjs?v=20261002-commas';
 import {createInventory,bindInventoryRecords} from './inventory.mjs?v=20261002-account360';
