@@ -3,7 +3,7 @@ import {openDesktopMenu,railLabels} from './menu-helper.mjs';
 const modules=['Dashboard','Leads','Accounts','Contacts','Opportunities','Quotations','Contracts & Renewal','Assets / Installed Base','Tickets / Service Desk','Activities','Documents','Reports & Analytics','AI Insights','Settings'];
 const entryPages={'Leads':'Lead Inbox','Accounts':'Account List','Contacts':'Contact List','Opportunities':'Pipeline Kanban','Quotations':'Quotation List','Contracts & Renewal':'All Contracts','Assets / Installed Base':'All Assets','Tickets / Service Desk':'All Tickets','Activities':'My Activities','Documents':'All Documents','AI Insights':'AI Customer Summary'};
 const groupFor={Opportunities:'Sales',Quotations:'Sales','Contracts & Renewal':'Sales','Assets / Installed Base':'Service','Tickets / Service Desk':'Service','Reports & Analytics':'Analytics','AI Insights':'Analytics'};
-const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
+const browser=await chromium.launch({headless:true,...((process.env.CHROME_PATH||process.env.CHROMIUM_PATH)?{executablePath:(process.env.CHROME_PATH||process.env.CHROMIUM_PATH)}:{})});
 try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();await page.getByRole('button',{name:'เปลี่ยนเป็นภาษาอังกฤษ',exact:true}).click();

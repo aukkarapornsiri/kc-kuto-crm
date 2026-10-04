@@ -1,7 +1,7 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import {openThaiSettings} from './menu-helper.mjs';
-const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
+const browser=await chromium.launch({headless:true,...((process.env.CHROME_PATH||process.env.CHROMIUM_PATH)?{executablePath:(process.env.CHROME_PATH||process.env.CHROMIUM_PATH)}:{})});
 try{for(const width of [1555,820,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');

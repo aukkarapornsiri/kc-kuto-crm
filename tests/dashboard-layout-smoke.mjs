@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const roles=['ของฉัน','ฝ่ายขาย','ผู้จัดการ','งานบริการ','ต่ออายุสัญญา','ผู้ดูแลระบบ','AI'];
-const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
+const browser=await chromium.launch({headless:true,...((process.env.CHROME_PATH||process.env.CHROMIUM_PATH)?{executablePath:(process.env.CHROME_PATH||process.env.CHROMIUM_PATH)}:{})});
 fs.mkdirSync('test-artifacts',{recursive:true});
 try{
  for(const width of [1440,390]){

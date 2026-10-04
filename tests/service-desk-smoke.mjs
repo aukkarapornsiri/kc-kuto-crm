@@ -1,5 +1,5 @@
 import {chromium} from 'playwright';import assert from 'node:assert/strict';import fs from 'node:fs';import {openDesktopMenu} from './menu-helper.mjs';
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
 try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();await page.getByRole('button',{name:'เปลี่ยนเป็นภาษาอังกฤษ',exact:true}).click();
  const open=async child=>{if(width>=1024)return openDesktopMenu(page,'Tickets / Service Desk',child);await page.locator('button.lg\\:hidden').first().click();const drawer=page.locator('div.fixed.top-0.left-0.h-full.w-64.lg\\:hidden');if(!await drawer.getByText('Tickets / Service Desk',{exact:true}).isVisible())await drawer.getByRole('button',{name:'Service',exact:true}).click();if(!await drawer.getByText(child,{exact:true}).isVisible())await drawer.getByText('Tickets / Service Desk',{exact:true}).click();await drawer.getByText(child,{exact:true}).click();};

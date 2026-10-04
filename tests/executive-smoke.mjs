@@ -2,7 +2,7 @@ import {chromium} from 'playwright';import http from 'node:http';import fs from 
 import {SAMPLE_DEALS,summarize} from '../src/executive-dashboard.mjs';
 const root=process.cwd();
 assert.equal(summarize(SAMPLE_DEALS.filter(r=>r.quarter===3),6).revenue,15435000);assert.equal(summarize(SAMPLE_DEALS.filter(r=>r.quarter===3),6).forecast,22809500);
-const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
+const browser=await chromium.launch({headless:true,...((process.env.CHROME_PATH||process.env.CHROMIUM_PATH)?{executablePath:(process.env.CHROME_PATH||process.env.CHROMIUM_PATH)}:{})});
 try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4173/kc-kuto-crm/');await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();await page.getByRole('button',{name:'แดชบอร์ดผู้บริหาร',exact:true}).click();

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {openThaiSettings} from './menu-helper.mjs';
 const fixture={service:'kc-account360-inventory',version:1,fetchedAt:new Date().toISOString(),canSeeCost:false,settings:{enabled:true},catalog:[{id:'source-1',category:'PRODUCT',code:'SRC-01',name:'Account Product',description:'Source specification',status:'Active',metadata:{unit:'ชิ้น',salePrice:123,vatMode:'exclusive'}},{id:'unit-1',category:'PRODUCT_UNIT',code:'PC',name:'ชิ้น',metadata:{}}],warehouses:[{code:'HQ',name:'Source Warehouse',active:true}],balances:[{warehouse:'HQ',code:'SRC-01',quantity:0,minimum:2}]};
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
 try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];let fail=false;
  page.on('pageerror',e=>errors.push(e.message));

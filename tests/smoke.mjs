@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import {openDesktopMenu,railLabels} from './menu-helper.mjs';
 
 const base = process.env.SITE_URL || 'http://127.0.0.1:4173/kc-kuto-crm/';
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
 const failures = [];
 const results = [];
 
