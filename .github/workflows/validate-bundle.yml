@@ -48,6 +48,8 @@ jobs:
           node --test tests/inventory-model.test.mjs
           node --check src/service-desk.mjs
           node --test tests/service-model.test.mjs
+          node --check src/email-studio.mjs
+          node --test tests/email-studio.test.mjs
           node --check src/marketing-email.mjs
           node --check src/sales-map.mjs
           node --test tests/marketing-model.test.mjs tests/sales-map-model.test.mjs tests/sales-order-sync-model.test.mjs tests/sales-order-sync-edge.test.mjs

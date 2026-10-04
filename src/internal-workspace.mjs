@@ -4,7 +4,7 @@ import {createQuotationDetail} from './quotation-detail.mjs?v=20261003-compact-c
 import {formatNumericField} from './number-format.mjs?v=20261002-commas';
 import {createInventory,bindInventoryRecords} from './inventory.mjs?v=20261002-account360';
 import {createServiceDesk} from './service-desk.mjs?v=20261002-commas';
-import {createMarketingEmails} from './marketing-email.mjs?v=20261001-marketing';
+import {createMarketingEmails} from './marketing-email.mjs?v=20261004-studio';
 import {createOpportunityDialog} from './opportunity-dialog.mjs?v=20261001';
 import {createAccountList} from './account-list-view.mjs?v=20260930-customer-card';
 import {OPTIONS} from './internal-options.mjs';
