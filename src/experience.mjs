@@ -89,26 +89,21 @@ export function createExperience({React,client,useApp,palette}) {
   }
   function Breadcrumb({lang,module,page,onNavigate,modules,categories,groups}){
     const h=React.createElement,tr=(th,en)=>lang==='th'?th:en;
-    const [open,setOpen]=React.useState(false),root=React.useRef(null),toggle=React.useRef(null);
+
     const mod=modules.find(x=>x.id===module),pages=mod?.subs??[];
     const label=item=>item?.label?.[lang]??item?.id??'';
     const current=page==='set-hub'?tr('ตั้งค่าระบบ','Settings'):label(pages.find(x=>x.id===page))||label(mod);
     const category=module==='settings'?categories.findIndex(x=>x.items.includes(page)):-1;
     const group=module==='settings'?null:Object.values(groups).find(x=>x.module===module&&x.members.includes(page)&&x.members[0]!==page&&x.members.length>1);
     const parent=group?pages.find(x=>x.id===group.members[0]):null;
-    React.useEffect(()=>{setOpen(false);},[module,page,lang]);
-    React.useEffect(()=>{if(!open)return;const outside=e=>{if(!root.current?.contains(e.target))setOpen(false);};const escape=e=>{if(e.key==='Escape'){setOpen(false);toggle.current?.focus();}};document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape);};},[open]);
-    const go=(m,p,params)=>{setOpen(false);onNavigate(m,p,params);};
+    const go=(m,p,params)=>onNavigate(m,p,params);
     const separator=()=>h('span',{'aria-hidden':true,className:'crm-crumb-separator'},'›');
-    return h('nav',{ref:root,className:'crm-breadcrumb','aria-label':tr('เส้นทางนำทาง','Breadcrumb')},
+    return h('nav',{className:'crm-breadcrumb','aria-label':tr('เส้นทางนำทาง','Breadcrumb')},
       h('button',{type:'button','aria-label':tr('ไปที่ ','Go to ')+label(mod),onClick:()=>go(module,module==='settings'?'set-hub':pages[0]?.id??module)},label(mod)),
       category>=0&&h(React.Fragment,null,separator(),h('button',{type:'button','aria-label':tr('ไปที่หมวด ','Go to category ')+categories[category].label[lang],onClick:()=>go('settings','set-hub',{category})},categories[category].label[lang])),
       parent&&h(React.Fragment,null,separator(),h('button',{type:'button','aria-label':tr('ไปที่หมวด ','Go to category ')+label(parent),onClick:()=>go(module,parent.id)},label(parent))),
-      pages.length>0&&h(React.Fragment,null,separator(),h('button',{ref:toggle,type:'button','aria-current':'page','aria-label':tr('เลือกหน้า: ','Choose page: ')+current,'aria-expanded':open,onClick:()=>setOpen(v=>!v),className:'crm-crumb-current'},current,h('svg',{width:12,height:12,viewBox:'0 0 12 12','aria-hidden':true},h('path',{d:'M2 4l4 4 4-4',fill:'none',stroke:'currentColor',strokeWidth:1.5})))),
-      !pages.length&&h('span',{'aria-current':'page',className:'sr-only'},current),
-      open&&h('div',{className:'crm-crumb-pages',role:'group','aria-label':tr('หน้าในโมดูลนี้','Pages in this module')},
-        module==='settings'&&h('button',{type:'button',onClick:()=>go(module,'set-hub')},tr('ศูนย์ตั้งค่า','Settings center')),
-        pages.filter(x=>x.id!==page&&x.id!=='set-func'&&(module==='settings'||x.visibleInSidebar!==false)).map(item=>h('button',{key:item.id,type:'button',onClick:()=>go(module,item.id)},label(item)))));
+      pages.length>0&&h(React.Fragment,null,separator(),h('span',{'aria-current':'page',className:'crm-crumb-current'},current)),
+      !pages.length&&h('span',{'aria-current':'page',className:'sr-only'},current));
   }
   function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null,navigationState}) {
     const {profile,demoMode}=useApp();
