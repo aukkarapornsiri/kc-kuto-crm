@@ -21,16 +21,12 @@ try{for(const width of [1440,390]){
    await sidebar.getByText(name,{exact:true}).click();
    if(entryPages[name])await sidebar.getByText(entryPages[name],{exact:true}).click();
   }
-  assert.equal(await nav.isVisible(),true);
-  await nav.getByRole('button',{name:'Go to '+name,exact:true}).click();
-  const initial=(await nav.locator('[aria-current="page"]').textContent()).trim();
-  assert.ok(initial.length>0);
-  assert.equal(await nav.locator('button[aria-current="page"], [aria-expanded], .crm-crumb-pages').count(),0);
-  assert.equal(await nav.locator('[aria-current="page"]').evaluate(el=>el.tagName),'SPAN');
+  assert.equal(await nav.count(),0,'Redundant header breadcrumb must be absent');
+  assert.equal(await page.locator('.kc-app-header').isVisible(),true);
   checked++;
  }
  assert.equal(checked,modules.length);assert.deepEqual(errors,[]);
- console.log('PASS '+width+'px: all 14 modules accessible, duplicate dropdown absent, current page labels and module home links preserved');
+ console.log('PASS '+width+'px: all 14 modules accessible, redundant header labels absent, primary navigation preserved');
  await page.screenshot({path:`test-artifacts/navigation-${width}.png`,fullPage:true});await page.close();
 }}finally{await browser.close();}
 
