@@ -14,7 +14,7 @@ import {toCSV} from './settings-model.mjs';
 import {CONTACT_VIEWS,filterContactView,addRecentContact} from './contact-list-view.mjs';
 import {SALES_VIEWS,filterSalesView} from './sales-list-view.mjs';
 import {SERVICE_VIEWS,filterServiceView,sortServiceRows} from './service-list-view.mjs';
-import {createQuotationDocumentComponents} from './quotation-document.mjs?v=20261004-brand-ribbon';
+import {createQuotationDocumentComponents} from './quotation-document.mjs?v=20261004-designer';
 const copy=x=>JSON.parse(JSON.stringify(x));
 export const DEMO_RECORDS={...Object.fromEntries(Object.keys(ENTITIES).map(x=>[x,[]])),sales_orders:[]};
 export function createInternalWorkspace({React,client,useApp}){
