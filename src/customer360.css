@@ -13,3 +13,5 @@
 @media(prefers-reduced-motion:reduce){.c360 .c360-kpis>button{transition:none}.c360 .c360-kpis>button:hover:not(:disabled){transform:none}}
 
 .c360>.c360-panel{margin-top:20px}.c360 .c360-panel h4{font-size:14px;font-weight:600;margin:22px 0 8px}.c360 .c360-contact-link{display:inline-flex;align-items:center;margin:6px 8px;padding:9px 14px;min-height:42px;border:1px solid var(--c360-line);border-radius:10px;color:var(--c360-teal);background:white;text-decoration:none}.c360 .c360-contact-link:focus-visible{outline:3px solid #32afb4;outline-offset:3px}
+
+.c360 .c360-readiness-value{display:grid;grid-template-columns:minmax(140px,1fr) 2fr;gap:16px;padding:12px 0;border-bottom:1px solid var(--c360-line)}.c360-readiness-value dt{color:var(--c360-muted)}.c360-readiness-value dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.c360 .crm-record-popup textarea{width:100%;font:inherit;border:1px solid #c8d8dd;border-radius:8px;padding:10px;box-sizing:border-box}.c360 .c360-panel>button{margin:8px 8px 8px 0}@media(max-width:600px){.c360 .c360-readiness-value{grid-template-columns:1fr;gap:4px}}

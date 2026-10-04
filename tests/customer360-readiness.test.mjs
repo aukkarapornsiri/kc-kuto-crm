@@ -1,0 +1,3 @@
+import assert from 'node:assert/strict';
+import {validateReadiness,readinessBrief} from '../src/customer360-readiness-model.mjs';
+assert.equal(validateReadiness({line_id:' @test '}).line_id,'@test');assert.equal(validateReadiness({}).mailbox,'');assert.throws(()=>validateReadiness({mailbox:'invalid'}));assert.throws(()=>validateReadiness({notes:'x'.repeat(2001)}));assert.equal(validateReadiness({unknown:'secret'}).unknown,undefined);const brief=readinessBrief({name:'Customer',code:'C1'},validateReadiness({next_goal:'Renewal'}),'en');assert.match(brief,/Not provided/);assert.match(brief,/not sent to a model/);assert.match(brief,/Renewal/);console.log('PASS optional preparation fields, validation, allowlist, honest AI brief');
