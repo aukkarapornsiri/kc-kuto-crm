@@ -8,7 +8,10 @@ export function validateCompany(input){
  if(!out.company_name||out.company_name.length>200)throw Error('กรอกชื่อบริษัท / Company name is required (max 200)');
  if(out.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(out.email))throw Error('อีเมลไม่ถูกต้อง / Invalid email');
  if(out.tax_id&&!/^\d{13}$/.test(out.tax_id))throw Error('เลขภาษีต้องมี 13 หลัก / Tax ID must have 13 digits');
- if(out.website&&!/^https?:\/\//i.test(out.website))throw Error('Website must start with https:// or http://');
+ if(out.website){
+  if(!/^[a-z][a-z0-9+.-]*:/i.test(out.website))out.website='https://'+out.website;
+  try{const url=new URL(out.website);if(!['https:','http:'].includes(url.protocol)||!url.hostname||url.username||url.password||/\s/.test(out.website))throw Error();}catch{throw Error('เว็บไซต์ไม่ถูกต้อง กรุณากรอกชื่อเว็บ เช่น www.example.com / Invalid website');}
+ }
  if(out.logo_url&&!/^https:\/\/|^data:image\/(png|jpeg|webp);base64,/i.test(out.logo_url))throw Error('Logo must be HTTPS or PNG/JPEG/WebP');
  if(out.logo_url.length>360000)throw Error('Logo too large (maximum 250 KB)');
  if(!['th','en'].includes(out.default_language)||!['THB','USD','EUR','JPY'].includes(out.currency)||!['DD/MM/YYYY','MM/DD/YYYY','YYYY-MM-DD'].includes(out.date_format)||!['12h','24h'].includes(out.time_format))throw Error('Invalid regional option');

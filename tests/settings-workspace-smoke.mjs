@@ -22,12 +22,13 @@ try{for(const width of [1440,390]){
   await page.locator('.crm-settings').getByRole('button',{name:'ข้อมูลบริษัท',exact:true}).click();
  }
  await page.getByLabel('ชื่อบริษัท',{exact:true}).fill('บริษัททดสอบ QA');
+ await page.getByLabel('เว็บไซต์',{exact:true}).fill('www.kai-com.com');
  await page.getByRole('button',{name:'ที่อยู่บริษัท',exact:true}).click();
  await page.getByLabel('ที่อยู่ภาษาไทย',{exact:true}).fill('ที่อยู่ทดสอบ กรุงเทพ');
  await page.getByRole('button',{name:'บันทึก',exact:true}).click();
  await page.getByRole('status').filter({hasText:'บันทึกเฉพาะโหมดทดลอง'}).waitFor();
  await page.getByRole('button',{name:'โหลดใหม่',exact:true}).click();
- assert.equal(await page.getByLabel('ที่อยู่ภาษาไทย',{exact:true}).inputValue(),'ที่อยู่ทดสอบ กรุงเทพ');
+ assert.equal(await page.getByLabel('ที่อยู่ภาษาไทย',{exact:true}).inputValue(),'ที่อยู่ทดสอบ กรุงเทพ');await page.getByRole('button',{name:'ข้อมูลทั่วไป',exact:true}).click();assert.equal(await page.getByLabel('เว็บไซต์',{exact:true}).inputValue(),'https://www.kai-com.com');
  await page.getByRole('button',{name:'ผู้ติดต่อ',exact:true}).filter({visible:true}).last().click();
  await page.getByLabel('ชื่อผู้ติดต่อ',{exact:true}).fill('QA Contact');
  await page.getByRole('button',{name:'บันทึก',exact:true}).click();

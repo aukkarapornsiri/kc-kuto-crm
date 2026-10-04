@@ -5,7 +5,7 @@ import {saveRolePermissions} from './role-permission-save.mjs?v=20261002-live-ac
 import {createAccessManagement,MODULE_LABELS,ACTION_LABELS,DASHBOARD_LABELS} from './access-management.mjs?v=20261002-live-access';
 import {profileNames,profileDisplayName} from './profile-names.mjs?v=20261002';
 import {createDeleteUserDialog,removeUser} from './delete-user.mjs?v=20261002';
-import {COMPANY_FIELDS,validateCompany,MODULES,ACTIONS,IMPORTS,toCSV,validateImport} from './settings-model.mjs';
+import {COMPANY_FIELDS,validateCompany,MODULES,ACTIONS,IMPORTS,toCSV,validateImport} from './settings-model.mjs?v=20261004-website';
 export function createSettingsWorkspace({React,client,useApp}){
  const RecordPopup=createRecordPopup(React);
  const DeleteUserDialog=createDeleteUserDialog(React);
