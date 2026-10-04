@@ -52,3 +52,9 @@
  .kc-context-menu button:hover{background:#e6f7f7;color:#088a87}
 }
 @media(max-width:1023px){.kc-context-bar{display:none}}
+
+/* Text-only top navigation: pointer selection has depth without a box. */
+.kc-app .kc-context-bar .kc-context-tab,.kc-app .kc-context-bar .kc-context-more,.kc-app .crm-breadcrumb button{border:0!important;outline:none!important;box-shadow:none!important;background:transparent!important;transition:color .15s ease,text-shadow .15s ease}
+.kc-app .kc-context-bar .kc-context-tab[data-active=true],.kc-app .kc-context-bar .kc-context-tab:hover,.kc-app .kc-context-bar .kc-context-tab:focus,.kc-app .kc-context-bar .kc-context-more:hover,.kc-app .crm-breadcrumb button:hover,.kc-app .crm-breadcrumb button:focus{color:var(--crm-surface-ink,#172033)!important;font-weight:700;text-shadow:0 1px 1px #102f3d20;text-decoration:none}
+.kc-app .kc-context-bar button:focus-visible,.kc-app .crm-breadcrumb button:focus-visible{text-decoration:underline!important;text-decoration-thickness:2px!important;text-underline-offset:6px}
+@media(prefers-reduced-motion:reduce){.kc-app .kc-context-bar .kc-context-tab,.kc-app .kc-context-bar .kc-context-more,.kc-app .crm-breadcrumb button{transition:none}}
