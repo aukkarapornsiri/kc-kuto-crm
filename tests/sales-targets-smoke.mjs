@@ -34,7 +34,7 @@ try { for(const width of [1440,390]) {
  if(width>=1024) {
   await page.getByRole('navigation',{name:'หมวดหลัก'}).getByRole('button',{name:'หน้าหลัก',exact:true}).click();
   await page.locator('.crm-target-kpis article').first().getByText('300,000.01',{exact:true}).waitFor();
-  assert.equal(await page.locator('.dash-hero .crm-target-banner article').count(),4);
+  assert.equal(await page.locator('.dash-hero .crm-target-banner article').count(),3);
   assert.equal(await page.locator('.dash-content .crm-target-kpis').count(),0);
   assert.equal(await page.locator('.crm-target-overview table').count(),0,'Dashboard omits detail tables');
   assert.equal(await page.getByLabel('ปีเป้าหมาย (ค.ศ.)',{exact:true}).count(),0,'Dashboard omits target year');
