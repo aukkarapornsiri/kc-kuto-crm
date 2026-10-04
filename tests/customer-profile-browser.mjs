@@ -38,7 +38,7 @@ export async function checkCustomerWorkflow(page,open,width) {
   const accounts=page.locator('[data-entity="customers"]');
   await accounts.getByRole('button',{name:/^Details /}).first().click();
   const detail=accounts.getByRole('region',{name:'Record details'});
-  const accountCode=await detail.getByRole('heading',{level:2}).innerText();
+  const accountCode=await detail.locator(':scope > h2').innerText();
   const linked=[['Leads','leads'],['Contacts','contacts'],['Customer branches','branches'],['Opportunities','opportunities'],['Quotations','quotations'],['Contracts and renewal','contracts'],['Customer assets','assets'],['Service tickets','tickets'],['Activities and follow-ups','activities'],['Documents','documents']];
   for(const [title,entity] of linked){
     const section=detail.getByRole('heading',{name:`${title} (1)`,exact:true}).locator('..');
