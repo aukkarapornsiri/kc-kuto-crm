@@ -4,6 +4,7 @@
 .kc-header-ai{width:560px;max-width:48vw;flex:0 1 560px}
 .kc-header-ai input,.kc-chat-compose input{border:0!important;border-radius:0!important;box-shadow:none!important}
 :is(.kc-header-ai,.kc-chat-compose) input:is(:focus,:focus-visible){outline:none!important;border-color:transparent!important;box-shadow:none!important}
+.kc-header-ai .kc-chat-launch:is(:focus,:focus-visible){outline:none!important;border-color:transparent!important;box-shadow:none!important;border-radius:7px;background:color-mix(in srgb,var(--crm-primary,#0aada9) 12%,transparent)}
 :is(.kc-header-ai,.kc-chat-compose):focus-within{outline:2px solid var(--crm-focus-accent,var(--crm-primary,#0aada9));outline-offset:-2px;box-shadow:none}
 @media(max-width:1100px){.kc-header-ai{width:340px;min-width:220px;flex-basis:340px}.kc-chat-launch span{display:none}}
 @media(max-width:767px){.kc-app-header{height:auto!important;min-height:56px;flex-wrap:wrap;padding-top:8px!important;padding-bottom:8px!important}.kc-header-ai{order:20;flex-basis:100%;width:100%;max-width:none;min-width:0}.kc-chat-launch span{display:inline}.kc-header-ai input{font-size:16px}.kc-chat-compose input{font-size:16px}.kc-chat-send{width:38px;height:38px}}
