@@ -25,3 +25,13 @@ test('image upload uses the private bucket, original bytes and immutable unique 
  for(const call of calls){assert.equal(call.bucket,QUOTATION_ASSET_BUCKET);assert.equal(call.body,file);assert.equal(call.options.upsert,false);assert.equal(call.options.contentType,'image/png');}
  await assert.rejects(()=>uploadQuotationAsset({storage:{from:()=>({upload:async()=>({error:Error('Denied')})})}},file,'owner','logo'),/Denied/);
 });
+import {loadQuotationImages,withMissingQuotationLogo} from '../src/quotation-assets.mjs';
+test('missing snapshot logo uses saved branding without overwriting document or existing logo',()=>{
+ const old={company_name_th:'Original',logo_url:''};assert.deepEqual(withMissingQuotationLogo(old,{logo_storage_key:'new/logo.png'}),{...old,logo_storage_key:'new/logo.png'});
+ assert.equal(withMissingQuotationLogo({logo_url:'saved.png'},{logo_url:'new.png'}).logo_url,'saved.png');assert.equal(old.logo_url,'');
+});
+test('a failed signature download does not remove the usable logo',async()=>{
+ const client={storage:{from:()=>({download:async()=>({error:Error('Denied')})})}};
+ const value=await loadQuotationImages(client,{logo_url:'data:image/png;base64,ok',seller_signature_storage_key:'missing'});
+ assert.equal(value.logo,'data:image/png;base64,ok');assert.equal(value.signature,'');assert.match(value.error,/Signature: Denied/);
+});

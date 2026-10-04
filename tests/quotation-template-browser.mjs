@@ -32,7 +32,7 @@ export async function checkQuotationTemplate(settings,page,width){
 export async function checkQuotationImages(form,page,width){
  const preview=page.locator('.kc-quotation-preview.is-visible');
  const logo=preview.locator('.kc-quote-preview-company img'),signature=preview.getByAltText('Seller signature',{exact:true});
- await logo.waitFor();await signature.waitFor();await logo.evaluate(el=>el.decode());await signature.evaluate(el=>el.decode());
+ await logo.waitFor();await signature.waitFor();const lines=await preview.locator(':scope > footer i').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().bottom));assert.equal(lines.length,3);assert.ok(Math.max(...lines)-Math.min(...lines)<1,'Signature baselines must align');await logo.evaluate(el=>el.decode());await signature.evaluate(el=>el.decode());
  assert.equal(await logo.evaluate(el=>el.complete&&el.naturalWidth>0),true);
  assert.equal(await signature.evaluate(el=>el.complete&&el.naturalWidth>0),true);
  assert.ok((await preview.locator('.kc-quote-payment-term').innerText()).includes('45 days'));

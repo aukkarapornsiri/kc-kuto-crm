@@ -29,3 +29,12 @@ export async function downloadQuotationAsset(client,key){
  if(!data)throw Error('Quotation image unavailable');
  return imageDataUrl(data);
 }
+export function withMissingQuotationLogo(snapshot,current){
+ const result={...snapshot};
+ if(!result.logo_storage_key&&!result.logo_url){result.logo_storage_key=current?.logo_storage_key||'';result.logo_url=current?.logo_url||'';}
+ return result;
+}
+export async function loadQuotationImages(client,value){
+ const results=await Promise.allSettled([value.logo_storage_key?downloadQuotationAsset(client,value.logo_storage_key):value.logo_url||'',value.seller_signature_storage_key?downloadQuotationAsset(client,value.seller_signature_storage_key):value.seller_signature_url||'']);
+ return {logo:results[0].status==='fulfilled'?results[0].value:'',signature:results[1].status==='fulfilled'?results[1].value:'',error:results.flatMap((r,i)=>r.status==='rejected'?[(i===0?'Logo: ':'Signature: ')+(r.reason?.message||String(r.reason))]:[]).join(' · '),loading:false};
+}

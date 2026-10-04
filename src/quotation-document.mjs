@@ -1,7 +1,7 @@
 import {createQuotationProductPicker} from './quotation-product-picker.mjs?v=20261003';
 import {quoteTotals} from './internal-model.mjs';
 import {resolvePaymentTerm,paymentTermOptions} from './quotation-payment-terms.mjs';
-import {readQuotationImage,uploadQuotationAsset,downloadQuotationAsset} from './quotation-assets.mjs';
+import {readQuotationImage,uploadQuotationAsset,loadQuotationImages,withMissingQuotationLogo} from './quotation-assets.mjs?v=20261004-logo-fix';
 
 export const DEFAULT_QUOTATION_TEMPLATE=Object.freeze({
   id:null,name:'KC Standard Quotation',description:'Account 360 style quotation',is_default:true,status:'active',
@@ -44,8 +44,8 @@ export function createQuotationDocumentComponents({React,client,useApp}){
   function useTemplateImages(value){
     const [images,setImages]=React.useState({logo:'',signature:'',error:'',loading:false});
     React.useEffect(()=>{let live=true;setImages({logo:'',signature:'',error:'',loading:true});(async()=>{try{
-      const [logo,signature]=await Promise.all([value.logo_storage_key?downloadQuotationAsset(client,value.logo_storage_key):value.logo_url||'',value.seller_signature_storage_key?downloadQuotationAsset(client,value.seller_signature_storage_key):value.seller_signature_url||'']);
-      if(live)setImages({logo,signature,error:'',loading:false});
+      const result=await loadQuotationImages(client,value);
+      if(live)setImages(result);
     }catch(e){if(live)setImages({logo:'',signature:'',error:e.message||String(e),loading:false});}})();return()=>{live=false;};},[value.logo_storage_key,value.logo_url,value.seller_signature_storage_key,value.seller_signature_url]);
     return images;
   }
@@ -55,7 +55,7 @@ export function createQuotationDocumentComponents({React,client,useApp}){
     const [template,setTemplate]=React.useState(()=>existingSnapshot&&Object.keys(existingSnapshot).length?{...DEFAULT_QUOTATION_TEMPLATE,...existingSnapshot}:copy(DEFAULT_QUOTATION_TEMPLATE));
     const [ready,setReady]=React.useState(false);
     React.useEffect(()=>{if(!open){setReady(false);return;}let live=true;setReady(false);(async()=>{try{
-      if(existingSnapshot&&Object.keys(existingSnapshot).length){if(live)setTemplate({...DEFAULT_QUOTATION_TEMPLATE,...existingSnapshot});return;}
+      if(existingSnapshot&&Object.keys(existingSnapshot).length){let resolved=existingSnapshot;if(!existingSnapshot.logo_storage_key&&!existingSnapshot.logo_url){try{const current=demoMode?demoTemplate:await unwrap(client.from('crm_quotation_templates').select('logo_storage_key,logo_url').eq('is_default',true).eq('status','active').maybeSingle());resolved=withMissingQuotationLogo(existingSnapshot,current);}catch{ /* Preserve the saved document if current branding is unavailable. */ }}if(live)setTemplate({...DEFAULT_QUOTATION_TEMPLATE,...resolved});return;}
       if(demoMode){if(live)setTemplate(copy(demoTemplate));return;}
       const row=await unwrap(client.from('crm_quotation_templates').select('*').eq('is_default',true).eq('status','active').maybeSingle());
       if(live)setTemplate({...DEFAULT_QUOTATION_TEMPLATE,...(row||{})});
