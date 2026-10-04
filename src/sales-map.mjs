@@ -38,7 +38,6 @@ export function createSalesMap({React,client,useApp,records}){
 export function createDashboardSalesMap(dependencies){
  const {React}=dependencies,h=React.createElement,SalesMap=createSalesMap(dependencies);
  return function DashboardSalesMap({lang,Component}){
-  const target=React.useRef(null);
-  return h(React.Fragment,null,h('div',{className:'sales-map-jump'},h('button',{type:'button',onClick:()=>target.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})},lang==='th'?'แผนที่ยอดขาย':'Sales map')),h(Component,{lang}),h('div',{ref:target},h(SalesMap,{lang})));
+  return h('div',{className:'kc-dashboard-layout'},h(Component,{lang}),h(SalesMap,{lang}));
  };
 }

@@ -36,6 +36,13 @@ try { for(const width of [1440,390]) {
   await page.locator('.crm-target-kpis article').first().getByText('300,000.01',{exact:true}).waitFor();
   assert.equal(await page.locator('.dash-hero .crm-target-banner article').count(),4);
   assert.equal(await page.locator('.dash-content .crm-target-kpis').count(),0);
+  assert.equal(await page.locator('.crm-target-overview table').count(),0,'Dashboard omits detail tables');
+  assert.equal(await page.getByLabel('ปีเป้าหมาย (ค.ศ.)',{exact:true}).count(),0,'Dashboard omits target year');
+  assert.equal(await page.getByText('ผลงานรายพนักงาน',{exact:true}).count(),0);
+  assert.equal(await page.getByText('กำไรเทียบเป้า',{exact:true}).count(),0);
+  assert.equal(await page.getByText('โหมดภาษาไทย',{exact:true}).count(),0);
+  assert.equal(await page.locator('.sales-map-jump').count(),0);
+  assert.ok(await page.locator('.sm-panel').isVisible(),'Summary charts retained');
   for(const bannerWidth of [1440,390]){await page.setViewportSize({width:bannerWidth,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.locator('.dash-hero').screenshot({path:`test-artifacts/target-banner-${bannerWidth}.png`});}
   await page.setViewportSize({width,height:1000});
   await page.getByRole('navigation',{name:'หมวดหลัก'}).getByRole('button',{name:'วิเคราะห์',exact:true}).click();
@@ -46,6 +53,7 @@ try { for(const width of [1440,390]) {
   await page.getByRole('button',{name:'รายงานและการวิเคราะห์',exact:true}).filter({visible:true}).click();
  }
  await page.getByRole('button',{name:'รายงานเป้ายอดขาย',exact:true}).click();
+ assert.ok(await page.getByText('ผลงานรายพนักงาน',{exact:true}).isVisible(),'Report retains employee details');
  await page.getByLabel('ปีเป้าหมาย (ค.ศ.)',{exact:true}).fill('2026');
  await page.locator('.crm-target-kpis article').first().getByText('1,200,000.01',{exact:true}).waitFor();
  const motion=await page.locator('.sm-reveal').evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=3600;const first=getComputedStyle(el).transform;a.currentTime=6600;const second=getComputedStyle(el).transform;return {first,second,iterations:a.effect.getTiming().iterations};});
