@@ -33,6 +33,7 @@ try{for(const width of [1440,390]){
  await page.getByLabel('ชื่อผู้ติดต่อ',{exact:true}).fill('QA Contact');
  await page.getByRole('button',{name:'บันทึก',exact:true}).click();
  await page.getByRole('status').filter({hasText:'บันทึกเฉพาะโหมดทดลอง'}).waitFor();
+ await page.getByRole('button',{name:'โซเชียลมีเดีย',exact:true}).click();await page.getByLabel('LINE ID / ลิงก์',{exact:true}).fill('@kaicom');await page.getByRole('button',{name:'บันทึก',exact:true}).click();await page.getByRole('status').filter({hasText:'บันทึกเฉพาะโหมดทดลอง'}).waitFor();await page.getByRole('button',{name:'โหลดใหม่',exact:true}).click();assert.equal(await page.getByLabel('LINE ID / ลิงก์',{exact:true}).inputValue(),'@kaicom');
  await open('ทีมงานและแผนก');await page.getByRole('button',{name:'เพิ่มรายการ',exact:true}).click();
  await page.getByLabel('ชื่อทีมภาษาไทย',{exact:true}).fill('ทีม QA');await page.getByLabel('ชื่อทีมภาษาอังกฤษ',{exact:true}).fill('QA Team');
  await page.getByLabel('แผนก',{exact:true}).fill('Sales');await page.getByRole('button',{name:'บันทึก',exact:true}).click();

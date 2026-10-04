@@ -19,7 +19,9 @@ export function validateCompany(input){
  out.fiscal_year_start_month=Number(out.fiscal_year_start_month);
  if(!Number.isInteger(out.fiscal_year_start_month)||out.fiscal_year_start_month<1||out.fiscal_year_start_month>12)throw Error('Fiscal month must be 1–12');
  out.company_details=Object.fromEntries(['address_th','address_en','branch_code','contact_name','contact_position','contact_phone','contact_email','facebook','line','linkedin'].map(k=>[k,String(input.company_details?.[k]??'').trim()]));
- for(const [k,v] of Object.entries(out.company_details)){if(v.length>2000)throw Error(`${k}: maximum 2000 characters`);if(['facebook','line','linkedin'].includes(k)&&v&&!/^https:\/\//i.test(v))throw Error(`${k}: HTTPS link required`);}
+ for(const [k,v] of Object.entries(out.company_details)){if(v.length>2000)throw Error(`${k}: maximum 2000 characters`);if(['facebook','linkedin'].includes(k)&&v&&!/^https:\/\//i.test(v))throw Error(`${k}: HTTPS link required`);}
+ const line=out.company_details.line;
+ if(line&&!/^@?[a-z0-9._-]+$/i.test(line)){try{const url=new URL(line);if(url.protocol!=='https:'||!url.hostname||url.username||url.password||/\s/.test(line))throw Error();}catch{throw Error('กรอก LINE ID เช่น @kaicom หรือ HTTPS link / Enter a LINE ID or HTTPS link');}}
  return out;
 }
 export const IMPORTS={
