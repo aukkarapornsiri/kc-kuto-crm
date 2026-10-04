@@ -35,7 +35,7 @@ export async function checkQuotationImages(form,page,width){
  const preview=page.locator('.kc-quotation-preview.is-visible');
  assert.equal(await preview.getAttribute('data-design-header'),'line');assert.equal(await preview.getAttribute('data-watermark'),'DRAFT');
  const logo=preview.locator('.kc-quote-brand-ribbon img'),signature=preview.getByAltText('Seller signature',{exact:true});
- await logo.waitFor();await signature.waitFor();const lines=await preview.locator(':scope > footer i').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().bottom));assert.equal(lines.length,3);assert.ok(Math.max(...lines)-Math.min(...lines)<1,'Signature baselines must align');await logo.evaluate(el=>el.decode());await signature.evaluate(el=>el.decode());
+ await logo.waitFor();await signature.waitFor();const companyLogo=preview.locator('.kc-quote-preview-company .kc-company-logo');await companyLogo.waitFor();await companyLogo.evaluate(el=>el.decode());assert.ok(await companyLogo.evaluate(el=>el.naturalWidth>0),'Top-left company logo loads');const lines=await preview.locator(':scope > footer i').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().bottom));assert.equal(lines.length,3);assert.ok(Math.max(...lines)-Math.min(...lines)<1,'Signature baselines must align');await logo.evaluate(el=>el.decode());await signature.evaluate(el=>el.decode());
  assert.equal(await logo.evaluate(el=>el.complete&&el.naturalWidth>0),true);
  assert.equal(await signature.evaluate(el=>el.complete&&el.naturalWidth>0),true);
  assert.ok((await preview.locator('.kc-quote-payment-term').innerText()).includes('45 days'));
