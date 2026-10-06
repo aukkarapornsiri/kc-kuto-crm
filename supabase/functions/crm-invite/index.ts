@@ -1,3 +1,4 @@
+import {createMicrosoftMailer} from './microsoft-mail.mjs';
 import {createClient} from 'npm:@supabase/supabase-js@2.57.4';
 const site='https://kc-cuto.kaicomhub.com/';
 const headers={'Access-Control-Allow-Origin':site.slice(0,-1),'Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Access-Control-Allow-Methods':'POST,OPTIONS','Content-Type':'application/json'};
@@ -18,8 +19,20 @@ Deno.serve(async req=>{
   if(recent?.last_sent_at&&Date.now()-Date.parse(recent.last_sent_at)<60000)return reply({error:'กรุณารอ 1 นาทีก่อนส่งซ้ำ'},429);
   const {data:existing,error:prepareError}=await client.rpc('crm_prepare_invitation',{p_email:email,p_actor:auth.user.id});
   if(prepareError)return reply({error:prepareError.message},400);
-  // Existing identities receive a secure recovery link; their password is never set by Admin.
-  const sent=existing?await client.auth.resetPasswordForEmail(email,{redirectTo:site}):await client.auth.admin.inviteUserByEmail(email,{redirectTo:site});
+  // Enable only after Exchange has restricted the app to the designated sender.
+  let sent;
+  if(Deno.env.get('CRM_INVITE_PROVIDER')==='microsoft_graph'){
+   try{
+    const send=await createMicrosoftMailer({tenant:Deno.env.get('CRM_MAIL_TENANT_ID'),clientId:Deno.env.get('CRM_MAIL_CLIENT_ID'),clientSecret:Deno.env.get('CRM_MAIL_CLIENT_SECRET')});
+    const generated=await client.auth.admin.generateLink({type:existing?'recovery':'invite',email,options:{redirectTo:site}});
+    if(generated.error)sent={error:generated.error};
+    else if(!generated.data?.properties?.action_link)sent={error:{message:'สร้างลิงก์คำเชิญไม่สำเร็จ'}};
+    else{await send(email,generated.data.properties.action_link);sent={error:null};}
+   }catch(error){sent={error:{message:error instanceof Error?error.message:'Microsoft 365 sender unavailable'}};}
+  }else{
+   // Existing identities receive a secure recovery link; Admin never sets their password.
+   sent=existing?await client.auth.resetPasswordForEmail(email,{redirectTo:site}):await client.auth.admin.inviteUserByEmail(email,{redirectTo:site});
+  }
   if(sent.error){await client.from('crm_access_invitations').update({status:'failed'}).eq('email',email);return reply({error:sent.error.message,code:sent.error.code},sent.error.status===429?429:400);}
   const {error:recordError}=await client.from('crm_access_invitations').update({status:'sent',last_sent_at:new Date().toISOString()}).eq('email',email);
   if(recordError)return reply({error:'ส่งอีเมลแล้ว แต่บันทึกสถานะไม่สำเร็จ กรุณาโหลดรายชื่อใหม่ก่อนส่งซ้ำ'},500);
