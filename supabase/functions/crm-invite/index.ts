@@ -20,7 +20,7 @@ Deno.serve(async req=>{
   if(prepareError)return reply({error:prepareError.message},400);
   // Existing identities receive a secure recovery link; their password is never set by Admin.
   const sent=existing?await client.auth.resetPasswordForEmail(email,{redirectTo:site}):await client.auth.admin.inviteUserByEmail(email,{redirectTo:site});
-  if(sent.error){await client.from('crm_access_invitations').update({status:'failed'}).eq('email',email);return reply({error:sent.error.message},400);}
+  if(sent.error){await client.from('crm_access_invitations').update({status:'failed'}).eq('email',email);return reply({error:sent.error.message,code:sent.error.code},sent.error.status===429?429:400);}
   const {error:recordError}=await client.from('crm_access_invitations').update({status:'sent',last_sent_at:new Date().toISOString()}).eq('email',email);
   if(recordError)return reply({error:'ส่งอีเมลแล้ว แต่บันทึกสถานะไม่สำเร็จ กรุณาโหลดรายชื่อใหม่ก่อนส่งซ้ำ'},500);
   return reply({ok:true,email});

@@ -1,3 +1,4 @@
+import {invitationError} from './invite-error.mjs?v=20261006';
 import {demoCompanyStore} from './quotation-company.mjs?v=20261004';
 import {createRecordPopup} from './record-popup.mjs?v=20261004';
 import {formatNumericField} from './number-format.mjs?v=20261002-commas';
@@ -82,7 +83,7 @@ export function createSettingsWorkspace({React,client,useApp}){
  }
  function Invite({lang}){
   const {demoMode,profile}=useApp(),task=useTask(),tr=(a,b)=>lang==='th'?a:b,[email,E]=React.useState(''),[confirm,C]=React.useState(false),[opened,Open]=React.useState(false);
-  const send=()=>task.run(async()=>{if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw Error(tr('อีเมลไม่ถูกต้อง','Invalid email'));if(demoMode){task.setMessage(tr('โหมดทดลอง: ไม่ได้ส่งอีเมลจริง','Demo: no email sent'));C(false);return;}const {data,error}=await client.functions.invoke('crm-invite',{body:{email:email.trim(),role:'sales_user'}});if(error||data?.error)throw Error(data?.error||error.message);task.setMessage(tr('ส่งคำเชิญไปที่ ','Invitation sent to ')+email);C(false);E('');});
+  const send=()=>task.run(async()=>{if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw Error(tr('อีเมลไม่ถูกต้อง','Invalid email'));if(demoMode){task.setMessage(tr('โหมดทดลอง: ไม่ได้ส่งอีเมลจริง','Demo: no email sent'));C(false);return;}const {data,error}=await client.functions.invoke('crm-invite',{body:{email:email.trim(),role:'sales_user'}});if(error||data?.error)throw Error(await invitationError(data,error));task.setMessage(tr('ส่งคำเชิญไปที่ ','Invitation sent to ')+email);C(false);E('');});
   return h(React.Fragment,null,button(tr('เชิญผู้ใช้งานใหม่','Invite new user'),()=>Open(true)),opened&&h(RecordPopup,{title:tr('เชิญผู้ใช้งานใหม่','Invite new user'),lang,busy:task.busy,onClose:()=>{Open(false);C(false);}},h('section',{className:'crm-master-form'},h('h2',null,tr('เชิญผู้ใช้งานใหม่','Invite user')),h('p',null,tr('บัญชีใหม่เริ่มต้นด้วยบทบาทพนักงานขาย ผู้ดูแลเปลี่ยนบทบาทภายหลังได้','New accounts start as Sales User; administrators can change the role later.')),task.message&&h('p',{role:task.error?'alert':'status',className:task.error?'crm-error':'crm-notice'},task.message),h(Field,{label:tr('อีเมลผู้รับคำเชิญ','Invitee email'),type:'email',value:email,onChange:v=>{E(v);C(false);},disabled:task.busy}),h('div',{className:'crm-actions'},confirm?h(React.Fragment,null,h('span',null,tr('ยืนยันส่งคำเชิญไปที่ ','Confirm invitation to ')+email),button(tr('ยืนยันส่งคำเชิญ','Confirm invitation'),send,task.busy),button(tr('ยกเลิก','Cancel'),()=>C(false),task.busy)):button(tr('เชิญผู้ใช้งาน','Invite user'),()=>C(true),task.busy||(!demoMode&&profile?.role!=='admin')||!email)))));
  }
 function Permissions({lang,mode='permissions',revision=0,onCreate,onEdit}){

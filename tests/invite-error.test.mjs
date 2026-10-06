@@ -1,0 +1,3 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {invitationError} from '../src/invite-error.mjs';
+test('shows email quota error from non-2xx response body',async()=>{assert.match(await invitationError(null,{message:'Edge Function returned a non-2xx status code',context:{json:async()=>({error:'email rate limit exceeded',code:'over_email_send_rate_limit'})}}),/คำเชิญนี้ยังไม่ได้ส่ง/);});
+test('keeps actionable server errors and handles unreadable responses',async()=>{assert.equal(await invitationError({error:'กรุณารอ 1 นาที'},null),'กรุณารอ 1 นาที');assert.equal(await invitationError(null,{message:'Network unavailable',context:{json:async()=>{throw Error();}}}),'Network unavailable');});
