@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {createSettingsWorkspace} from '../src/settings-workspace.mjs';
+const states=[];let cursor=0;
+const React={createElement:(type,props,...children)=>({type,props:props||{},children:children.flat(Infinity)}),useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>states[i]=typeof v==='function'?v(states[i]):v];},useEffect:()=>{},Fragment:'fragment'};
+const ws=createSettingsWorkspace({React,client:{},useApp:()=>({demoMode:false,profile:{id:'self',role:'admin'}})});
+const editor=ws.DataEditor({kind:'users',lang:'th'}).type;
+const render=()=>{cursor=0;return editor({kind:'users',lang:'th'});};
+const nodes=t=>t&&typeof t==='object'?[t,...(t.children||[]).flatMap(nodes)]:[];
+render();states[3]=[{id:'other',display_name:'Other',is_active:true},{id:'self',display_name:'Self',is_active:true},{id:'super',display_name:'Super',is_active:true,is_super_admin:true},{id:'inactive',display_name:'Inactive',is_active:false}];
+let tree=render();const find=label=>nodes(tree).find(n=>n.props['aria-label']===label);
+assert.equal(find('ระงับผู้ใช้ Other').props.disabled,false);
+assert.equal(find('ระงับผู้ใช้ Self').props.disabled,true);
+assert.equal(find('ระงับผู้ใช้ Super').props.disabled,true);
+assert.equal(find('เปิดใช้งานผู้ใช้ Inactive').props.disabled,false);
+assert.equal(find('ระงับผู้ใช้ Other').children[0].type,'svg');
+find('ระงับผู้ใช้ Other').props.onClick();tree=render();
+assert(nodes(tree).some(n=>n.props.title==='ระงับผู้ใช้'&&n.props.onClose));
+console.log('PASS: pause/resume icons, self and Super Admin guards, confirmation dialog');
