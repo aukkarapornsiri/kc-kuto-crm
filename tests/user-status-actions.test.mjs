@@ -3,7 +3,7 @@ import {createSettingsWorkspace} from '../src/settings-workspace.mjs';
 const states=[];let cursor=0;
 const React={createElement:(type,props,...children)=>({type,props:props||{},children:children.flat(Infinity)}),useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>states[i]=typeof v==='function'?v(states[i]):v];},useEffect:()=>{},Fragment:'fragment'};
 const ws=createSettingsWorkspace({React,client:{},useApp:()=>({demoMode:false,profile:{id:'self',role:'admin'}})});
-const editor=ws.DataEditor({kind:'users',lang:'th'}).type;
+const access=ws.DataEditor({kind:'users',lang:'th'});const walk=t=>t&&typeof t==='object'?[t,...(t.children||[]).flatMap(walk)]:[];const editor=walk(access.type(access.props)).find(n=>n.props.kind==='users').type;states.length=0;
 const render=()=>{cursor=0;return editor({kind:'users',lang:'th'});};
 const nodes=t=>t&&typeof t==='object'?[t,...(t.children||[]).flatMap(nodes)]:[];
 render();states[3]=[{id:'other',display_name:'Other',is_active:true},{id:'self',display_name:'Self',is_active:true},{id:'super',display_name:'Super',is_active:true,is_super_admin:true},{id:'inactive',display_name:'Inactive',is_active:false}];

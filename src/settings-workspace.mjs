@@ -46,7 +46,7 @@ export function createSettingsWorkspace({React,client,useApp}){
   workflow:{table:'crm_approval_policies',title:['Workflow การอนุมัติ','Approval workflow'],key:'id',create:true,fields:[['name','ชื่อนโยบาย','Policy name','text',true],['minimum_amount','ยอดขั้นต่ำ','Minimum amount','number',true],['approver_ids','ผู้อนุมัติตามลำดับที่เลือก','Approvers in selection order','members'],['is_active','ใช้งานอยู่','Active','checkbox']]}
  };
  const AccessManagement=createAccessManagement({React,RecordEditor,Permissions,Feed,client,useApp});
- function DataEditor(props){return props.kind==='roles'?h(AccessManagement,{lang:props.lang}):h(RecordEditor,props);}
+ function DataEditor(props){return ['users','roles'].includes(props.kind)?h(AccessManagement,{lang:props.lang}):h(RecordEditor,props);}
  function RecordEditor({lang,kind,initialEdit=null,initialCreate=false,onSaved,onCancel,hidePermissions=false}){
   const def=definitions[kind],{demoMode,profile}=useApp(),task=useTask(),tr=(a,b)=>lang==='th'?a:b,canEdit=demoMode||profile?.role==='admin';
   const [rows,S]=React.useState([]),[people,P]=React.useState([]),[edit,E]=React.useState(null),[original,O]=React.useState(null),[query,Q]=React.useState(''),[loaded,L]=React.useState(false),[deleting,D]=React.useState(null),[statusTarget,ST]=React.useState(null),[roleOptions,RO]=React.useState([]),[statusFilter,SF]=React.useState('all'),[showDeleted,SD]=React.useState(false);
