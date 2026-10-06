@@ -7,7 +7,7 @@ const access=ws.DataEditor({kind:'users',lang:'th'});const walk=t=>t&&typeof t==
 const render=()=>{cursor=0;return editor({kind:'users',lang:'th'});};
 const nodes=t=>t&&typeof t==='object'?[t,...(t.children||[]).flatMap(nodes)]:[];
 render();states[3]=[{id:'other',display_name:'Other',is_active:true},{id:'self',display_name:'Self',is_active:true},{id:'super',display_name:'Super',is_active:true,is_super_admin:true},{id:'inactive',display_name:'Inactive',is_active:false}];
-let tree=render();const find=label=>nodes(tree).find(n=>n.props['aria-label']===label);
+let tree=render();assert(nodes(tree).some(n=>n.type==='th'&&n.children.includes('สถานะ')));assert.equal(nodes(tree).filter(n=>n.props.className==='crm-user-status active').length,3);assert.equal(nodes(tree).filter(n=>n.props.className==='crm-user-status suspended').length,1);const find=label=>nodes(tree).find(n=>n.props['aria-label']===label);
 assert.equal(find('ระงับผู้ใช้ Other').props.disabled,false);
 assert.equal(find('ระงับผู้ใช้ Self').props.disabled,true);
 assert.equal(find('ระงับผู้ใช้ Super').props.disabled,true);
