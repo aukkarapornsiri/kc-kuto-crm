@@ -56,6 +56,8 @@ jobs:
           npm install --no-save --no-package-lock sanitize-html@2.17.0
           node --test tests/marketing-edge.test.mjs
           node --check src/internal-workspace.mjs
+          node --check src/lead-detail-enterprise.mjs
+          node --test tests/lead-detail-enterprise.test.mjs
           node --test tests/thai-address.test.mjs
           node --check src/quotation-document.mjs
           node --check src/number-format.mjs
