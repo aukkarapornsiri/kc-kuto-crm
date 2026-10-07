@@ -74,7 +74,7 @@ jobs:
           node --check src/master-data.mjs
           node --test tests/master-data.test.mjs
           node --check src/settings-workspace.mjs
-          node --test tests/settings-model.test.mjs tests/delete-user.test.mjs tests/profile-names.test.mjs tests/role-access.test.mjs tests/grouped-navigation.test.mjs
+          node --test tests/settings-model.test.mjs tests/delete-user.test.mjs tests/profile-names.test.mjs tests/role-access.test.mjs tests/grouped-navigation.test.mjs tests/user-si-defaults.test.mjs
           node --check src/workspace-theme.mjs
           node --test tests/workspace-theme.test.mjs
       - name: Parse Edge Function TypeScript
