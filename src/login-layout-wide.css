@@ -17,7 +17,7 @@
   .kc-login-top{gap:12px;align-items:center}
   .kc-login-top > span{min-width:0;overflow-wrap:anywhere}
   .kc-login-language{padding:7px 12px}
-  .kc-login-content{margin:40px 0 24px}
+  .kc-login-content{margin:32px 0 20px}
   .kc-login-content > h2{font-size:28px}
   .kc-login-intro{font-size:13px}
   .kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo) > button,
