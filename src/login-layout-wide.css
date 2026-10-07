@@ -1,0 +1,114 @@
+/* User-approved follow-up: 70% brand / 30% sign-in on desktop.
+   Keep authentication and the centered outer shell unchanged. */
+@media (min-width:1024px){
+  .kc-login-shell{grid-template-columns:minmax(0,7fr) minmax(0,3fr)}
+  .kc-login-brand{padding:40px 48px}
+  .kc-login-logo{width:100%;height:240px;justify-content:center;padding:12px 24px}
+  .kc-login-logo img{width:min(100%,648px);max-height:216px;object-position:center}
+  .kc-login-story{width:100%;margin-top:28px;align-items:center;text-align:center}
+  .kc-login-badge{justify-content:center}
+  .kc-login-story h1{width:100%;font-size:42px;line-height:1.28;margin:18px 0 16px}
+  .kc-login-story > p{width:100%;max-width:none;font-size:16px;line-height:1.6;text-wrap:pretty}
+  .kc-login-features{width:100%;margin-top:24px;gap:16px;text-align:left}
+  .kc-login-features > div{min-height:92px;padding:16px 18px;font-size:14px;gap:10px}
+  .kc-login-features svg{width:24px;height:24px}
+  .kc-login-brand footer{width:100%;padding-top:24px;font-size:11px}
+  .kc-login-access{padding:40px 30px 18px}
+  .kc-login-top{gap:12px;align-items:center}
+  .kc-login-top > span{min-width:0;overflow-wrap:anywhere}
+  .kc-login-language{padding:7px 12px}
+  .kc-login-content{margin:40px 0 24px}
+  .kc-login-content > h2{font-size:28px}
+  .kc-login-intro{font-size:13px}
+  .kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo) > button,
+  .kc-login-demo button{width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.5}
+  .kc-login-assurance{gap:10px;padding:14px 12px}
+  .kc-login-assurance > svg{padding:9px}
+  .kc-login-assurance > div{min-width:0}
+  .kc-login-assurance strong{font-size:12px}
+  .kc-login-assurance p{font-size:11px}
+  .kc-login-access > footer{padding-top:16px;overflow-wrap:anywhere}
+}
+/* Short notebooks keep the larger centered logo and all content visible. */
+@media (min-width:1024px) and (max-height:780px){
+  .kc-login-brand{padding:28px 36px}
+  .kc-login-logo{height:180px;padding:10px 20px}
+  .kc-login-logo img{width:min(100%,474px);max-height:158px}
+  .kc-login-story{margin-top:22px}
+  .kc-login-story h1{font-size:36px;margin:14px 0 12px}
+  .kc-login-story > p{font-size:14px}
+  .kc-login-features{margin-top:20px;gap:12px}
+  .kc-login-features > div{min-height:80px;padding:12px 14px;font-size:13px;gap:8px}
+  .kc-login-features svg{width:22px;height:22px}
+  .kc-login-brand footer{padding-top:18px;font-size:10px}
+  .kc-login-access{padding:26px 26px 16px}
+  .kc-login-content{margin:26px 0 18px}
+  .kc-login-content > h2{font-size:26px}
+  .kc-login-assurance{padding:10px;gap:9px;margin-top:18px}
+  .kc-login-assurance > svg{padding:8px}
+}
+@media (min-width:1024px) and (max-height:680px){
+  .kc-login-brand{padding:24px 32px}
+  .kc-login-logo{height:160px;padding:10px 20px}
+  .kc-login-logo img{width:min(100%,414px);max-height:138px}
+  .kc-login-story{margin-top:18px}
+  .kc-login-story h1{font-size:32px;margin:12px 0 10px}
+  .kc-login-story > p{font-size:13px}
+  .kc-login-features{margin-top:18px}
+  .kc-login-features > div{min-height:72px;padding:10px 12px;font-size:12px}
+  .kc-login-features svg{width:20px;height:20px}
+  .kc-login-brand footer{padding-top:14px}
+  .kc-login-access{padding:18px 24px 12px}
+  .kc-login-content{margin:20px 0 16px}
+  .kc-login-content > h2{font-size:24px}
+  .kc-login-intro{font-size:12px}
+  .kc-login-assurance{margin-top:14px}
+  .kc-login-assurance p{font-size:10px}
+}
+@media (min-width:1024px) and (max-width:1200px){
+  .kc-login-brand{padding-left:28px;padding-right:28px}
+  .kc-login-access{padding-left:20px;padding-right:20px}
+  .kc-login-content > h2{font-size:24px}
+  .kc-login-intro{font-size:12px}
+  .kc-login-top{gap:8px;font-size:9px}
+  .kc-login-language{padding-left:10px;padding-right:10px}
+  .kc-login-story h1{font-size:32px}
+  .kc-login-story > p{font-size:13px}
+  .kc-login-features{gap:10px}
+  .kc-login-features > div{padding-left:12px;padding-right:12px;font-size:12px}
+  .kc-login-assurance{gap:8px;padding:10px}
+  .kc-login-assurance > svg{width:18px;height:18px;padding:7px}
+  .kc-login-assurance strong{font-size:11px}
+}
+/* Portrait tablets stack instead of squeezing a sign-in form into 30%.
+   Phone behavior is retained; logo, cards and both footers are never hidden. */
+@media (max-width:1023px){
+  .kc-login{padding:24px}
+  .kc-login-shell{height:auto;grid-template-columns:minmax(0,1fr)}
+  .kc-login-brand{padding:32px;overflow:visible}
+  .kc-login-logo{width:100%;height:200px;padding:16px;justify-content:center}
+  .kc-login-logo img{width:min(100%,498px);max-height:166px;object-position:center}
+  .kc-login-story{width:100%;margin-top:28px;align-items:center;text-align:center}
+  .kc-login-badge{justify-content:center}
+  .kc-login-story h1{width:100%;font-size:32px;margin:20px 0 14px}
+  .kc-login-story > p{width:100%;font-size:14px}
+  .kc-login-features{text-align:left}
+  .kc-login-brand footer{margin-top:28px;padding-top:0;flex-wrap:wrap}
+  .kc-login-access{padding:32px;overflow:visible}
+  .kc-login-content{width:100%;max-width:520px;align-self:center;margin:30px 0 28px}
+  .kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo) > button,
+  .kc-login-demo button{white-space:normal;min-height:44px}
+  .kc-login-form-card input{font-size:16px;min-height:44px}
+}
+@media (max-width:720px){
+  .kc-login{padding:16px}
+  .kc-login-brand,.kc-login-access{padding:28px 24px}
+  .kc-login-logo{height:140px;padding:14px}
+  .kc-login-logo img{width:100%;max-width:324px;max-height:108px}
+  .kc-login-story h1{font-size:clamp(23px,5.8vw,32px)}
+  .kc-login-story > p{font-size:13px}
+}
+@media (max-width:360px){
+  .kc-login{padding:12px}
+  .kc-login-brand,.kc-login-access{padding-left:18px;padding-right:18px}
+}

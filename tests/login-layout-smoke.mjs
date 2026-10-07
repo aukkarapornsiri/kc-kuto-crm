@@ -4,7 +4,7 @@ import fs from 'node:fs';
 
 const base = process.env.SITE_URL || 'http://127.0.0.1:4173/kc-kuto-crm/';
 const browser = await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
-const viewports = [[1779,864],[1920,1080],[1736,800],[1440,720],[1280,650],[1024,650],[768,1024],[390,800],[320,568]];
+const viewports = [[1779,864],[1920,1080],[1736,800],[1440,900],[1440,720],[1366,768],[1280,650],[1024,650],[1024,768],[768,1024],[390,800],[320,568]];
 const results = [];
 fs.mkdirSync('test-artifacts',{recursive:true});
 try {
@@ -27,20 +27,32 @@ try {
     }
     assert.equal(await page.locator('.kc-login-features>div').count(),3);
     const metrics = await page.evaluate(()=>{
-      const shell=document.querySelector('.kc-login-shell').getBoundingClientRect();
-      return {width:innerWidth,height:innerHeight,scrollW:document.documentElement.scrollWidth,scrollH:document.documentElement.scrollHeight,shell:{x:shell.x,y:shell.y,width:shell.width,height:shell.height}};
+      const box=selector=>{const e=document.querySelector(selector),r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,scrollH:e.scrollHeight,clientH:e.clientHeight}};
+      return {width:innerWidth,height:innerHeight,scrollW:document.documentElement.scrollWidth,scrollH:document.documentElement.scrollHeight,shell:box('.kc-login-shell'),brand:box('.kc-login-brand'),access:box('.kc-login-access'),logo:box('.kc-login-logo img'),story:box('.kc-login-story'),cards:box('.kc-login-features')};
     });
     const dx = metrics.shell.x+metrics.shell.width/2-width/2;
     const dy = metrics.shell.y+metrics.shell.height/2-height/2;
+    const logoDx=metrics.logo.x+metrics.logo.width/2-(metrics.brand.x+metrics.brand.width/2);
+    assert.ok(Math.abs(logoDx)<=1,'logo must be centered within the brand panel');
+    assert.ok(Math.abs(metrics.cards.width-metrics.story.width)<=1,'feature cards must fill the story width');
     assert.ok(Math.abs(dx)<=1,`frame must be horizontally centered at ${width}x${height}; offset=${dx}`);
     assert.ok(metrics.scrollW<=width+1,'login must never overflow horizontally');
-    if (width>720) {
+    if (width>=1024) {
+      const ratio=metrics.brand.width/(metrics.brand.width+metrics.access.width);
+      assert.ok(Math.abs(ratio-.7)<.001,`desktop must be 70/30; ratio=${ratio}`);
+      assert.ok(metrics.logo.width>=400,'desktop logo must be larger than the previous reference');
+      assert.ok(metrics.brand.scrollH<=metrics.brand.clientH+1,'desktop brand content must fit without internal scrolling');
+      assert.ok(metrics.access.scrollH<=metrics.access.clientH+1,'desktop sign-in content must fit without internal scrolling');
       assert.ok(Math.abs(dy)<=1,`frame must be vertically centered at ${width}x${height}; offset=${dy}`);
       assert.ok(metrics.scrollH<=height+1,'desktop login must fit viewport');
       for (const control of controls) {
         const r=await control.boundingBox();
         assert.ok(r&&r.x>=0&&r.x+r.width<=width+1&&r.y>=0&&r.y+r.height<=height+1,'desktop control must fit viewport');
       }
+    }
+    if (width<1024) {
+      assert.ok(Math.abs(metrics.brand.width-metrics.access.width)<=1,'tablet/mobile panels must be full-width');
+      assert.ok(metrics.access.y>=metrics.brand.y+metrics.brand.height-1,'tablet/mobile panels must stack');
     }
     assert.equal(await page.locator('#login-email').getAttribute('type'),'email');
     assert.equal(await page.locator('#login-password').getAttribute('type'),'password');
@@ -57,6 +69,9 @@ try {
     assert.equal(await page.getByRole('button',{name:'Sign in with Microsoft 365',exact:true}).isVisible(),true);
     assert.equal(await page.getByRole('button',{name:'Continue in Demo Mode',exact:true}).isVisible(),true);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'English layout must not overflow horizontally');
+    if(width>=1024){
+      for(const selector of ['.kc-login-brand','.kc-login-access'])assert.ok(await page.locator(selector).evaluate(e=>e.scrollHeight<=e.clientHeight+1),'English panels must fit without internal scrolling');
+    }
     await page.screenshot({path:`test-artifacts/login-layout-en-${width}x${height}.png`,fullPage:true});
     await page.locator('.kc-login-language').click();
     await page.getByRole('heading',{name:'ยินดีต้อนรับกลับ',exact:true}).waitFor();
@@ -65,9 +80,9 @@ try {
     assert.equal(await page.locator('#login-email').evaluate(e=>e.validity.valueMissing),true);
     assert.equal(await page.locator('.kc-login-shell').isVisible(),true);
     assert.deepEqual(errors,[]);
-    results.push({...metrics,centerOffsetX:dx,centerOffsetY:width>720?dy:null,languageToggle:'PASS',requiredFields:'PASS'});
+    results.push({...metrics,logoCenterOffsetX:logoDx,centerOffsetX:dx,centerOffsetY:width>=1024?dy:null,languageToggle:'PASS',requiredFields:'PASS'});
     await page.close();
   }
   fs.writeFileSync('test-artifacts/login-layout-geometry.json',JSON.stringify(results,null,2));
-  console.log('PASS login reference: 9 viewport sizes, true centered frame, all cards/footers, Thai/English toggle, no horizontal overflow, native form validation; authentication handlers unchanged.');
+  console.log('PASS login 70/30: 12 viewport sizes, enlarged centered logo, full-width cards, true centered frame, all cards/footers, Thai/English toggle, no horizontal overflow, native form validation; authentication handlers unchanged.');
 } finally { await browser.close(); }
