@@ -13,12 +13,13 @@ export function pageAction(page=''){
 }
 export function permitsPage(access,module,page){
  // Personal notifications remain available independently of administration.
+ if(module==='dashboard'&&page==='dash-sales')return !!effectiveRole(access.profile)&&!access.profile?.deleted_at;
  if(module==='settings'&&page==='set-notifications')return !!effectiveRole(access.profile);
  if(!access.can(module,'view')||!access.can(module,pageAction(page)))return false;
  if(module==='dashboard'&&page?.startsWith('dash-')&&access.profile?.role!=='admin')return access.dashboards.some(row=>row.dashboard_type===page.slice(5)&&row.visible);
  return true;
 }
-export function filterModules(modules,access){return modules.filter(m=>access.can(m.id,'view')).map(m=>({...m,subs:m.subs?.filter(p=>permitsPage(access,m.id,p.id))}));}
+export function filterModules(modules,access){return modules.filter(m=>access.can(m.id,'view')||(m.id==='dashboard'&&permitsPage(access,'dashboard','dash-sales'))).map(m=>({...m,subs:m.subs?.filter(p=>permitsPage(access,m.id,p.id))}));}
 export function notifyAccessChanged(){globalThis.window?.dispatchEvent(new Event(ACCESS_CHANGED));}
 export function createRoleAccess({React,client,useApp}){
  const h=React.createElement,empty={profile:null,rows:[],dashboards:[],loading:true,error:'',can:()=>false};
