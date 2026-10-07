@@ -1,3 +1,4 @@
+import {printQuotation} from './quotation-print.mjs?v=20261007-a4';
 import {applyCompanyQuotationDefaults,demoCompanyStore} from './quotation-company.mjs?v=20261004';
 import {createQuotationCustomerPicker,recentQuotationCustomers} from './quotation-customer-picker.mjs?v=20261005-company';
 import {DESIGN_DEFAULTS,normalizeDesign,designAttributes,createDesignControls} from './quotation-designer.mjs?v=20261004';
@@ -135,7 +136,7 @@ export function createQuotationDocumentComponents({React,client,useApp}){
   }
 
   function QuotationDialog({lang='th',editing,setEditing,busy=false,error='',lookup={},masters=[],onSave,onClose,onOpenTemplateSettings,initialPreview=false,canViewFinancials=false,onCreateCustomer,onCreatePrice}){
-    const {demoMode,profile}=useApp(),tr=(th,en)=>lang==='th'?th:en,ref=React.useRef(null),[preview,setPreview]=React.useState(!!initialPreview);
+    const {demoMode,profile}=useApp(),tr=(th,en)=>lang==='th'?th:en,ref=React.useRef(null),[preview,setPreview]=React.useState(!!initialPreview),[printError,setPrintError]=React.useState('');
     const snapshot=editing?.template_snapshot&&typeof editing.template_snapshot==='object'&&!Array.isArray(editing.template_snapshot)?editing.template_snapshot:null;
     const [template,,templateLoading]=useTemplate(!!editing,snapshot);
     const images=useTemplateImages(template);
@@ -161,7 +162,7 @@ export function createQuotationDocumentComponents({React,client,useApp}){
     const removeItem=index=>setEditing(old=>({...old,items:old.items.length>1?old.items.filter((_,i)=>i!==index):old.items}));
     let totals;try{totals=quoteTotals(editing.items,{taxRate:editing.tax_rate,withholdingRate:editing.wht_rate,documentDiscount:editing.document_discount});}catch{totals={subtotal:0,discount:0,net_before_tax:0,vat:0,total:0,withholding_tax:0,net_total:0,gp_amount:0,gp_margin:0,items:editing.items};}
     const showGP=!!canViewFinancials&&!!template.show_gp,showMargin=!!canViewFinancials&&!!template.show_margin;const itemGridCols='kc-quote-line';const gridColumns=['36px',...(template.show_item_code?['96px']:[]),'minmax(430px,1fr)','64px','64px','104px','112px',...(showGP?['104px']:[]),...(showMargin?['88px']:[]),'32px'].join(' ');const lineStyle={gridTemplateColumns:gridColumns,minWidth:(920+(template.show_item_code?96:0)+(showGP?104:0)+(showMargin?88:0))+'px'};
-    const printNow=async()=>{setPreview(true);requestAnimationFrame(async()=>{await Promise.all([...ref.current.querySelectorAll('.kc-quotation-preview img')].map(img=>img.decode().catch(()=>{})));window.print();});};
+    const printNow=async()=>{setPrintError('');setPreview(true);requestAnimationFrame(async()=>{try{await printQuotation(ref.current?.querySelector('.kc-quotation-preview'));}catch(e){setPrintError(e.message||String(e));}});};
     const companyName=docLang==='th'?template.company_name_th:template.company_name_en||template.company_name_th;
     const companyAddress=docLang==='th'?template.company_address_th:template.company_address_en||template.company_address_th;
     const title=templateLabel(template,'title',docLang)||docTr('ใบเสนอราคา','Quotation');
@@ -185,6 +186,7 @@ export function createQuotationDocumentComponents({React,client,useApp}){
           h('div',{className:'kc-quote-signatures'},[['reviewed_by',signature('signature_prepared_label')?signature('signature_prepared_label'):docTr('ผู้จัดทำ','Prepared by'),editing.prepared_by],['reviewed_by',signature('signature_reviewed_label')||docTr('ผู้ตรวจสอบ','Reviewed by'),editing.reviewed_by],['approved_by',signature('signature_approved_label')||docTr('ผู้อนุมัติ','Approved by'),editing.approved_by]].map(([key,label,name],index)=>h('label',{key:label},h('span',null,label),index===0?h('div',{className:'kc-quote-sign-line'},images.signature&&h('img',{className:'kc-quote-seller-signature',src:images.signature,alt:docTr('ลายเซ็นผู้ขาย','Seller signature')}),name||''):input({'aria-label':label,value:editing[key]||'',onChange:e=>set(key,e.target.value)}))))
         ),
         previewSheet,
+        printError&&h('p',{role:'alert',className:'crm-error'},printError),
         h('footer',{className:'kc-quote-dialog-footer'},button(tr('ยกเลิก','Cancel'),onClose,busy),button(preview?tr('กลับไปแก้ไข','Back to edit'):tr('ดูตัวอย่าง','Preview'),()=>setPreview(v=>!v),busy),button(tr('พิมพ์ / บันทึก PDF','Print / Save PDF'),printNow,busy||images.loading||!!images.error),h('button',{type:'submit',className:'crm-save',disabled:busy},tr('บันทึกเอกสาร','Save document')))
       )
     );
