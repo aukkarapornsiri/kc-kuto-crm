@@ -8,11 +8,122 @@ import {createAccessManagement,MODULE_LABELS,ACTION_LABELS,DASHBOARD_LABELS} fro
 import {profileNames,profileDisplayName} from './profile-names.mjs?v=20261002';
 import {createDeleteUserDialog,removeUser} from './delete-user.mjs?v=20261002';
 import {COMPANY_FIELDS,validateCompany,MODULES,ACTIONS,IMPORTS,toCSV,validateImport} from './settings-model.mjs?v=20261004-quote-company';
+
+export const SI_DEPARTMENT_OPTIONS=Object.freeze([
+ ['Executive / Management','ผู้บริหาร','Executive / Management'],
+ ['Sales','ฝ่ายขาย','Sales'],
+ ['Pre-Sales / Solution Consulting','พรีเซลส์ / ที่ปรึกษาโซลูชัน','Pre-Sales / Solution Consulting'],
+ ['Product Management','บริหารผลิตภัณฑ์','Product Management'],
+ ['Project Management / PMO','บริหารโครงการ / PMO','Project Management / PMO'],
+ ['Engineering / Implementation','วิศวกรรม / ติดตั้งระบบ','Engineering / Implementation'],
+ ['Network & Infrastructure','ระบบเครือข่ายและ Infrastructure','Network & Infrastructure'],
+ ['Cyber Security','ความปลอดภัยไซเบอร์','Cyber Security'],
+ ['Cloud & Data Center','Cloud & Data Center','Cloud & Data Center'],
+ ['Software / Application Development','พัฒนาซอฟต์แวร์ / แอปพลิเคชัน','Software / Application Development'],
+ ['QA / Testing','ทดสอบระบบ / QA','QA / Testing'],
+ ['Service Desk / Helpdesk','ศูนย์บริการ / Helpdesk','Service Desk / Helpdesk'],
+ ['Technical Support / Maintenance','Technical Support / MA','Technical Support / Maintenance'],
+ ['Customer Success / Account Service','ลูกค้าสัมพันธ์ / Account Service','Customer Success / Account Service'],
+ ['Procurement / Purchasing','จัดซื้อ','Procurement / Purchasing'],
+ ['Warehouse / Inventory / Logistics','คลังสินค้า / Inventory / Logistics','Warehouse / Inventory / Logistics'],
+ ['Finance','การเงิน','Finance'],
+ ['Accounting','บัญชี','Accounting'],
+ ['Human Resources','ทรัพยากรบุคคล','Human Resources'],
+ ['Administration / Office','ธุรการ / สำนักงาน','Administration / Office'],
+ ['Marketing','การตลาด','Marketing'],
+ ['Training / Professional Services','ฝึกอบรม / Professional Services','Training / Professional Services'],
+ ['Legal / Compliance','กฎหมาย / Compliance','Legal / Compliance'],
+ ['Internal IT / System Administration','IT ภายใน / System Administration','Internal IT / System Administration']
+].map(([value,th,en])=>Object.freeze({value,th,en})));
+
+export const SI_CUSTOM_ROLE_DEFAULTS=Object.freeze([
+ ['sales_director','ผู้อำนวยการฝ่ายขาย','Sales Director'],
+ ['account_manager','ผู้จัดการบัญชีลูกค้า','Account Manager'],
+ ['key_account_manager','ผู้จัดการลูกค้ารายสำคัญ','Key Account Manager'],
+ ['sales_coordinator','ผู้ประสานงานฝ่ายขาย','Sales Coordinator'],
+ ['presales_manager','ผู้จัดการพรีเซลส์','Pre-Sales Manager'],
+ ['solution_architect','สถาปนิกโซลูชัน','Solution Architect'],
+ ['solution_consultant','ที่ปรึกษาโซลูชัน','Solution Consultant'],
+ ['presales_engineer','วิศวกรพรีเซลส์','Pre-Sales Engineer'],
+ ['product_director','ผู้อำนวยการผลิตภัณฑ์','Product Director'],
+ ['product_manager','ผู้จัดการผลิตภัณฑ์','Product Manager'],
+ ['product_specialist','ผู้เชี่ยวชาญผลิตภัณฑ์','Product Specialist'],
+ ['pmo_manager','ผู้จัดการ PMO','PMO Manager'],
+ ['project_manager','ผู้จัดการโครงการ','Project Manager'],
+ ['project_coordinator','ผู้ประสานงานโครงการ','Project Coordinator'],
+ ['engineering_manager','ผู้จัดการวิศวกรรม','Engineering Manager'],
+ ['senior_engineer','วิศวกรอาวุโส','Senior Engineer'],
+ ['implementation_engineer','วิศวกรติดตั้งระบบ','Implementation Engineer'],
+ ['system_engineer','วิศวกรระบบ','System Engineer'],
+ ['network_manager','ผู้จัดการระบบเครือข่าย','Network Manager'],
+ ['network_engineer','วิศวกรเครือข่าย','Network Engineer'],
+ ['security_manager','ผู้จัดการ Cyber Security','Security Manager'],
+ ['security_consultant','ที่ปรึกษา Cyber Security','Security Consultant'],
+ ['security_engineer','วิศวกร Cyber Security','Security Engineer'],
+ ['cloud_architect','สถาปนิก Cloud','Cloud Architect'],
+ ['cloud_engineer','วิศวกร Cloud','Cloud Engineer'],
+ ['data_center_engineer','วิศวกร Data Center','Data Center Engineer'],
+ ['development_manager','ผู้จัดการพัฒนาซอฟต์แวร์','Development Manager'],
+ ['software_developer','นักพัฒนาซอฟต์แวร์','Software Developer'],
+ ['frontend_developer','นักพัฒนา Frontend','Frontend Developer'],
+ ['backend_developer','นักพัฒนา Backend','Backend Developer'],
+ ['fullstack_developer','นักพัฒนา Full Stack','Full Stack Developer'],
+ ['qa_manager','ผู้จัดการ QA','QA Manager'],
+ ['qa_engineer','วิศวกร QA','QA Engineer'],
+ ['software_tester','นักทดสอบซอฟต์แวร์','Software Tester'],
+ ['service_desk_manager','ผู้จัดการ Service Desk','Service Desk Manager'],
+ ['helpdesk_officer','เจ้าหน้าที่ Helpdesk','Helpdesk Officer'],
+ ['support_manager','ผู้จัดการ Technical Support','Technical Support Manager'],
+ ['support_engineer','วิศวกร Technical Support','Support Engineer'],
+ ['field_engineer','วิศวกรภาคสนาม','Field Engineer'],
+ ['ma_engineer','วิศวกร Maintenance / MA','MA Engineer'],
+ ['customer_success_manager','ผู้จัดการ Customer Success','Customer Success Manager'],
+ ['customer_success_executive','เจ้าหน้าที่ Customer Success','Customer Success Executive'],
+ ['procurement_manager','ผู้จัดการจัดซื้อ','Procurement Manager'],
+ ['purchasing_officer','เจ้าหน้าที่จัดซื้อ','Purchasing Officer'],
+ ['procurement_officer','เจ้าหน้าที่ Procurement','Procurement Officer'],
+ ['warehouse_manager','ผู้จัดการคลังสินค้า','Warehouse Manager'],
+ ['warehouse_officer','เจ้าหน้าที่คลังสินค้า','Warehouse Officer'],
+ ['inventory_officer','เจ้าหน้าที่ Inventory','Inventory Officer'],
+ ['logistics_officer','เจ้าหน้าที่ Logistics','Logistics Officer'],
+ ['finance_manager','ผู้จัดการการเงิน','Finance Manager'],
+ ['finance_officer','เจ้าหน้าที่การเงิน','Finance Officer'],
+ ['credit_control','เจ้าหน้าที่ควบคุมเครดิต','Credit Control'],
+ ['accounting_manager','ผู้จัดการบัญชี','Accounting Manager'],
+ ['senior_accountant','นักบัญชีอาวุโส','Senior Accountant'],
+ ['accountant','นักบัญชี','Accountant'],
+ ['accounting_officer','เจ้าหน้าที่บัญชี','Accounting Officer'],
+ ['hr_manager','ผู้จัดการทรัพยากรบุคคล','HR Manager'],
+ ['hr_officer','เจ้าหน้าที่ทรัพยากรบุคคล','HR Officer'],
+ ['administration_manager','ผู้จัดการธุรการ','Administration Manager'],
+ ['admin_officer','เจ้าหน้าที่ธุรการ','Admin Officer'],
+ ['marketing_manager','ผู้จัดการการตลาด','Marketing Manager'],
+ ['marketing_executive','เจ้าหน้าที่การตลาด','Marketing Executive'],
+ ['digital_marketing_executive','เจ้าหน้าที่ Digital Marketing','Digital Marketing Executive'],
+ ['training_manager','ผู้จัดการฝึกอบรม','Training Manager'],
+ ['trainer','วิทยากร / Trainer','Trainer'],
+ ['technical_consultant','ที่ปรึกษาด้านเทคนิค','Technical Consultant'],
+ ['compliance_manager','ผู้จัดการ Compliance','Compliance Manager'],
+ ['auditor','ผู้ตรวจสอบ','Auditor'],
+ ['viewer','ผู้ใช้งานแบบอ่านอย่างเดียว','Viewer / Read Only'],
+ ['external_guest','ผู้ใช้งานภายนอก / Guest','External User / Guest']
+].map(([role_key,label_th,label_en])=>Object.freeze({role_key,label_th,label_en,description:'SI default role',is_system:false})));
+
+export function userRoleSelection(profile={}){return profile.role==='custom'?(profile.custom_role_key||''):(profile.role||'');}
+export function applyUserRoleSelection(profile={},roleKey='',roleOptions=[]){
+ const selected=roleOptions.find(r=>r.role_key===roleKey);
+ if(!selected)return {...profile,role:roleKey,custom_role_key:null};
+ return selected.is_system?{...profile,role:selected.role_key,custom_role_key:null}:{...profile,role:'custom',custom_role_key:selected.role_key};
+}
+export function departmentOptions(current='',lang='th'){
+ const options=SI_DEPARTMENT_OPTIONS.map(d=>[d.value,lang==='th'?d.th:d.en]);
+ return current&&!SI_DEPARTMENT_OPTIONS.some(d=>d.value===current)?[[current,current],...options]:options;
+}
 export function createSettingsWorkspace({React,client,useApp}){
  const RecordPopup=createRecordPopup(React);
  const DeleteUserDialog=createDeleteUserDialog(React);
  const h=React.createElement,copy=x=>JSON.parse(JSON.stringify(x));
- const demo={company_settings:[{id:1,company_name:'บริษัทตัวอย่าง',company_name_en:'Demo Company',default_language:'th',timezone:'Asia/Bangkok',currency:'THB',fiscal_year_start_month:1,date_format:'DD/MM/YYYY',time_format:'24h',company_details:{},updated_at:'demo'}],crm_teams:[],profiles:[],custom_roles:[['admin','ผู้ดูแลระบบ','Administrator'],['executive','ผู้บริหาร','Executive'],['sales_manager','ผู้จัดการฝ่ายขาย','Sales manager'],['sales_user','พนักงานขาย','Sales user'],['finance','การเงิน','Finance'],['service_agent','เจ้าหน้าที่บริการ','Service agent'],['renewal_owner','ผู้ดูแลการต่ออายุ','Renewal owner']].map(([role_key,label_th,label_en])=>({role_key,label_th,label_en,description:'',is_system:true})),role_permissions:[],dashboard_type_access:[],approval_rules:[],notifications:[],audit_logs:[]};
+ const demo={company_settings:[{id:1,company_name:'บริษัทตัวอย่าง',company_name_en:'Demo Company',default_language:'th',timezone:'Asia/Bangkok',currency:'THB',fiscal_year_start_month:1,date_format:'DD/MM/YYYY',time_format:'24h',company_details:{},updated_at:'demo'}],crm_teams:[],profiles:[],custom_roles:[...([['admin','ผู้ดูแลระบบ','Administrator'],['executive','ผู้บริหาร','Executive'],['sales_manager','ผู้จัดการฝ่ายขาย','Sales manager'],['sales_user','พนักงานขาย','Sales user'],['finance','การเงิน','Finance'],['service_agent','เจ้าหน้าที่บริการ','Service agent'],['renewal_owner','ผู้ดูแลการต่ออายุ','Renewal owner']].map(([role_key,label_th,label_en])=>({role_key,label_th,label_en,description:'',is_system:true}))),...SI_CUSTOM_ROLE_DEFAULTS.map(copy)],role_permissions:[],dashboard_type_access:[],approval_rules:[],notifications:[],audit_logs:[]};
  function download(name,text,type='text/csv;charset=utf-8'){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
  async function unwrap(query){const {data,error}=await query;if(error)throw error;return data;}
  function useTask(){const [busy,B]=React.useState(false),[message,M]=React.useState(''),[error,E]=React.useState(false);async function run(fn){if(busy)return;B(true);M('');E(false);try{await fn();}catch(e){E(true);M(e.message||String(e));}finally{B(false);}}return {busy,message,error,run,setMessage:M};}
@@ -41,7 +152,7 @@ export function createSettingsWorkspace({React,client,useApp}){
  }
  const definitions={
   teams:{table:'crm_teams',title:['ทีมงานและแผนก','Teams and departments'],key:'id',create:true,fields:[['name_th','ชื่อทีมภาษาไทย','Team name (TH)','text',true],['name_en','ชื่อทีมภาษาอังกฤษ','Team name (EN)','text',true],['department','แผนก','Department'],['leader_id','หัวหน้าทีม','Team leader','profile'],['member_ids','สมาชิกทีม','Team members','members'],['is_active','ใช้งานอยู่','Active','checkbox']]},
-  users:{table:'profiles',title:['ผู้ใช้งาน','Users'],key:'id',fields:[['first_name','ชื่อ','First name','text',true],['last_name','นามสกุล','Last name','text'],['email','อีเมล','Email','readonly'],['job_title','ตำแหน่ง','Job title'],['department_group','แผนก','Department'],['role','บทบาท','Role','roles'],['custom_role_key','บทบาทกำหนดเอง','Custom role','customrole'],['is_active','ใช้งานอยู่','Active','checkbox']]},
+  users:{table:'profiles',title:['ผู้ใช้งาน','Users'],key:'id',fields:[['first_name','ชื่อ','First name','text',true],['last_name','นามสกุล','Last name','text'],['email','อีเมล','Email','readonly'],['job_title','ตำแหน่ง','Job title'],['department_group','แผนก','Department','departments'],['role','บทบาท','Role','roles'],['custom_role_key','บทบาทกำหนดเอง','Custom role','customrole'],['is_active','ใช้งานอยู่','Active','checkbox']]},
   roles:{table:'custom_roles',title:['บทบาทและสิทธิ์','Roles and permissions'],key:'role_key',create:true,fields:[['role_key','รหัสบทบาท','Role key','text',true],['label_th','ชื่อภาษาไทย','Thai name','text',true],['label_en','ชื่อภาษาอังกฤษ','English name','text',true],['description','รายละเอียด','Description','textarea']]},
   workflow:{table:'crm_approval_policies',title:['Workflow การอนุมัติ','Approval workflow'],key:'id',create:true,fields:[['name','ชื่อนโยบาย','Policy name','text',true],['minimum_amount','ยอดขั้นต่ำ','Minimum amount','number',true],['approver_ids','ผู้อนุมัติตามลำดับที่เลือก','Approvers in selection order','members'],['is_active','ใช้งานอยู่','Active','checkbox']]}
  };
@@ -59,7 +170,7 @@ export function createSettingsWorkspace({React,client,useApp}){
    if(kind==='users')patch.display_name=profileDisplayName(patch.first_name,patch.last_name);
    if(kind==='workflow'&&(!patch.approver_ids?.length||patch.approver_ids.length>8))throw Error('Select 1–8 approvers in order');
    if(kind==='roles'&&!/^[a-z][a-z0-9_]{1,39}$/.test(edit.role_key))throw Error('Role key: a-z, 0-9, underscore, 2–40');
-   if(kind==='users'&&edit.id===profile?.id&&(patch.is_active===false||patch.role!==profile.role))throw Error(tr('ห้ามปิดหรือเปลี่ยนบทบาทบัญชีตนเอง','Cannot disable or change your own role'));
+   if(kind==='users'&&edit.id===profile?.id&&(patch.is_active===false||patch.role!==profile.role||(patch.role==='custom'&&patch.custom_role_key!==profile.custom_role_key)))throw Error(tr('ห้ามปิดหรือเปลี่ยนบทบาทบัญชีตนเอง','Cannot disable or change your own role'));
    if(kind==='users'&&patch.role==='custom'&&!roleOptions.some(r=>!r.is_system&&r.role_key===patch.custom_role_key))throw Error(tr('เลือกบทบาทกำหนดเองที่มีในระบบ','Select an existing custom role'));
    if(kind==='users'&&patch.role!=='custom')patch.custom_role_key=null;
    let row;
@@ -89,7 +200,7 @@ h('div',{className:'crm-actions'},h('input',{type:'search',className:'crm-search
    statusTarget&&h(RecordPopup,{title:tr(statusTarget.is_active?'ระงับผู้ใช้':'เปิดใช้งานผู้ใช้',statusTarget.is_active?'Suspend user':'Activate user'),lang,busy:task.busy,error:task.error?task.message:null,onClose:()=>ST(null)},h('p',null,(statusTarget.display_name||statusTarget.email)+' — '+tr(statusTarget.is_active?'ยืนยันระงับการเข้าใช้ CRM โดยเก็บข้อมูลและประวัติงานไว้หรือไม่?':'ยืนยันเปิดให้ผู้ใช้นี้เข้า CRM อีกครั้งหรือไม่?',statusTarget.is_active?'Suspend CRM access while keeping work history?':'Restore CRM access for this user?')),h('div',{className:'crm-actions'},button(tr('ยกเลิก','Cancel'),()=>ST(null),task.busy),button(tr('ยืนยัน','Confirm'),changeStatus,task.busy))),
    deleting&&h(DeleteUserDialog,{key:deleting.id,row:deleting,lang,onDelete:remove,onCancel:()=>D(null)}),
    loaded&&!visible.length&&h('p',null,tr('ไม่มีรายการ','No records')),
-   edit&&h(RecordPopup,{title:tr(original?'แก้ไขรายการ':'เพิ่มรายการ',original?'Edit item':'Add item'),lang,busy:task.busy,error:task.error?task.message:null,onClose:()=>{E(null);if(onCancel)onCancel();}},h('form',{className:'crm-master-form',onSubmit:e=>{e.preventDefault();save();},'aria-label':tr('แบบฟอร์มตั้งค่า','Settings form')},h('h2',null,tr(original?'แก้ไขรายการ':'เพิ่มรายการ',original?'Edit item':'Add item')),h('div',{className:'crm-grid'},def.fields.filter(([key])=>key!=='custom_role_key'||edit.role==='custom').map(([key,th,en,type,required])=>type==='members'?h('fieldset',{key,className:'crm-field'},h('legend',null,tr(th,en)),people.map(p=>h('label',{key:p.id},h('input',{type:'checkbox',checked:edit[key]?.includes(p.id),disabled:task.busy,onChange:e=>E(old=>({...old,[key]:e.target.checked?[...(old[key]||[]),p.id]:(old[key]||[]).filter(id=>id!==p.id)}))}),(edit[key]?.includes(p.id)?String(edit[key].indexOf(p.id)+1)+'. ':'')+(p.display_name||p.email)))):h(Field,{key,label:tr(th,en),type:type==='readonly'?'text':type,value:edit[key],required,disabled:task.busy||type==='readonly'||(!!original&&key===def.key),options:type==='customrole'?[['',tr('เลือกบทบาท','Select a role')],...roleOptions.filter(r=>!r.is_system).map(r=>[r.role_key,lang==='th'?r.label_th:r.label_en])]:type==='roles'?[...roleOptions.filter(r=>r.is_system).map(r=>[r.role_key,lang==='th'?r.label_th:r.label_en]),['custom',tr('บทบาทกำหนดเอง','Custom role')]]:type==='status'?['active','inactive']:type==='profile'?[['',tr('ไม่ระบุ','None')],...people.map(p=>[p.id,p.display_name||p.email])]:undefined,onChange:value=>E(old=>({...old,[key]:value}))}))),h('div',{className:'crm-actions'},h('button',{type:'submit',className:'crm-save',disabled:task.busy},tr('บันทึก','Save')),button(tr('ยกเลิก','Cancel'),()=>{E(null);if(onCancel)onCancel();},task.busy)))),
+   edit&&h(RecordPopup,{title:tr(original?'แก้ไขรายการ':'เพิ่มรายการ',original?'Edit item':'Add item'),lang,busy:task.busy,error:task.error?task.message:null,onClose:()=>{E(null);if(onCancel)onCancel();}},h('form',{className:'crm-master-form',onSubmit:e=>{e.preventDefault();save();},'aria-label':tr('แบบฟอร์มตั้งค่า','Settings form')},h('h2',null,tr(original?'แก้ไขรายการ':'เพิ่มรายการ',original?'Edit item':'Add item')),h('div',{className:'crm-grid'},def.fields.filter(([key])=>key!=='custom_role_key').map(([key,th,en,type,required])=>type==='members'?h('fieldset',{key,className:'crm-field'},h('legend',null,tr(th,en)),people.map(p=>h('label',{key:p.id},h('input',{type:'checkbox',checked:edit[key]?.includes(p.id),disabled:task.busy,onChange:e=>E(old=>({...old,[key]:e.target.checked?[...(old[key]||[]),p.id]:(old[key]||[]).filter(id=>id!==p.id)}))}),(edit[key]?.includes(p.id)?String(edit[key].indexOf(p.id)+1)+'. ':'')+(p.display_name||p.email)))):h(Field,{key,label:tr(th,en),type:type==='readonly'?'text':type,value:type==='roles'?userRoleSelection(edit):edit[key],required,disabled:task.busy||type==='readonly'||(!!original&&key===def.key),options:type==='departments'?departmentOptions(edit.department_group,lang):type==='customrole'?[['',tr('เลือกบทบาท','Select a role')],...roleOptions.filter(r=>!r.is_system).map(r=>[r.role_key,lang==='th'?r.label_th:r.label_en])]:type==='roles'?[['',tr('เลือกบทบาท','Select a role')],...roleOptions.map(r=>[r.role_key,lang==='th'?r.label_th:r.label_en])]:type==='status'?['active','inactive']:type==='profile'?[['',tr('ไม่ระบุ','None')],...people.map(p=>[p.id,p.display_name||p.email])]:undefined,onChange:value=>E(old=>type==='roles'?applyUserRoleSelection(old,value,roleOptions):({...old,[key]:value}))}))),h('div',{className:'crm-actions'},h('button',{type:'submit',className:'crm-save',disabled:task.busy},tr('บันทึก','Save')),button(tr('ยกเลิก','Cancel'),()=>{E(null);if(onCancel)onCancel();},task.busy)))),
    kind==='roles'&&!hidePermissions&&h(Permissions,{lang,key:rows.length}));
  }
  function Invite({lang}){
