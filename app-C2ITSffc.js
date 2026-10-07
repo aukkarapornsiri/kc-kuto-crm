@@ -1,4 +1,4 @@
-import {createUserProfile} from './src/user-profile.mjs?v=20261006-profile';
+import {createUserProfile} from './src/user-profile.mjs?v=20261007-profile';
 import {createAccountOnboarding} from './src/account-onboarding.mjs?v=20261006';
 import {createHeaderAIChat} from './src/header-ai-chat.mjs?v=20261004';
 import {createAIRobot} from './src/ai-robot.mjs?v=20261002-wave';
@@ -9,7 +9,7 @@ import {createInventory} from './src/inventory.mjs?v=20261003-crm-owned';
 import {createDashboardSalesMap} from './src/sales-map.mjs?v=20261004-vertical';
 import {LoginLayout as KCLoginLayout} from './src/login-layout.mjs?v=20260930-login';
 import {createInternalReports} from './src/internal-reports.mjs?v=20261002-commas';
-import {createInternalWorkspace,createInternalQuickMenu,DEMO_RECORDS} from './src/internal-workspace.mjs?v=20261007-a4';
+import {createInternalWorkspace,createInternalQuickMenu,DEMO_RECORDS} from './src/internal-workspace.mjs?v=20261007-profile';
 import {createSidebarToggle} from "./src/sidebar-toggle.mjs?v=20260927-layout";
 import {createGroupedNavigation} from "./src/grouped-navigation.mjs?v=20261007-full-sales";
 import {createContextNavigation} from "./src/context-navigation.mjs?v=20261007-full-sales";
