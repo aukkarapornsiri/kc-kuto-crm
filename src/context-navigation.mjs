@@ -1,5 +1,5 @@
-import {filterModules} from './role-access.mjs?v=20261002-live-access';
-import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs?v=20261002-live-access';
+import {filterModules} from './role-access.mjs?v=20261007-full-sales';
+import {SIDEBAR_GROUPS,SIDEBAR_PRIMARY_ORDER} from './grouped-navigation.mjs?v=20261007-full-sales';
 
 const RAIL_LABELS={
   dashboard:{th:'หน้าหลัก',en:'Home'},leads:{th:'ลีด',en:'Leads'},
