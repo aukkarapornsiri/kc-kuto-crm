@@ -31,3 +31,11 @@
 .crm-activity-dialog :is(.crm-profile-header,.crm-profile-footer){flex-shrink:0}
 .crm-activity-dialog .crm-profile-body{min-height:0}
 @media(max-width:600px){.crm-activity-dialog{width:calc(100vw - 16px)}}
+
+/* Lead fields share one alignment grid across identity and address sections. */
+.crm-lead-dialog .crm-profile-name{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 22px}
+.crm-lead-dialog .crm-profile-name>.crm-field:first-child{grid-column:1/-1;width:88px}
+.crm-lead-dialog textarea.crm-lead-street{min-height:39px;height:39px;overflow-y:hidden}
+.crm-lead-dialog :is(.crm-profile-header,.crm-profile-footer){flex-shrink:0}
+.crm-lead-dialog .crm-profile-body{min-height:0}
+@media(max-width:600px){.crm-lead-dialog .crm-profile-name{grid-template-columns:minmax(0,1fr)}.crm-lead-dialog .crm-profile-name>.crm-field:first-child{width:88px}}
