@@ -1,6 +1,6 @@
 // Keep the existing module and page registry as the source of truth. This layer
 // changes only how those modules are presented in the sidebar.
-import {filterModules} from './role-access.mjs?v=20261002-live-access';
+import {filterModules} from './role-access.mjs?v=20261007-full-sales';
 export const SIDEBAR_GROUPS = Object.freeze([
   {id:'sales', label:{th:'การขาย',en:'Sales'}, icon:'opportunities', modules:['opportunities','quotations','contracts']},
   {id:'service', label:{th:'บริการ',en:'Service'}, icon:'tickets', modules:['tickets','assets']},
