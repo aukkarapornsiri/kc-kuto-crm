@@ -7,10 +7,15 @@ try{for(const width of [1440,390]){
  page.on('pageerror',e=>errors.push(e.message));
  // Replace only the data-reader boundary; exercise the shipped dashboard and animation.
  await page.route('**/app-C2ITSffc.js*',async route=>{const response=await route.fetch();let body=await response.text();body=body.replace('readTargets:(...args)=>KCTargets.readTargets(...args)','readTargets:async()=>{if(window.ringFail)throw Error("offline");return window.ringData}');await route.fulfill({response,body});});
- await page.addInitScript(()=>{window.ringData={scope:'company',plan:{plan_year:2026},months:[{month:'2026-10-01',company_target:200,company_actual:75,employees:[]}]};});
+ await page.addInitScript(()=>{window.ringData={scope:'company',plan:{plan_year:2026},people:[{id:'s1',name:'Sales One',active:true,department_group:'Sales'},{id:'s2',name:'Sales Two',active:true,department_group:'Sales'},{id:'a1',name:'Accounting One',active:true,department_group:'Accounting'},{id:'sx',name:'Inactive Sales',active:false,department_group:'Sales'}],months:[{month:'2026-10-01',company_target:200,company_actual:75,employees:[{profile_id:'s1',target:100,actual:50},{profile_id:'s2',target:100,actual:25},{profile_id:'a1',target:100,actual:999},{profile_id:'sx',target:100,actual:777}]}]};});
  await page.goto(process.env.SITE_URL||'http://127.0.0.1:4179/kc-kuto-crm/');
  await page.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).click();
+ await page.getByRole('button',{name:'แดชบอร์ดผู้ดูแลระบบ',exact:true}).click();
+ await page.locator('.dash-sales-orbit').first().waitFor();
+ assert.equal(await page.locator('.dash-sales-orbit').count(),2,'Admin dashboard must show one planet per active Sales employee only');
+ assert.deepEqual((await page.locator('.dash-sales-planet>span:nth-child(2)').allTextContents()).sort(),['1. Sales One','2. Sales Two']);
  await page.getByRole('button',{name:'แดชบอร์ดฝ่ายขาย',exact:true}).click();
+ assert.equal(await page.locator('.dash-sales-orbit').count(),2,'Sales dashboard must use the same Sales-only people set');
  const value=page.locator('.dash-growth-center em'),ring=page.locator('.dash-growth-progress');
  await value.filter({hasText:'37.5%'}).waitFor();
  assert.equal(await page.locator('.dash-growth-center').innerText(),'37.5%\nของเป้ายอดขายปีนี้');
