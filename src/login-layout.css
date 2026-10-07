@@ -1,60 +1,181 @@
-/* Approved reference 2026-10-07. Login-only rules; size the shell inside its padded viewport so both margins remain equal. Preserve all content on small screens and existing authentication handlers. */
-.kc-login{box-sizing:border-box;width:100%;min-height:100vh;min-height:100dvh;height:auto;padding:56px clamp(16px,3.2vw,56px);display:flex;align-items:center;justify-content:center;background:#080d1b;color:#0e1b30;font-family:Anuphan,Inter,"Noto Sans Thai","Segoe UI",Arial,sans-serif}
+/* Approved 50/50 login. All rules are scoped to the public login screen. */
+.kc-login{--login-pad:44px;--login-field:52px;--login-button:54px;box-sizing:border-box;width:100%;min-height:100vh;min-height:100dvh;padding:32px clamp(16px,3.2vw,56px);display:flex;align-items:center;justify-content:center;background:#080d1b;color:#0e1b30;font-family:'IBM Plex Sans Thai',Anuphan,Inter,'Segoe UI',sans-serif}
 .kc-login *,.kc-login *::before,.kc-login *::after{box-sizing:border-box}
-.kc-login-shell{width:100%;max-width:1432px;min-width:0;height:752px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);border:1px solid #96a5b1;border-radius:32px;overflow:hidden;background:#fff;box-shadow:none}
-.kc-login-brand{min-width:0;min-height:0;overflow:auto;padding:48px 54px;display:flex;flex-direction:column;background:radial-gradient(ellipse at 52% 89%,#07404b30,transparent 48%),linear-gradient(135deg,#101827,#03131c 88%);color:#f8fcff;scrollbar-width:thin}
-.kc-login-logo{flex:none;height:184px;display:flex;align-items:center;justify-content:flex-start;padding:18px 34px;border:1px solid #8398a7;border-radius:21px;background:#ffffff01}
-.kc-login-logo img{display:block;width:min(100%,396px);height:auto;max-height:132px;object-fit:contain}
-.kc-login-story{margin-top:63px;display:flex;flex-direction:column;align-items:flex-start;flex:none}
+.kc-login-shell{width:100%;max-width:1432px;min-width:0;min-height:824px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #96a5b1;border-radius:32px;overflow:hidden;background:#fff}
+.kc-login-brand{min-width:0;padding:48px var(--login-pad) 34px;display:flex;flex-direction:column;align-items:flex-start;background:radial-gradient(ellipse at 52% 89%,#07404b30,transparent 48%),linear-gradient(135deg,#101827,#03131c 88%);color:#f8fcff}
+.kc-login-logo{width:min(100%,560px);flex:none;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;line-height:0}
+.kc-login-logo>svg{display:block;width:100%;height:auto;aspect-ratio:1265/383;overflow:hidden}
+.kc-login-story{width:100%;margin-top:56px;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
 .kc-login-badge{max-width:100%;display:inline-flex;align-items:center;gap:10px;min-height:42px;padding:9px 14px;border:1px solid #75d0de;border-radius:30px;background:#06324136;color:#b7f7fb;font-size:12px;line-height:1.6}
 .kc-login-badge svg{width:17px;height:17px;flex:none}
-.kc-login-story h1{margin:23px 0 20px;color:#fff;font-size:clamp(29px,2.25vw,40px);font-weight:700;line-height:1.35;letter-spacing:-.6px}
-/* Latest supplied reference has no accent rule, field icons, or divider. */
-.kc-login-accent-line{display:none}
-.kc-login-story > p{margin:0;max-width:100%;color:#cbdbea;font-size:16px;line-height:1.65}
-.kc-login-features{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:34px}
-.kc-login-features > div{min-width:0;min-height:80px;padding:14px 12px;display:flex;flex-direction:column;gap:9px;border:1px solid #8098a6;border-radius:15px;background:#ffffff02;font-size:12px;line-height:1.4}
-.kc-login-features svg{width:21px;height:21px;color:#19d4db;flex:none}
-.kc-login-brand footer{display:flex;justify-content:space-between;gap:16px;margin-top:auto;padding-top:24px;color:#7bd8ee;font-size:10px;line-height:1.5;flex:none}
-.kc-login-access{min-width:0;min-height:0;padding:46px 64px 8px;display:flex;flex-direction:column;background:#fff;overflow:auto;scrollbar-width:thin}
-.kc-login-top{display:flex;align-items:center;justify-content:space-between;gap:20px;color:#279caf;font-size:10px;line-height:1.5;flex:none}
-.kc-login-language{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:7px 14px;border:1px solid #dde5ec;border-radius:30px;background:#fff;color:#14334c;font-size:12px;line-height:1.5;box-shadow:0 4px 14px #12213d05;flex:none;cursor:pointer}
-.kc-login-language span{font-size:20px;line-height:1}
-.kc-login-content{margin:46px 0 20px;padding:0;flex:none}
-.kc-login-content > h2{margin:0 0 9px;color:#0f1c31;font-size:30px;font-weight:500;line-height:1.35}
-.kc-login-intro{margin:0 0 20px;color:#8290a5;font-size:14px;line-height:1.6}
-.kc-login-form-card{width:100% !important;max-width:none !important;padding:0 !important;gap:0 !important;border:0 !important;border-radius:0 !important;background:transparent !important;color:#14283d !important;box-shadow:none !important}
-.kc-login-form-card > div{padding:0 !important}
-.kc-login-form-card form{display:grid;gap:12px}
-.kc-login-form-card form > div{margin:0 !important}
-.kc-login-form-card form > div:has(> input){display:grid;gap:4px}
-.kc-login-form-card label{margin:0 !important;color:#576980;font-size:12px;font-weight:400;line-height:1.5}
-.kc-login-form-card input{width:100%;min-width:0;height:44px;margin:0 !important;padding:0 13px;border:1px solid #d9e2ed;border-radius:10px;background:#f8fafc;color:#203247;font-size:14px;line-height:1.5;box-shadow:none}
-.kc-login-form-card input::placeholder{color:#7a8ba0;opacity:1}
+.kc-login-story h1{width:100%;margin:24px 0 20px;color:#fff;font-size:clamp(30px,2.4vw,42px);font-weight:700!important;line-height:1.35;letter-spacing:-.5px;overflow-wrap:break-word}
+.kc-login-story>p{width:100%;margin:0;max-width:none;color:#cbdbea;font-size:16px;line-height:1.75;text-wrap:pretty}
+.kc-login-features{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:32px;text-align:left}
+.kc-login-features>div{min-width:0;min-height:96px;padding:16px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;border:1px solid #8098a6;border-radius:15px;background:#ffffff02;font-size:12px;line-height:1.5}
+.kc-login-features svg{width:24px;height:24px;color:#19d4db;flex:none}
+.kc-login-brand footer{width:100%;display:flex;justify-content:space-between;gap:16px;margin-top:auto;padding-top:32px;color:#7bd8ee;font-size:11px;line-height:1.6;flex:none}
+.kc-login-access{min-width:0;padding:24px var(--login-pad) 14px;display:flex;flex-direction:column;background:#fff}
+.kc-login-top{display:flex;align-items:center;justify-content:space-between;gap:16px;color:#279caf;font-size:12px;line-height:1.5;flex:none}
+.kc-login-top>span{min-width:0;overflow-wrap:break-word}
+.kc-login-language{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:7px 14px;border:1px solid #dde5ec;border-radius:30px;background:#fff;color:#14334c;font-size:12px;line-height:1.5;flex:none;cursor:pointer}
+.kc-login-language span{font-size:16px;line-height:1}
+.kc-login-content{margin:22px 0 16px;padding:0;flex:none}
+.kc-login-content>h2{margin:0 0 12px;color:#0f1c31;font-size:30px;font-weight:700!important;line-height:1.4}
+.kc-login-intro{margin:0 0 22px;color:#8290a5;font-size:16px;line-height:1.6}
+.kc-login-form-card{width:100%!important;max-width:none!important;padding:0!important;gap:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#14283d!important;box-shadow:none!important}
+.kc-login-form-card>div{padding:0!important}
+.kc-login-form-card form{display:grid;gap:14px}
+.kc-login-form-card form>div{margin:0!important}
+.kc-login-form-card form>div:has(#login-email),.kc-login-form-card form>div:has(#login-password){display:grid;gap:8px}
+.kc-login-form-card label{margin:0!important;color:#70849e;font-size:14px;font-weight:400;line-height:1.5}
+.kc-login-form-card input{display:block;width:100%;min-width:0;height:var(--login-field);margin:0!important;padding:0 18px;border:1px solid #d3dfed;border-radius:13px;background:#f7f9fb;color:#203f59;font:inherit;font-size:16px;line-height:1.5;box-shadow:none}
+.kc-login-form-card input::placeholder{color:#8b9db2;opacity:1}
 .kc-login-form-card #login-email,.kc-login-form-card #login-password{background-image:none}
 .kc-login-form-card input:focus-visible{border-color:#0aada9;outline:3px solid #10b7b52e;outline-offset:2px}
-.kc-login-form-card button[type=submit]{width:100%;min-height:50px;margin:6px 0 0;border:0;border-radius:10px;background:linear-gradient(105deg,#14a6aa,#20babc);color:#fff;font-size:14px;font-weight:500;box-shadow:0 10px 24px #0daaa71a}
+.kc-login-password-field{position:relative;min-width:0;margin:0!important}
+.kc-login-password-field #login-password{padding-right:56px}
+.kc-login-password-toggle{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6c879e}
+.kc-login-form-card button[type=submit]{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:var(--login-button);margin:6px 0 0;padding:10px 16px;border:0;border-radius:12px;background:linear-gradient(105deg,#0ca7aa,#1bb7bd);color:#fff;font-family:inherit;font-size:16px;font-weight:700!important;box-shadow:0 12px 28px #0daaa71a}
 .kc-login-form-card button:disabled{opacity:.6;cursor:wait}
-.kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo){margin-top:14px !important}
-.kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo) > button{display:flex;align-items:center;justify-content:center;min-height:40px;padding:9px 12px !important;border-color:#cbd7e5 !important;border-radius:8px !important;color:#18344f !important;font-size:12px;font-weight:400 !important;line-height:1.5}
-.kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo) > p:not([role=alert]){margin-top:6px !important;color:#8393aa !important;font-size:11px !important;line-height:1.6}
-.kc-login-form-card .kc-login-demo{margin-top:18px;padding:0;border:0}
-.kc-login-demo::before,.kc-login-demo::after{display:none;content:none}
-.kc-login-demo button{width:100%;min-height:40px;border:1px solid #d8e2e9;border-radius:9px;background:#fff;color:#52808f;font-size:12px;font-weight:400}
-.kc-login-assurance{display:flex;align-items:center;gap:14px;min-height:80px;margin-top:24px;padding:15px 16px;border:1px solid #dfe6ee;border-radius:15px;background:#f7f9fb}
-.kc-login-assurance > svg{box-sizing:content-box;width:20px;height:20px;padding:12px;border-radius:13px;background:#d8f8f5;color:#00a7aa;flex:none}
-.kc-login-assurance strong{color:#27415d;font-size:13px;font-weight:500;line-height:1.5}
-.kc-login-assurance p{margin:3px 0 0;color:#8b9bb0;font-size:11px;line-height:1.5}
-.kc-login-access > footer{margin-top:auto;padding-top:20px;border-top:1px solid #e0e5eb;color:#93a6b9;font-size:10px;line-height:1.5;flex:none}
-.kc-login button:focus-visible{outline:3px solid #0aada9;outline-offset:3px}
+.kc-login-microsoft{margin-top:14px!important}
+.kc-login-microsoft>button{display:flex;align-items:center;justify-content:center;gap:12px;min-height:var(--login-button);padding:10px 16px!important;border-color:#cbd9e9!important;border-radius:12px!important;color:#345772!important;font-family:inherit;font-size:16px;font-weight:400!important;line-height:1.5;white-space:normal}
+.kc-login-microsoft-mark{display:grid;grid-template-columns:repeat(2,9px);grid-template-rows:repeat(2,9px);gap:1px;flex:none}
+.kc-login-microsoft-mark>i{display:block;width:9px;height:9px}
+.kc-login-microsoft>p:not([role=alert]){margin:8px 0 0!important;color:#8b9bb0!important;font-size:12px!important;line-height:1.65}
+.kc-login-microsoft>[role=alert]{margin-top:10px;line-height:1.6}
+.kc-login-help{margin:14px 0 16px;color:#8b9bb0;font-size:12px;line-height:1.65}
+.kc-login-guest{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:var(--login-button);padding:10px 16px;border:1px solid #cbd9e9;border-radius:12px;background:#fff;color:#588999;font-size:16px;line-height:1.5;text-decoration:none;text-align:center}
+.kc-login-guest svg{flex:none;width:22px;height:22px}
+.kc-login-demo{margin-top:14px}
+.kc-login-demo button{width:100%;min-height:44px;padding:9px 12px;border:1px solid #d8e2e9;border-radius:10px;background:#fff;color:#52808f;font:inherit;font-size:13px}
+.kc-login-assurance{display:flex;align-items:center;gap:14px;min-height:80px;margin-top:16px;padding:12px;border:1px solid #dce6ee;border-radius:21px;background:#f7f9fb}
+.kc-login-assurance>svg{box-sizing:content-box;width:24px;height:24px;padding:14px;border-radius:16px;background:#d8f8f5;color:#00a7aa;flex:none}
+.kc-login-assurance>div{min-width:0}
+.kc-login-assurance strong{display:block;color:#345a73;font-size:15px;font-weight:400!important;line-height:1.6}
+.kc-login-assurance p{margin:4px 0 0;color:#8b9bb0;font-size:12px;line-height:1.6}
+.kc-login-session-note{display:flex;align-items:flex-start;gap:8px;margin:14px 0 0;color:#8b9bb0;font-size:11px;line-height:1.65}
+.kc-login-session-note>svg{width:16px;height:16px;flex:none;margin-top:1px}
+.kc-login-access>footer{margin-top:auto;padding-top:12px;border-top:1px solid #dbe3ec;color:#93a6b9;font-size:11px;line-height:1.65;flex:none}
+.kc-login button:focus-visible,.kc-login a:focus-visible{outline:3px solid #0aada9;outline-offset:3px}
 .kc-login button:not(:disabled){cursor:pointer}
 .kc-login-form-card button[type=submit]:hover:not(:disabled){filter:brightness(.97)}
-/* Short desktop and notebook screens. */
-@media (min-width:721px) and (max-height:863px){.kc-login{padding-top:24px;padding-bottom:24px}.kc-login-shell{height:min(752px,calc(100dvh - 48px))}}
-@media (min-width:721px) and (max-height:780px){.kc-login-brand{padding:32px 40px}.kc-login-logo{height:150px}.kc-login-logo img{width:min(100%,354px);max-height:118px}.kc-login-story{margin-top:34px}.kc-login-badge{min-height:36px;font-size:11px;padding:7px 12px}.kc-login-story h1{font-size:32px;margin:18px 0 16px}.kc-login-story > p{font-size:14px}.kc-login-features{margin-top:24px;gap:10px}.kc-login-features > div{min-height:74px;padding:12px 10px;font-size:11px}.kc-login-brand footer{padding-top:20px}.kc-login-access{padding:28px 44px 14px}.kc-login-content{margin:28px 0 22px}.kc-login-content > h2{font-size:27px;margin-bottom:7px}.kc-login-intro{margin-bottom:18px;font-size:13px}.kc-login-form-card form{gap:10px}.kc-login-form-card input{height:40px;font-size:13px}.kc-login-form-card button[type=submit]{min-height:44px;margin-top:4px}.kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo){margin-top:12px !important}.kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo) > button{min-height:36px;padding:7px 12px !important}.kc-login-form-card .kc-login-demo{margin-top:14px}.kc-login-demo button{min-height:36px}.kc-login-assurance{min-height:68px;margin-top:18px;padding:12px}.kc-login-assurance > svg{padding:9px}.kc-login-access > footer{padding-top:14px}}
-@media (min-width:721px) and (max-height:680px){.kc-login{padding-top:16px;padding-bottom:16px}.kc-login-shell{height:max(560px,calc(100dvh - 32px))}.kc-login-brand{padding:24px 32px}.kc-login-logo{height:112px;padding:12px 24px}.kc-login-logo img{width:min(100%,282px);max-height:94px}.kc-login-story{margin-top:26px}.kc-login-story h1{font-size:28px;margin:16px 0 12px}.kc-login-story > p{font-size:13px;line-height:1.55}.kc-login-features{margin-top:20px}.kc-login-features > div{min-height:66px;padding:10px;gap:7px}.kc-login-features svg{width:18px;height:18px}.kc-login-brand footer{padding-top:16px}.kc-login-access{padding:20px 34px 12px}.kc-login-language{min-height:32px;padding:5px 12px}.kc-login-content{margin:22px 0 18px}.kc-login-content > h2{font-size:24px;margin-bottom:6px}.kc-login-intro{margin-bottom:14px;font-size:12px}.kc-login-form-card form{gap:8px}.kc-login-form-card label{font-size:11px}.kc-login-form-card input{height:36px;font-size:12px}.kc-login-form-card button[type=submit]{min-height:38px;margin-top:4px;font-size:13px}.kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo){margin-top:10px !important}.kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo) > button{min-height:34px;padding:6px 10px !important}.kc-login-form-card .kc-login-demo{margin-top:12px}.kc-login-demo button{min-height:34px}.kc-login-assurance{min-height:58px;margin-top:16px;padding:9px 12px;gap:10px}.kc-login-assurance > svg{width:18px;height:18px;padding:8px}.kc-login-assurance strong{font-size:12px}.kc-login-assurance p{font-size:10px}.kc-login-access > footer{padding-top:12px}}
-@media (min-width:721px) and (max-width:1200px){.kc-login{padding-left:24px;padding-right:24px}.kc-login-brand{padding-left:26px;padding-right:26px}.kc-login-access{padding-left:28px;padding-right:28px}.kc-login-logo{padding-left:18px;padding-right:18px}.kc-login-story h1{font-size:28px}.kc-login-story > p{font-size:13px}.kc-login-badge{font-size:11px}.kc-login-features{gap:8px}.kc-login-features > div{padding-left:9px;padding-right:9px;font-size:11px}}
-@media (min-width:721px) and (max-width:900px){.kc-login-brand{padding-top:32px;padding-bottom:32px}.kc-login-logo{height:140px}.kc-login-story{margin-top:36px}.kc-login-story h1{font-size:26px}.kc-login-access{padding-top:32px;padding-bottom:16px}.kc-login-top{gap:10px}.kc-login-content{margin-top:30px;margin-bottom:20px}.kc-login-content > h2{font-size:26px}}
-/* Phones: stacked layout; keep all three cards, description and both footers. */
-@media (max-width:720px){.kc-login{padding:16px}.kc-login-shell{height:auto;grid-template-columns:minmax(0,1fr);border-radius:24px}.kc-login-brand{padding:28px 24px;overflow:visible}.kc-login-logo{height:124px;padding:16px;justify-content:center}.kc-login-logo img{width:min(100%,300px);max-height:100px}.kc-login-story{margin-top:28px}.kc-login-badge{min-height:38px;padding:8px 10px;gap:8px;font-size:11px}.kc-login-story h1{font-size:clamp(23px,5.8vw,32px);margin:20px 0 14px}.kc-login-story > p{font-size:13px;line-height:1.7}.kc-login-features{margin-top:24px;gap:8px}.kc-login-features > div{min-height:86px;padding:12px 8px;font-size:11px;gap:8px}.kc-login-brand footer{margin-top:24px;padding-top:0;font-size:9px;gap:10px;flex-wrap:wrap}.kc-login-access{padding:28px 24px 24px;overflow:visible}.kc-login-top{gap:12px}.kc-login-top > span{max-width:210px}.kc-login-language{min-height:44px;padding:8px 12px}.kc-login-content{margin:30px 0 28px}.kc-login-content > h2{font-size:26px}.kc-login-intro{margin-bottom:24px;font-size:13px}.kc-login-form-card input{height:46px;font-size:16px}.kc-login-form-card [data-slot=card-content] > div:not(.kc-login-demo) > button,.kc-login-demo button{min-height:44px;white-space:normal}.kc-login-assurance{padding:14px 12px;gap:10px}.kc-login-assurance > svg{padding:9px}.kc-login-assurance strong{font-size:12px}.kc-login-assurance p{font-size:11px}.kc-login-access > footer{padding-top:16px;line-height:1.7}}
-@media (max-width:360px){.kc-login{padding:12px}.kc-login-brand,.kc-login-access{padding-left:18px;padding-right:18px}.kc-login-features{grid-template-columns:minmax(0,1fr)}.kc-login-features > div{min-height:50px;flex-direction:row;align-items:center;gap:12px;font-size:12px}}
+.kc-login-guest:hover{background:#f0fbfb;border-color:#87c6ce}
+/* Fit typical laptops without clipping copy, controls or footers. */
+@media(min-width:1024px) and (max-height:900px){
+ .kc-login{padding-top:24px;padding-bottom:24px;--login-field:48px;--login-button:50px}
+ .kc-login-shell{min-height:min(824px,calc(100dvh - 48px));height:auto}
+ .kc-login-brand{padding-top:40px;padding-bottom:28px}
+ .kc-login-story{margin-top:42px}
+ .kc-login-access{padding-top:22px;padding-bottom:12px}
+ .kc-login-content{margin-top:18px;margin-bottom:14px}
+ .kc-login-content>h2{font-size:28px;margin-bottom:9px}
+ .kc-login-intro{margin-bottom:18px;font-size:15px}
+ .kc-login-form-card form{gap:12px}
+ .kc-login-form-card form>div:has(input){gap:6px}
+ .kc-login-help{margin:12px 0 14px}
+ .kc-login-assurance{min-height:76px}
+}
+@media(min-width:1024px) and (max-height:780px){
+ .kc-login{--login-pad:32px;--login-field:42px;--login-button:44px;padding-top:16px;padding-bottom:16px}
+ .kc-login-shell{height:auto;min-height:calc(100dvh - 32px)}
+ .kc-login-brand{padding-top:28px;padding-bottom:24px}
+ .kc-login-logo{width:min(100%,470px)}
+ .kc-login-story{margin-top:30px}
+ .kc-login-story h1{font-size:32px;margin:20px 0 16px}
+ .kc-login-story>p{font-size:14px;line-height:1.65}
+ .kc-login-features{margin-top:24px;gap:10px}
+ .kc-login-features>div{min-height:80px;padding:12px 10px;font-size:11px;gap:8px}
+ .kc-login-brand footer{font-size:10px;padding-top:24px}
+ .kc-login-access{padding-top:18px;padding-bottom:10px}
+ .kc-login-top{font-size:11px}
+ .kc-login-content{margin-top:16px;margin-bottom:12px}
+ .kc-login-content>h2{font-size:26px;margin-bottom:6px}
+ .kc-login-intro{font-size:14px;margin-bottom:14px}
+ .kc-login-form-card label{font-size:12px}
+ .kc-login-form-card input{font-size:14px}
+ .kc-login-form-card form{gap:10px}
+ .kc-login-form-card button[type=submit],.kc-login-microsoft>button,.kc-login-guest{font-size:14px}
+ .kc-login-microsoft{margin-top:12px!important}
+ .kc-login-microsoft>p:not([role=alert]),.kc-login-help{font-size:11px!important}
+ .kc-login-help{margin:10px 0 12px}
+ .kc-login-assurance{min-height:68px;margin-top:14px;padding:10px;gap:12px;border-radius:18px}
+ .kc-login-assurance>svg{width:22px;height:22px;padding:10px}
+ .kc-login-assurance strong{font-size:13px}
+ .kc-login-assurance p{font-size:11px}
+ .kc-login-session-note{margin-top:12px;font-size:10px}
+ .kc-login-access>footer{font-size:10px;padding-top:10px}
+}
+@media(min-width:1024px) and (max-height:680px){
+ .kc-login{--login-pad:28px;--login-field:36px;--login-button:38px}
+ .kc-login-shell{height:auto;min-height:618px}
+ .kc-login-brand{padding-top:24px;padding-bottom:20px}
+ .kc-login-logo{width:min(100%,420px)}
+ .kc-login-story{margin-top:24px}
+ .kc-login-badge{min-height:36px;font-size:11px;padding:6px 12px}
+ .kc-login-story h1{font-size:29px;margin:16px 0 12px}
+ .kc-login-story>p{font-size:13px}
+ .kc-login-features{margin-top:20px}
+ .kc-login-features>div{min-height:72px}
+ .kc-login-access{padding-top:12px;padding-bottom:8px}
+ .kc-login-language{min-height:32px;padding:5px 12px}
+ .kc-login-content{margin-top:10px;margin-bottom:8px}
+ .kc-login-content>h2{font-size:24px}
+ .kc-login-intro{margin-bottom:10px;font-size:13px}
+ .kc-login-form-card form{gap:6px}
+ .kc-login-form-card form>div:has(input){gap:3px}
+ .kc-login-form-card button[type=submit]{margin-top:4px}
+ .kc-login-microsoft{margin-top:8px!important}
+ .kc-login-microsoft>p:not([role=alert]){margin-top:4px!important}
+ .kc-login-help{margin:6px 0 8px}
+ .kc-login-assurance{margin-top:10px;min-height:58px;padding:8px 10px}
+ .kc-login-assurance>svg{padding:8px;width:20px;height:20px}
+ .kc-login-session-note{margin-top:8px}
+ .kc-login-form-card input{font-size:13px}
+ .kc-login-assurance strong{font-size:12px}
+ .kc-login-assurance p{font-size:10px}
+}
+@media(min-width:1024px) and (max-width:1200px){
+ .kc-login{padding-left:24px;padding-right:24px;--login-pad:28px}
+ .kc-login-story h1{font-size:30px}
+ .kc-login-story>p{font-size:14px}
+ .kc-login-features{gap:8px}
+ .kc-login-features>div{padding-left:10px;padding-right:10px;font-size:11px}
+}
+/* Stacked on portrait tablets and phones, with all content still accessible. */
+@media(max-width:1023px){
+ .kc-login{padding:24px;--login-pad:32px;--login-field:50px;--login-button:52px}
+ .kc-login-shell{height:auto;min-height:0;grid-template-columns:minmax(0,1fr);max-width:720px}
+ .kc-login-brand{padding:32px var(--login-pad)}
+ .kc-login-logo{width:min(100%,470px)}
+ .kc-login-story{margin-top:32px}
+ .kc-login-story h1{font-size:32px;margin:22px 0 16px}
+ .kc-login-story>p{font-size:14px}
+ .kc-login-features{margin-top:24px}
+ .kc-login-brand footer{margin-top:28px;padding-top:0;flex-wrap:wrap;font-size:10px}
+ .kc-login-access{padding:28px var(--login-pad) 20px}
+ .kc-login-content{margin:24px 0 20px}
+ .kc-login-top{font-size:11px;gap:12px}
+ .kc-login-language{min-height:44px}
+ .kc-login-form-card input{font-size:16px}
+}
+@media(max-width:720px){
+ .kc-login{padding:16px;--login-pad:24px}
+ .kc-login-shell{border-radius:24px}
+ .kc-login-logo{width:min(100%,400px)}
+ .kc-login-story h1{font-size:clamp(24px,6.1vw,32px)}
+ .kc-login-badge{font-size:11px;padding:8px 10px;gap:8px}
+ .kc-login-features{gap:8px}
+ .kc-login-features>div{padding:12px 8px;font-size:11px;min-height:88px}
+ .kc-login-content>h2{font-size:26px}
+ .kc-login-intro{font-size:14px}
+ .kc-login-microsoft>button,.kc-login-guest{font-size:14px;gap:10px}
+ .kc-login-assurance{gap:10px}
+ .kc-login-assurance>svg{padding:10px;width:22px;height:22px}
+ .kc-login-assurance strong{font-size:13px}
+ .kc-login-assurance p{font-size:11px}
+}
+@media(max-width:360px){
+ .kc-login{padding:12px;--login-pad:18px}
+ .kc-login-features{grid-template-columns:minmax(0,1fr)}
+ .kc-login-features>div{min-height:52px;flex-direction:row;align-items:center;gap:12px;font-size:12px}
+}
