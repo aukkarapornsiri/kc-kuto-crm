@@ -11,7 +11,7 @@ export function createCustomer360({React,client,useApp,records}){
  return function Customer360({record,lang='th'}){
   const {demoMode,profile,navigate}=useApp(),th=lang==='th',t=(a,b)=>th?a:b;
   const [state,State]=React.useState(null),[busy,Busy]=React.useState(false),[error,ErrorText]=React.useState(''),[tab,Tab]=React.useState('overview'),[detail,Detail]=React.useState(null),[filter,Filter]=React.useState(''),[search,Search]=React.useState(''),[review,Review]=React.useState(null),[reason,Reason]=React.useState(''),[confirmed,Confirmed]=React.useState(false),[reload,Reload]=React.useState(0);
-  const saving=React.useRef(false),isAdmin=profile?.is_super_admin===true;
+  const saving=React.useRef(false),isAdmin=demoMode||profile?.is_super_admin===true;
   React.useEffect(()=>{let active=true;State(null);ErrorText('');Busy(true);Review(null);Detail(null);
    (async()=>{try{
     let rights=[];if(!demoMode&&!isAdmin)rights=await unwrap(client.from('role_permissions').select('module,can_view,can_create,can_edit,can_approve').eq('role_key',profile?.role==='custom'?profile.custom_role_key:profile?.role||''));

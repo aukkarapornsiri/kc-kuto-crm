@@ -26,3 +26,7 @@ Database: `tocsxnprspiogawignib`. Applied migration: `20261008171808_unified_per
 ## Boundaries
 
 View permission necessarily allows reading data; disabling the application Export action cannot prevent a viewer from copying information already authorized for reading. Existing business rules (approval sequencing, preventing self-approval, stock integrity) remain enforced. This change does not grant new roles to users or alter customer records.
+
+## Browser CI follow-up
+
+The full browser suite found three failures also present at baseline commit 50ba35d: internal-workspace lead detail close, opportunity stage probability (60 vs 100), and settings-workspace outdated permission selector. They are not certified as passing by this audit. A fourth failure introduced by the permission change hid demo Customer 360 identity controls; restored the explicit demo allowance while retaining Super Admin enforcement for real sessions. Real-account browser coverage across every role remains outstanding.
