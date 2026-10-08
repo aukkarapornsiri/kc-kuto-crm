@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {capitalizeSelectLabel as cap} from '../src/select-labels.mjs';
+test('capitalize only the first letter; preserve acronyms, Thai and the rest of labels',()=>{for(const [a,b] of [['in progress','In progress'],['  prospect','  Prospect'],['-- none --','-- None --'],['CRM','CRM'],['Microsoft 365','Microsoft 365'],['รอดำเนินการ','รอดำเนินการ'],['',''],['123 pending','123 Pending']])assert.equal(cap(a),b);});
