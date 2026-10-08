@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {validateRecord,summarizePipeline} from '../src/internal-model.mjs';
-import {opportunityStagePatch} from '../src/opportunity-dialog.mjs';
+import {opportunityStagePatch,createOpportunityDialog} from '../src/opportunity-dialog.mjs';
 const draft={name:'Server project',customer_id:'customer',contact_id:'contact',owner_id:'owner',close_date:'2026-10-31',amount:'120000.50',probability:'60',stage:'Proposal',status:'open',forecast_category:'Best Case',solution:'Description',next_action:'Customer review'};
 
 test('required opportunity fields and numeric boundaries are enforced',()=>{
@@ -25,4 +25,15 @@ test('won and lost stages keep status, probability, forecast and weighted amount
   assert.equal(lost.status,'lost');assert.equal(lost.forecast_category,'Closed Lost');assert.equal(lost.weighted_amount,0);
   assert.deepEqual(opportunityStagePatch('Proposal'),{stage:'Proposal',status:'open'});
   assert.throws(()=>validateRecord('opportunities',{...draft,forecast_category:'Closed Won'}),/Open opportunity/);
+});
+
+// React can defer state updater execution until after the select value is restored.
+test('stage handler snapshots the selected value before the queued state update',()=>{
+ const flatten=n=>n&&typeof n==='object'?[n,...(n.children||[]).flat(Infinity).flatMap(flatten)]:[];
+ const React={createElement:(type,props,...children)=>({type,props:props||{},children}),useState:x=>[x,()=>{}],useRef:()=>({current:null}),useId:()=>"test-id",useEffect:()=>{}};
+ let updater;const Component=createOpportunityDialog({React});
+ const tree=Component({lang:'en',editing:draft,setEditing:fn=>{updater=fn;},lookup:{},masters:[],busy:false});
+ const select=flatten(tree).find(x=>x.type==='select'&&x.props['aria-label']==='Stage');
+ const event={target:{value:'Won'}};select.props.onChange(event);event.target.value='Proposal';
+ const result=updater(draft);assert.equal(result.stage,'Won');assert.equal(result.probability,100);assert.equal(result.forecast_category,'Closed Won');
 });

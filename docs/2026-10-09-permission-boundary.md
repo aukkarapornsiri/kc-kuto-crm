@@ -30,3 +30,10 @@ View permission necessarily allows reading data; disabling the application Expor
 ## Browser CI follow-up
 
 The full browser suite found three failures also present at baseline commit 50ba35d: internal-workspace lead detail close, opportunity stage probability (60 vs 100), and settings-workspace outdated permission selector. They are not certified as passing by this audit. A fourth failure introduced by the permission change hid demo Customer 360 identity controls; restored the explicit demo allowance while retaining Super Admin enforcement for real sessions. Real-account browser coverage across every role remains outstanding.
+
+## Requested retest, 9 October 2026
+
+- Live production transaction: **33,075 permission assertions passed**, covering all 81 stored roles, 15 modules and 9 actions (current configuration, revocation, grants), Super Admin rights and disabled-account denial. Added `tests/permission-matrix-exhaustive.sql`. No login credentials or sessions created; every fixture and matrix change rolled back.
+- Added all-role frontend tests for isolated action grants, inactive/deleted/pending account denial, menu filtering and direct-page denial.
+- Corrected two stale browser selectors for the redesigned lead/contact details and the Roles tab. Fixed Opportunity Stage event handling to snapshot the selected value before React executes the queued update; regression test verifies Won stays at 100%.
+- Browser role simulation and database-role assertions are distinct from interactive login as real employees. No real employee credentials used.
