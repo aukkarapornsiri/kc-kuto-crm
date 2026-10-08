@@ -7,16 +7,16 @@ function fixture(overrides={}){
  const calls=[];
  const client={auth:{getUser:async()=>({data:{user:{id:actor}},error:overrides.authError}),admin:{updateUserById:async(...args)=>{calls.push(['ban',...args]);return {error:overrides.banError};}}},
  from:()=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:{role:overrides.role||'admin',is_active:overrides.active!==false}})})})}),
- rpc:async(_,args)=>{calls.push(['rpc',args]);return {data:{deleted:!!overrides.deleted},error:args.p_finalize?overrides.finishError:overrides.startError};}};
+ rpc:async(name,args)=>{if(name==='crm_actor_can')return {data:overrides.allowed??((overrides.role||'super_admin')==='super_admin'&&overrides.active!==false)};calls.push(['rpc',args]);return {data:{deleted:!!overrides.deleted},error:args.p_finalize?overrides.finishError:overrides.startError};}};
  const send=(body={user_id:target,confirm:true},opts={})=>createHandler(client)(new Request('https://example.test',{method:'POST',headers:{authorization:'Bearer test'},body:JSON.stringify(body),...opts}));
  return {calls,send};
 }
-test('active admin: deactivate, ban, finalize in order',async()=>{
+test('active Super Admin: deactivate, ban, finalize in order',async()=>{
  const {send,calls}=fixture();assert.equal((await send()).status,200);
  assert.equal(calls[0][1].p_finalize,false);assert.equal(calls[0][1].p_actor,actor);
  assert.deepEqual(calls[1],['ban',target,{ban_duration:'876000h'}]);assert.equal(calls[2][1].p_finalize,true);
 });
-for(const [label,options,status] of [['invalid token',{authError:{}},401],['member',{role:'sales_user'},403],['disabled admin',{active:false},403]])test(label+' cannot mutate',async()=>{
+for(const [label,options,status] of [['invalid token',{authError:{}},401],['member',{role:'sales_user'},403],['ordinary admin',{role:'admin'},403],['incomplete onboarding',{allowed:false},403],['disabled admin',{active:false},403]])test(label+' cannot mutate',async()=>{
  const f=fixture(options);assert.equal((await f.send()).status,status);assert.equal(f.calls.length,0);
 });
 test('self deletion, malformed ID and missing confirmation cannot mutate',async()=>{

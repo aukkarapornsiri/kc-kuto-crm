@@ -1,5 +1,5 @@
 import {validateMaster} from './master-data.mjs';
-export const MODULES=['dashboard','leads','customers','contacts','opportunities','quotations','contracts','assets','tickets','activities','documents','reports','ai','settings'];
+export const MODULES=['dashboard','leads','customers','contacts','opportunities','quotations','contracts','assets','tickets','activities','documents','reports','ai','settings','inventory'];
 export const ACTIONS=['view','create','edit','delete','export','approve','assign','import','manage_settings'];
 export const COMPANY_FIELDS=['company_name','company_name_en','tax_id','phone','email','website','logo_url','default_language','timezone','currency','fiscal_year_start_month','date_format','time_format','company_details'];
 export function validateCompany(input){

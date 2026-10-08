@@ -40,17 +40,15 @@ async function getProfile(id:string){
 async function requireAdmin(req:Request){
   const user=await currentUser(req); if(!user)return{error:json({error:"Unauthorized"},401)};
   const profile=await getProfile(user.id);
-  if(!profile?.is_active||profile.role!=="admin")return{error:json({error:"Admin permission required"},403)};
+  const {data:allowed,error}=await adminClient.rpc("crm_actor_can",{p_actor:user.id,p_module:"settings",p_action:"manage_settings"});
+  if(error||allowed!==true)return{error:json({error:"Settings permission required"},403)};
   return{user,profile};
 }
 async function requirePermission(req:Request,module:string,action:string){
   const user=await currentUser(req); if(!user)return{error:json({error:"Unauthorized"},401)};
   const profile=await getProfile(user.id); if(!profile?.is_active)return{error:json({error:"Inactive user"},403)};
-  if(profile.role==="admin")return{user,profile};
-  const roleKey=profile.role==="custom"?profile.custom_role_key:profile.role;
-  const {data}=await adminClient.from("role_permissions").select("*").eq("role_key",roleKey).eq("module",module).maybeSingle();
-  const field=({view:"can_view",create:"can_create",edit:"can_edit",delete:"can_delete",export:"can_export",approve:"can_approve",assign:"can_assign",import:"can_import",manage_settings:"can_manage_settings"} as Record<string,string>)[action];
-  if(!field||!data?.[field])return{error:json({error:"Permission denied"},403)};
+  const {data:allowed,error}=await adminClient.rpc("crm_actor_can",{p_actor:user.id,p_module:module,p_action:action});
+  if(error||allowed!==true)return{error:json({error:"Permission denied"},403)};
   return{user,profile};
 }
 async function setStatus(provider:string,status:string,error?:string|null){
@@ -359,7 +357,7 @@ async function handlePortal(req:Request){
 function localInsight(prompt:string,system?:string){const text=prompt.trim().replace(/\s+/g," "),thai=/[ก-๙]/.test(text),short=text.length>900?text.slice(0,900)+"…":text;return thai?["AI Insight","• สรุป: "+(short||"ยังไม่มีข้อมูลเพียงพอ"),"• คำแนะนำ: ตรวจสอบข้อมูลลูกค้า สถานะ Pipeline และกิจกรรมล่าสุดก่อนดำเนินการขั้นถัดไป",system?"• ใช้บริบทระบบประกอบแล้ว":""].filter(Boolean).join("\n"):["AI Insight","• Summary: "+(short||"Not enough information."),"• Recommended next step: validate customer context, pipeline status, and latest activity.",system?"• System context was incorporated.":""].filter(Boolean).join("\n");}
 async function handleAi(req:Request){const access=await requirePermission(req,"ai","view");if("error"in access)return access.error;const body=await req.json().catch(()=>({})),prompt=String(body.prompt??"").trim();if(!prompt)return json({error:"prompt is required"},400);return json({text:localInsight(prompt,body.system)});}
 function tempPassword(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#%",bytes=crypto.getRandomValues(new Uint8Array(18));return Array.from(bytes,b=>chars[b%chars.length]).join("");}
-async function handleInvite(req:Request){const admin=await requireAdmin(req);if("error"in admin)return admin.error;const body=await req.json().catch(()=>({})),email=String(body.email??"").trim().toLowerCase();if(!email||!email.includes("@"))return json({error:"Valid email is required"},400);const {data,error}=await adminClient.auth.admin.inviteUserByEmail(email,{redirectTo:siteUrl});if(error)return json({error:error.message},400);if(data.user?.id&&body.role)await adminClient.from("profiles").update({role:body.role,department_group:body.department_group??"Sales",updated_at:new Date().toISOString()}).eq("id",data.user.id);return json({ok:true,user_id:data.user?.id??null,email});}
+async function handleInvite(req:Request){const admin=await requirePermission(req,"access","create");if("error"in admin)return admin.error;const body=await req.json().catch(()=>({})),email=String(body.email??"").trim().toLowerCase();if(!email||!email.includes("@"))return json({error:"Valid email is required"},400);const {data,error}=await adminClient.auth.admin.inviteUserByEmail(email,{redirectTo:siteUrl});if(error)return json({error:error.message},400);if(data.user?.id&&body.role)await adminClient.from("profiles").update({role:body.role,department_group:body.department_group??"Sales",updated_at:new Date().toISOString()}).eq("id",data.user.id);return json({ok:true,user_id:data.user?.id??null,email});}
 async function handleAccount360Quotation(req:Request){
   return json({error:"Direct KC Account 360 connector disconnected",status:"disabled"},410);
 
@@ -410,7 +408,7 @@ async function handleAccount360Quotation(req:Request){
     const message=e instanceof Error?e.message:"KC Account 360 sync failed";await adminClient.from("quotations").update({account360_sync_status:"error",account360_last_error:message.slice(0,500),updated_at:new Date().toISOString()}).eq("id",q.id);await finishRun(run,"failed",{seen:1,failed:1},{quotation_id:q.id,event_id:eventId},message);await setStatus("kc_account_360","error",message);return json({ok:false,provider:"kc_account_360",error:message},502);
   }
 }
-async function handleReset(req:Request){const admin=await requireAdmin(req);if("error"in admin)return admin.error;const body=await req.json().catch(()=>({})),userId=String(body.user_id??"").trim();if(!userId)return json({error:"user_id is required"},400);const password=tempPassword(),{error}=await adminClient.auth.admin.updateUserById(userId,{password});if(error)return json({error:error.message},400);return json({ok:true,temporary_password:password});}
+async function handleReset(req:Request){const admin=await requirePermission(req,"access","edit");if("error"in admin)return admin.error;const body=await req.json().catch(()=>({})),userId=String(body.user_id??"").trim();if(!userId)return json({error:"user_id is required"},400);const password=tempPassword(),{error}=await adminClient.auth.admin.updateUserById(userId,{password});if(error)return json({error:error.message},400);return json({ok:true,temporary_password:password});}
 
 Deno.serve(async(req:Request)=>{
   if(req.method==="OPTIONS")return new Response("ok",{headers:cors});

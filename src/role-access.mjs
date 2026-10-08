@@ -1,8 +1,9 @@
 export const ACCESS_CHANGED='crm-access-changed';
-export function effectiveRole(profile){return profile?.is_active===true?(profile.role==='custom'?profile.custom_role_key:profile.role):null;}
+export function effectiveRole(profile){return profile?.is_active===true&&!profile.deleted_at&&!profile.deletion_requested_at&&profile.access_active!==false?(profile.role==='custom'?profile.custom_role_key:profile.role):null;}
 export function canAccess(profile,rows,module,action='view'){
  if(!effectiveRole(profile))return false;
- if(profile.role==='admin')return true;
+ if(module==='access')return profile.is_super_admin===true;
+ if(profile.is_super_admin===true)return true;
  return rows.some(row=>row.module===module&&row['can_'+action]===true);
 }
 export function pageAction(page=''){
@@ -12,14 +13,18 @@ export function pageAction(page=''){
  return 'view';
 }
 export function permitsPage(access,module,page){
- // Personal notifications remain available independently of administration.
- if(module==='dashboard'&&page==='dash-sales')return !!effectiveRole(access.profile)&&!access.profile?.deleted_at;
+ if(!effectiveRole(access.profile))return false;
+ if(['set-users','set-roles','set-permissions','set-dashboard-access'].includes(page))return access.profile.is_super_admin===true;
+ if(page==='set-inventory')return access.can('inventory','view');
+ if(page==='set-sales-targets')return access.can('reports','view');
+ if(['set-ai','set-api','set-package'].includes(page))return access.can('settings','manage_settings');
+ if(page==='set-import-export')return ['customers','contacts','leads','settings'].some(m=>access.can(m,'import')||access.can(m,'export'));
  if(module==='settings'&&page==='set-notifications')return !!effectiveRole(access.profile);
  if(!access.can(module,'view')||!access.can(module,pageAction(page)))return false;
- if(module==='dashboard'&&page?.startsWith('dash-')&&access.profile?.role!=='admin')return access.dashboards.some(row=>row.dashboard_type===page.slice(5)&&row.visible);
+ if(module==='dashboard'&&page?.startsWith('dash-')&&access.profile?.is_super_admin!==true)return access.dashboards.some(row=>row.dashboard_type===page.slice(5)&&row.visible);
  return true;
 }
-export function filterModules(modules,access){return modules.filter(m=>access.can(m.id,'view')||(m.id==='dashboard'&&permitsPage(access,'dashboard','dash-sales'))).map(m=>({...m,subs:m.subs?.filter(p=>permitsPage(access,m.id,p.id))}));}
+export function filterModules(modules,access){return modules.map(m=>({...m,...(m.subs?{subs:m.subs.filter(p=>permitsPage(access,m.id,p.id))}:{})})).filter(m=>access.can(m.id,'view')||m.subs?.length>0||(m.id==='settings'&&access.profile?.is_super_admin===true));}
 export function notifyAccessChanged(){globalThis.window?.dispatchEvent(new Event(ACCESS_CHANGED));}
 export function createRoleAccess({React,client,useApp}){
  const h=React.createElement,empty={profile:null,rows:[],dashboards:[],loading:true,error:'',can:()=>false};
@@ -34,6 +39,7 @@ export function createRoleAccess({React,client,useApp}){
    if(!session?.user?.id){setState(empty);return;}
    (async()=>{try{
     const {data:profile,error}=await client.from('profiles').select('*').eq('id',session.user.id).single();if(error)throw error;
+    const {data:context,error:contextError}=await client.rpc('crm_access_context');if(contextError)throw contextError;profile.access_active=context?.active===true;
     const role=effectiveRole(profile);if(!role)throw Error('บัญชีไม่มีสิทธิ์ใช้งาน / Account access is disabled');
     const [permissions,dashboards]=await Promise.all([client.from('role_permissions').select('*').eq('role_key',role).order('module'),client.from('dashboard_type_access').select('*').eq('role_key',role).order('dashboard_type')]);
     if(permissions.error||dashboards.error)throw permissions.error||dashboards.error;

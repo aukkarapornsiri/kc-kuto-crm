@@ -11,8 +11,8 @@ Deno.serve(async req=>{
   const token=(req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'');
   const {data:auth,error:authError}=await client.auth.getUser(token);
   if(authError||!auth.user)return reply({error:'Unauthorized'},401);
-  const {data:profile,error:profileError}=await client.from('profiles').select('role,is_active').eq('id',auth.user.id).single();
-  if(profileError||profile?.role!=='admin'||!profile.is_active)return reply({error:'Admin permission required'},403);
+  const {data:allowed,error:accessError}=await client.rpc('crm_actor_can',{p_actor:auth.user.id,p_module:'access',p_action:'create'});
+  if(accessError||allowed!==true)return reply({error:'Super Admin required'},403);
   const body=await req.json();const email=String(body.email||'').trim().toLowerCase();
   if(email.length>254||! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return reply({error:'อีเมลไม่ถูกต้อง'},400);
   const {data:recent}=await client.from('crm_access_invitations').select('last_sent_at').eq('email',email).maybeSingle();

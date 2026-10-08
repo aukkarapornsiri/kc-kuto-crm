@@ -1,9 +1,9 @@
 import {CATEGORIES,CATEGORY_LINKS,validateMaster,masterDemo,ensureMasterSamples} from './master-data-model.mjs?v=20261001-master-popup';
 export {CATEGORIES,validateMaster};
-export function createMasterData({React,client,useApp}) {
+export function createMasterData({React,client,useApp,useAccess}) {
  const h=React.createElement;
  return function MasterDataPage({lang='th',scope,fixedCategory,compact=false,onChanged}) {
-  const tr=(th,en)=>lang==='th'?th:en,{demoMode,profile}=useApp(),canEdit=demoMode||profile?.role==='admin';
+  const tr=(th,en)=>lang==='th'?th:en,{demoMode,profile}=useApp(),access=useAccess(),canEdit=demoMode||access.can('settings','edit')||(!!fixedCategory&&access.can('inventory','manage_settings')),canCreate=demoMode||access.can('settings','create')||(!!fixedCategory&&access.can('inventory','manage_settings'));
   const [category,setCategory]=React.useState(fixedCategory||(scope==='assets'?'asset_type':scope==='stages'?'sales_stage':'customer_type')),[rows,setRows]=React.useState([]),[refs,setRefs]=React.useState([]),[query,setQuery]=React.useState('');
   const [loading,setLoading]=React.useState(true),[busy,setBusy]=React.useState(false),[error,setError]=React.useState(''),[message,setMessage]=React.useState(''),[editing,setEditing]=React.useState(null),[reload,setReload]=React.useState(0);
   const dialog=React.useRef(null),opener=React.useRef(null),lock=React.useRef(false);
@@ -22,7 +22,7 @@ export function createMasterData({React,client,useApp}) {
   React.useEffect(()=>{if(!editing)return;const oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';if(dialog.current&&!dialog.current.open)dialog.current.showModal();return()=>{document.body.style.overflow=oldOverflow;opener.current?.focus();};},[!!editing]);
   function close(){if(lock.current)return;setEditing(null);setError('');}
   function open(row){opener.current=document.activeElement;setError('');setMessage('');setEditing({category,code:'',name_th:'',name_en:'',description:'',sort_order:0,status:'active',...row});}
-  async function save(event){event.preventDefault();if(lock.current||!canEdit||!editing)return;
+  async function save(event){event.preventDefault();if(lock.current||!editing||!(editing.id?canEdit:canCreate))return;
    lock.current=true;setBusy(true);setError('');setMessage('');
    try {
     const value=validateMaster({...editing,code:editing.code.trim()||'REF-'+crypto.randomUUID().replaceAll('-','').slice(0,16).toUpperCase()});
@@ -46,7 +46,7 @@ export function createMasterData({React,client,useApp}) {
    demoMode&&h('p',{className:'crm-notice'},tr('ข้อมูลตัวอย่างในโหมดทดลอง ไม่กระทบฐานข้อมูลจริง','Sample data in demo mode; production data is unchanged')),
    scope&&h('p',{className:'crm-notice'},tr('รายการอ้างอิงนี้บันทึกลงฐานข้อมูลได้ แต่ยังไม่เปลี่ยนตัวเลือกและกฎในฟอร์มธุรกิจเดิมโดยอัตโนมัติ','These references persist; existing business-form rules are not automatically changed.')),
    !fixedCategory&&h('div',{className:'crm-tabs'},CATEGORIES.filter(([id])=>!scope||(scope==='stages'?id==='sales_stage':['asset_type','asset_brand','asset_model','asset_status','warranty_status','license_status','asset_location'].includes(id))).map(([id,th,en])=>h('button',{key:id,type:'button',disabled:busy,'aria-pressed':category===id,onClick:()=>{setCategory(id);setEditing(null);setMessage('');setQuery('');}},tr(th,en)))),
-   h('div',{className:'crm-actions'},h('input',{type:'search',className:'crm-search','aria-label':tr('ค้นหาข้อมูลหลัก','Search master data'),placeholder:tr('ค้นหารหัส ชื่อ หรือรายละเอียด','Search code, name or description'),value:query,onChange:e=>setQuery(e.target.value)}),h('button',{onClick:()=>setReload(v=>v+1),disabled:busy||loading},tr('โหลดใหม่','Reload')),canEdit&&h('button',{className:'crm-save',disabled:busy||loading,onClick:()=>open(null)},tr('เพิ่มรายการ','Add Item'))),
+   h('div',{className:'crm-actions'},h('input',{type:'search',className:'crm-search','aria-label':tr('ค้นหาข้อมูลหลัก','Search master data'),placeholder:tr('ค้นหารหัส ชื่อ หรือรายละเอียด','Search code, name or description'),value:query,onChange:e=>setQuery(e.target.value)}),h('button',{onClick:()=>setReload(v=>v+1),disabled:busy||loading},tr('โหลดใหม่','Reload')),canCreate&&h('button',{className:'crm-save',disabled:busy||loading,onClick:()=>open(null)},tr('เพิ่มรายการ','Add Item'))),
    error&&!editing&&h('p',{role:'alert',className:'crm-error'},error),message&&h('p',{role:'status',className:'crm-notice'},message),
    loading?h('p',{role:'status'},tr('กำลังโหลด…','Loading…')):h('div',{className:'crm-master-scroll'},h('table',{className:'crm-master-table'},h('thead',null,h('tr',null,['Code',tr('ชื่อ / รายละเอียด','Name / Description'),tr('ชื่อ (EN)','Name (EN)'),tr('ลำดับ','Order'),tr('สถานะ','Status'),''].map((v,i)=>h('th',{key:i},v)))),h('tbody',null,visible.map(row=>h('tr',{key:row.id},h('td',null,row.code),h('td',null,row.name_th,row.description&&h('small',{className:'crm-master-description'},row.description)),h('td',null,row.name_en),h('td',null,row.sort_order),h('td',null,row.status==='active'?tr('ใช้งานอยู่','Active'):tr('ปิดใช้งาน','Inactive')),h('td',null,canEdit&&h('button',{onClick:()=>open(row),disabled:busy,'aria-label':tr('แก้ไข ','Edit ')+row.code},tr('แก้ไข','Edit'))))),!visible.length&&h('tr',null,h('td',{colSpan:6},tr('ไม่พบรายการ','No records found')))))),
    rows.length===1000&&h('p',null,tr('แสดง 1,000 รายการแรกในหมวดนี้','Showing the first 1,000 records in this category')),

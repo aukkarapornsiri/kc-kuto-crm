@@ -17,7 +17,8 @@ async function auth(req:Request,action='view'){
  const {data,error}=await userdb.auth.getUser(authorization.slice(7));if(error||!data.user)throw Error('401: Session expired');
  const profile=await value(db.from('profiles').select('id,role,custom_role_key,is_active').eq('id',data.user.id).maybeSingle());
  if(!profile?.is_active)throw Error('403: Inactive user');
- if(profile.role!=='admin'){const p=await value(db.from('role_permissions').select('can_'+action).eq('role_key',profile.role==='custom'?profile.custom_role_key:profile.role).eq('module','activities').maybeSingle());if(!p?.['can_'+action])throw Error('403: Activity permission required');}
+ const allowed=await value(db.rpc('crm_actor_can',{p_actor:profile.id,p_module:'activities',p_action:action}));
+ if(allowed!==true)throw Error('403: Activity permission required');
  return {userdb,profile};
 }
 async function settings(){return await value(db.from('crm_email_sender').select('*').eq('id',true).single());}
@@ -65,7 +66,7 @@ Deno.serve(async req=>{
   const {userdb,profile}=await auth(req,body.action==='queue'?'create':body.action==='cancel'?'edit':'view');
   if(body.action==='status'){const cfg=await settings();return json({...cfg,has_api_key:!!await secret('EMAIL_MARKETING_API_KEY')});}
   if(body.action==='configure'){
-   if(profile.role!=='admin')return json({error:'Administrator required'},403);
+   if(await value(db.rpc('crm_actor_can',{p_actor:profile.id,p_module:'activities',p_action:'manage_settings'}))!==true)return json({error:'Settings permission required'},403);
    const cfg={from_name:String(body.from_name||'').trim().slice(0,120),from_email:email(body.from_email),reply_to:email(body.reply_to),postal_address:String(body.postal_address||'').trim().slice(0,600)};
    if(!cfg.from_name||!valid(cfg.from_email)||(cfg.reply_to&&!valid(cfg.reply_to))||!cfg.postal_address)throw Error('Provide sender name, email and company postal address');
    const apiKey=String(body.api_key||'').trim()||await secret('EMAIL_MARKETING_API_KEY');if(!apiKey)throw Error('Provide a Resend API key with domain access');

@@ -1,3 +1,4 @@
+import {permitsPage} from './role-access.mjs';
 import {createWorkspaceTheme,WORKSPACE_SHADOWS} from './workspace-theme.mjs?v=20261001-five-themes';
 // Editable source for the Settings extension. The original frontend is distributed as a bundle.
 export const DEFAULT_DESIGN = Object.freeze({primary:'#0AADA9',sidebar:'#172033',background:'#F7FAFA',font:'IBM Plex Sans Thai',fontSize:'14',radius:'12',density:'comfortable'});
@@ -26,7 +27,7 @@ export function readableInk(hex) {
   const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);
   return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2]>.179?'#172033':'#FFFFFF';
 }
-export function createExperience({React,client,useApp,palette}) {
+export function createExperience({React,client,useApp,useAccess,palette}) {
   const h=React.createElement;
   const eventName='kc-crm-design-saved';
   let demoDesign=null;
@@ -106,14 +107,14 @@ export function createExperience({React,client,useApp,palette}) {
       !pages.length&&h('span',{'aria-current':'page',className:'sr-only'},current));
   }
   function SettingsHub({lang,onNavigate,categories,findItem,initialCategory=null,navigationState}) {
-    const {profile,demoMode}=useApp();
+    const {profile,demoMode}=useApp(),access=useAccess();
     const [query,setQuery]=React.useState('');
     const [category,setCategory]=React.useState(()=>Number.isInteger(initialCategory)&&initialCategory>=0&&initialCategory<categories.length?initialCategory:null);
     React.useEffect(()=>{setCategory(Number.isInteger(initialCategory)?initialCategory:null);setQuery('');},[navigationState]);
     const tr=(th,en)=>lang==='th'?th:en;
     const normalized=query.trim().toLowerCase();
-    const baseGroups=categories.map((group,index)=>({...group,index,items:group.items.map(findItem).filter(Boolean)})).filter(group=>group.items.length);
-    const canAdmin=demoMode||profile?.role==='admin';
+    const baseGroups=categories.map((group,index)=>({...group,index,items:group.items.map(findItem).filter(Boolean).filter(item=>demoMode||permitsPage(access,item.id.startsWith('opp-')?'opportunities':item.id.startsWith('asset-')?'assets':'settings',item.id))})).filter(group=>group.items.length);
+    const canAdmin=demoMode||access.can('quotations','manage_settings');
     const quotationIcon=findItem('set-company')?.icon||baseGroups[0]?.items[0]?.icon;
     const quotationSettings=canAdmin&&quotationIcon?{id:'quot-template-settings',label:{th:'ตั้งค่าใบเสนอราคา',en:'Quotation Template'},icon:quotationIcon}:null;
     const groups=quotationSettings?[...baseGroups,{label:{th:'เอกสารการขาย',en:'Sales Documents'},index:categories.length,items:[quotationSettings]}]:baseGroups;
@@ -143,7 +144,7 @@ export function createExperience({React,client,useApp,palette}) {
     const [busy,setBusy]=React.useState(false);
     const [message,setMessage]=React.useState('');
     const [failed,setFailed]=React.useState(false);
-    const canEdit=demoMode||profile?.role==='admin';
+    const designAccess=useAccess(),canEdit=demoMode||designAccess.can('settings','manage_settings');
     const column=scopeMode?'ecosystem_scope':'ui_design';
     const load=React.useCallback(async()=>{
       setLoading(true);setMessage('');setFailed(false);

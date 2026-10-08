@@ -15,9 +15,8 @@ Deno.serve(async req=>{
   if(!profile?.is_active)return json({error:'Inactive user'},403);
   const raw=await req.text();if(raw.length>24000)return json({error:'Request too large'},413);let body;try{body=JSON.parse(raw);}catch{return json({error:'Invalid JSON'},400);}
   const action=body.action||'generate';if(!['status','configure','test','disable','generate'].includes(action))return json({error:'Unknown action'},400);
-  const admin=profile.role==='admin'||profile.is_super_admin===true;
-  if(action!=='generate'&&!admin)return json({error:'Only an administrator can manage AI connections'},403);
-  if(!admin){const permission=await read(db.from('role_permissions').select('can_view').eq('role_key',profile.role==='custom'?profile.custom_role_key:profile.role).eq('module','ai').maybeSingle());if(!permission?.can_view)return json({error:'AI permission required'},403);}
+  const allowed=await read(db.rpc('crm_actor_can',{p_actor:profile.id,p_module:action==='generate'?'ai':'settings',p_action:action==='generate'?'view':'manage_settings'}));
+  if(allowed!==true)return json({error:'Permission denied'},403);
   const company='KC CuTo CRM'; // Application scope is server-owned, never a user-editable profile field.
   const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(company)))).map(x=>x.toString(16).padStart(2,'0')).join('');const name='KC_CRM_AI_'+digest;
   const saved=await read(db.rpc('kc_get_integration_secret',{p_name:name}));let config=saved?JSON.parse(saved):null;

@@ -10,9 +10,9 @@ export function createHandler(admin) {
       if(!token) return reply(401,{error:'unauthorized'});
       const {data:auth,error:authError} = await admin.auth.getUser(token);
       if(authError||!auth?.user) return reply(401,{error:'unauthorized'});
-      const {data:actor,error:profileError} = await admin.from('profiles').select('role,is_active').eq('id',auth.user.id).maybeSingle();
-      if(profileError) return reply(503,{error:'unavailable'});
-      if(actor?.role!=='admin'||!actor.is_active) return reply(403,{error:'forbidden'});
+      const {data:allowed,error:accessError}=await admin.rpc('crm_actor_can',{p_actor:auth.user.id,p_module:'access',p_action:'delete'});
+      if(accessError)return reply(503,{error:'unavailable'});
+      if(allowed!==true)return reply(403,{error:'forbidden'});
       let body; try { body=await req.json(); } catch { return reply(400,{error:'invalid_request'}); }
       if(!body||!uuid.test(body.user_id||'')||body.confirm!==true) return reply(400,{error:'invalid_request'});
       if(body.user_id===auth.user.id) return reply(409,{error:'cannot_delete_self'});
