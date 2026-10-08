@@ -42,11 +42,11 @@ export function createContactDetailEnterprise({React}){
   ];
   return h('div',{className:'kc-lead-detail-overlay',style:{alignItems:'center'},role:'presentation',onMouseDown:e=>{if(e.target===e.currentTarget)onClose?.();}},
    h('section',{ref:modalRef,className:'kc-lead-detail-modal',style:{maxHeight:'calc(100dvh - 40px)',overflowY:'auto'},role:'dialog','aria-modal':true,'aria-label':t('รายละเอียดผู้ติดต่อ','Contact Detail')},
-    h('header',{className:'kc-lead-detail-header'},
-     h('div',{className:'kc-lead-detail-title-row'},
+    h('header',{className:'kc-lead-detail-header',style:{position:'sticky',top:0,zIndex:2,background:'#fff'}},
+     h('div',{className:'kc-lead-detail-title-row',style:{paddingRight:'42px'}},
       h('div',{className:'kc-lead-detail-mark','aria-hidden':true},'CT'),
       h('div',{className:'kc-lead-detail-heading'},h('div',{className:'kc-lead-detail-code'},clean(record.code)),h('h2',null,clean(record.name)),h('div',{className:'kc-lead-detail-sub'},t('Contact Detail · ข้อมูลล่าสุดใน CRM','Contact Detail · Latest CRM information'))),
-      h('button',{type:'button',className:'kc-lead-detail-close','aria-label':t('ปิดรายละเอียด','Close detail'),onClick:onClose},'×')
+      h('button',{type:'button',className:'kc-lead-detail-close',style:{position:'absolute',top:'14px',right:'14px'},'aria-label':t('ปิดรายละเอียด','Close detail'),onClick:onClose},'×')
      ),
      h('div',{className:'kc-lead-detail-actions'},
       h('span',{className:'kc-lead-chip is-primary'},t('สถานะ: ','Status: ')+clean(record.status)),
@@ -54,8 +54,7 @@ export function createContactDetailEnterprise({React}){
       h('span',{className:'kc-lead-chip'},clean(record.company)),
       h('span',{className:'kc-lead-owner-chip'},h('span',{className:'kc-lead-owner-avatar'},initials(ownerName)),h('span',{className:'kc-lead-owner-meta'},h('span',null,t('ผู้รับผิดชอบ','Assignee')),h('strong',null,ownerName))),
       h('span',{className:'kc-lead-detail-actions-spacer'}),
-      canEdit&&h('button',{type:'button',className:'kc-lead-action-btn',onClick:onEdit},t('แก้ไข','Edit')),
-      h('button',{type:'button',className:'kc-lead-action-btn',onClick:onClose},t('ปิดรายละเอียด','Close Detail'))
+      canEdit&&h('button',{type:'button',className:'kc-lead-action-btn',onClick:onEdit},t('แก้ไข','Edit'))
      )
     ),
     h('div',{className:'kc-lead-detail-body'},
