@@ -1,0 +1,3 @@
+export function mapItem(item,detail,canSeeCost){
+ return {id:item.id,code:item.code,name:item.name,description:item.description||'',category:'PRODUCT',status:item.status,updatedAt:item.updated_at,metadata:{unit:item.unit,categoryName:item.category,brandName:detail.brand||'',partNumber:detail.part_number||'',barcode:detail.barcode||'',salePrice:Number(item.price),...(canSeeCost&&item.cost!=null?{purchasePrice:Number(item.cost)}:{}),vatMode:detail.vat_mode||'exclusive',inventoryControl:detail.stock_mode==='stock',serialNumberControl:!!detail.track_serial,productType:detail.product_type||'',itemType:detail.product_kind||'',subscriptionPeriod:detail.subscription||'',subscriptionStartDate:detail.contract_start||null,subscriptionExpiryDate:detail.contract_end||null}};
+}

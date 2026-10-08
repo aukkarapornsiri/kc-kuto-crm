@@ -1,0 +1,1 @@
+Deno.serve(()=>Response.json({error:'Direct KC Account 360 connection disconnected',status:'disabled',replacement:'crm-inventory-api',version:1},{status:410,headers:{'Cache-Control':'no-store','Access-Control-Allow-Origin':'*'}}));

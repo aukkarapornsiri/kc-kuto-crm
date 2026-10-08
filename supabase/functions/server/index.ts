@@ -111,6 +111,7 @@ async function googleToken(){
   return (await r.json()).access_token as string;
 }
 async function checkProvider(provider:string){
+  if(provider==="kc_account_360")return{configured:false,connected:false,message:"Direct connector disconnected; use Inventory API v1"};
   if(provider==="microsoft_intune"){
     const token=await msToken();if(!token)return{configured:false,connected:false,message:"Microsoft Graph credentials missing"};
     const r=await fetch("https://graph.microsoft.com/v1.0/deviceManagement/managedDevices?$top=1&$select=id,deviceName",{headers:{Authorization:`Bearer ${token}`,Accept:"application/json"}});
@@ -360,6 +361,8 @@ async function handleAi(req:Request){const access=await requirePermission(req,"a
 function tempPassword(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#%",bytes=crypto.getRandomValues(new Uint8Array(18));return Array.from(bytes,b=>chars[b%chars.length]).join("");}
 async function handleInvite(req:Request){const admin=await requireAdmin(req);if("error"in admin)return admin.error;const body=await req.json().catch(()=>({})),email=String(body.email??"").trim().toLowerCase();if(!email||!email.includes("@"))return json({error:"Valid email is required"},400);const {data,error}=await adminClient.auth.admin.inviteUserByEmail(email,{redirectTo:siteUrl});if(error)return json({error:error.message},400);if(data.user?.id&&body.role)await adminClient.from("profiles").update({role:body.role,department_group:body.department_group??"Sales",updated_at:new Date().toISOString()}).eq("id",data.user.id);return json({ok:true,user_id:data.user?.id??null,email});}
 async function handleAccount360Quotation(req:Request){
+  return json({error:"Direct KC Account 360 connector disconnected",status:"disabled"},410);
+
   const access=await requirePermission(req,"quotations","approve");if("error"in access)return access.error;
   const body=await req.json().catch(()=>({})),quotationId=String(body.quotation_id??"").trim();
   if(!quotationId)return json({error:"quotation_id is required"},400);

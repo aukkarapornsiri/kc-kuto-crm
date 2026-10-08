@@ -1,11 +1,6 @@
 export const ACCOUNT360_URL='https://kc-account-360-preview.saelim-m.chatgpt.site';
 export async function fetchAccountInventory(client,signal){
- const {data,error}=await client.auth.getSession();if(error)throw error;
- if(!data?.session?.access_token)throw Error('กรุณาเข้าสู่ระบบเพื่อโหลดข้อมูล KC Account 360');
- const r=await fetch(ACCOUNT360_URL+'/api/integrations/cuto/inventory',{headers:{authorization:'Bearer '+data.session.access_token},cache:'no-store',signal:AbortSignal.any([signal,AbortSignal.timeout(20000)])});
- const value=await r.json().catch(()=>({}));if(!r.ok)throw Error(value.error||'ไม่สามารถเชื่อมต่อ KC Account 360 ได้');
- if(value.service!=='kc-account360-inventory'||value.version!==1||!['catalog','warehouses','balances'].every(k=>Array.isArray(value[k])))throw Error('ข้อมูลจาก KC Account 360 ไม่สมบูรณ์');
- return value;
+ throw Error('ตัดการเชื่อมต่อโดยตรงแล้ว กรุณาใช้ CRM Inventory API v1 / Direct connection disconnected');
 }
 export function createAccountInventory({React,client}){
  const h=React.createElement;
