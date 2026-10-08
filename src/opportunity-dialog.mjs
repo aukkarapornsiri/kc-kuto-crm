@@ -20,7 +20,7 @@ export function createOpportunityDialog({React}) {
     const set=(key,value)=>setEditing(old=>({...old,[key]:value}));
     const selectCustomer=row=>{setEditing(old=>({...old,customer_id:row.id,customer_name:row.name,contact_id:'',contact_name:''}));Search(row.name);Expanded(false);inputRef.current?.focus();};
     const input=(key,label,extra={})=>h('input',{'aria-label':label,value:editing[key]??'',disabled:busy,onChange:e=>set(key,e.target.value),...extra});
-    const field=(label,control,required=false)=>h('label',{className:'crm-opportunity-field'},h('span',null,required&&h('b',{'aria-hidden':true},'* '),label),h('div',{className:'crm-opportunity-control'},control));
+    const field=(label,control,required=false)=>h('label',{className:'crm-opportunity-field'},h('span',null,label,required&&h('b',{'aria-hidden':true},' *')),h('div',{className:'crm-opportunity-control'},control));
     const select=(key,label,values,extra={})=>h('select',{'aria-label':label,value:editing[key]||'',disabled:busy,onChange:e=>set(key,e.target.value),...extra},h('option',{value:''},t('--ไม่มี--','--None--')),values.map(([value,name])=>h('option',{key:value,value},name)));
     const stageOptions=[...OPTIONS.opportunities.stage.map(value=>[value,value]),...masters.filter(x=>x.category==='sales_stage'&&!OPTIONS.opportunities.stage.includes(x.name_en)).map(x=>[x.name_en,lang==='th'?x.name_th:x.name_en])];
     if(editing.stage&&!stageOptions.some(x=>x[0]===editing.stage))stageOptions.unshift([editing.stage,editing.stage]);
@@ -30,8 +30,8 @@ export function createOpportunityDialog({React}) {
       search&&!editing.customer_id&&!expanded&&h('small',{className:'crm-opportunity-invalid'},t('กรุณาเลือกลูกค้าจากรายชื่อ','Select an account from the results')));
     return h('dialog',{ref,className:'crm-profile-dialog crm-opportunity-dialog','aria-labelledby':titleId,onCancel:e=>{e.preventDefault();if(!busy)onClose();}},
       h('form',{'aria-label':t('ฟอร์มโอกาสการขาย','Opportunity form'),onSubmit:onSave},
-        h('header',{className:'crm-opportunity-header'},h('h2',{id:titleId},editing.id?t('แก้ไขโอกาสการขาย','Edit Opportunity'):t('สร้างโอกาสใหม่','New Opportunity')),h('button',{type:'button',disabled:busy,'aria-label':t('ปิดฟอร์ม','Close form'),onClick:onClose},'×')),
-        h('div',{className:'crm-profile-body crm-opportunity-body'},h('p',{className:'crm-opportunity-required'},h('b',null,'* '),t('= ข้อมูลที่จำเป็น','= Required information')),error&&h('p',{role:'alert',className:'crm-error'},error),message&&h('p',{role:'status',className:'crm-notice'},message),
+        h('header',{className:'crm-opportunity-header'},h('span',{className:'crm-opportunity-icon','aria-hidden':true},h('svg',{width:22,height:22,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7},h('rect',{x:3,y:7,width:18,height:14,rx:2}),h('path',{d:'M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v3h4v-3'}))),h('div',{className:'crm-opportunity-heading'},h('h2',{id:titleId},editing.id?t('แก้ไขโอกาสการขาย','Edit Opportunity'):t('สร้างโอกาสใหม่','New Opportunity')),h('p',{className:'crm-opportunity-required'},t('ข้อมูลที่มี * จำเป็นต้องระบุ','Fields marked * are required'))),h('button',{type:'button',disabled:busy,'aria-label':t('ปิดฟอร์ม','Close form'),onClick:onClose},'×')),
+        h('div',{className:'crm-profile-body crm-opportunity-body'},error&&h('p',{role:'alert',className:'crm-error'},error),message&&h('p',{role:'status',className:'crm-notice'},message),
           h('section',{className:'crm-opportunity-section'},h('h3',null,t('เกี่ยวกับโอกาส','About')),
             field(t('ชื่อโอกาส','Opportunity Name'),input('name',t('ชื่อโอกาส','Opportunity Name'),{required:true,autoFocus:true,maxLength:10000}),true),
             field(t('ชื่อลูกค้า','Account Name'),accountSearch,true),
@@ -50,6 +50,6 @@ export function createOpportunityDialog({React}) {
             field(t('คู่แข่ง','Competitor'),input('competitor',t('คู่แข่ง','Competitor'))),
             field(t('ความสำคัญ','Priority'),select('priority',t('ความสำคัญ','Priority'),OPTIONS.opportunities.priority.map(x=>[x,x]))),
             field(t('เหตุผลที่แพ้','Lost Reason'),input('lost_reason',t('เหตุผลที่แพ้','Lost Reason'),{required:editing.stage==='Lost'}),editing.stage==='Lost'))),
-        h('footer',{className:'crm-profile-footer'},h('button',{type:'button',disabled:busy,onClick:onClose},t('ยกเลิก','Cancel')),!editing.id&&h('button',{type:'submit',value:'save-new',disabled:busy},t('บันทึกและสร้าง','Save & New')),h('button',{type:'submit',value:'save',disabled:busy,className:'crm-save'},t('บันทึก','Save')))));
+        h('footer',{className:'crm-profile-footer'},h('button',{type:'button',disabled:busy,onClick:onClose},t('ยกเลิก','Cancel')),!editing.id&&h('button',{type:'submit',value:'save-new',disabled:busy},t('บันทึกและเพิ่มใหม่','Save & New')),h('button',{type:'submit',value:'save',disabled:busy,className:'crm-save'},t('บันทึก','Save')))));
   };
 }
