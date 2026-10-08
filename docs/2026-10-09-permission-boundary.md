@@ -17,7 +17,7 @@ Database: `tocsxnprspiogawignib`. Applied migration: `20261008171808_unified_per
 
 ## Validation
 
-- 175 automated tests passed. Added coverage for ordinary users with independently granted Inventory actions, Super Admin-only routes, blocked account states and ordinary Admin denial.
+- Initial hardening: 175 automated tests passed (superseded by the 258-test retest below). Added coverage for ordinary users with independently granted Inventory actions, Super Admin-only routes, blocked account states and ordinary Admin denial.
 - Live database transaction tests exercised authenticated RLS, attempted matrix/user escalation, direct RPC denial, immediate matrix grant/revoke, suspension, deletion and onboarding. All test changes were rolled back.
 - JavaScript and changed Edge TypeScript syntax checks passed.
 - Security advisor: no ERROR findings; remaining password leak-protection warning is an existing Auth configuration item. No-policy INFO findings are outside this change or intentionally private/service-only tables.
@@ -29,7 +29,7 @@ View permission necessarily allows reading data; disabling the application Expor
 
 ## Browser CI follow-up
 
-The full browser suite found three failures also present at baseline commit 50ba35d: internal-workspace lead detail close, opportunity stage probability (60 vs 100), and settings-workspace outdated permission selector. They are not certified as passing by this audit. A fourth failure introduced by the permission change hid demo Customer 360 identity controls; restored the explicit demo allowance while retaining Super Admin enforcement for real sessions. Real-account browser coverage across every role remains outstanding.
+The full browser suite found three failures also present at baseline commit 50ba35d: internal-workspace lead detail close, opportunity stage probability (60 vs 100), and settings-workspace outdated permission selector. These initial failures were subsequently addressed during the requested retest below. A fourth failure introduced by the permission change hid demo Customer 360 identity controls; restored the explicit demo allowance while retaining Super Admin enforcement for real sessions. Real-account browser coverage across every role remains outstanding.
 
 ## Requested retest, 9 October 2026
 
@@ -43,4 +43,13 @@ The full browser suite found three failures also present at baseline commit 50ba
 - Full browser retest reached further into previously blocked suites. Updated remaining stale Opportunity close and access-management heading selectors; synchronized Stage assertions with React rendering. Split the same suite list into four CI groups so failures can be diagnosed independently.
 
 - Follow-up tests found and fixed Lead assignment visibility (requires Edit and Assign), restored permitted linked-account navigation, and gated cross-module create actions. Price Book now uses Inventory permissions consistent with database policies; removed an unrelated approval prerequisite and supplied the shared access hook to its Inventory view.
-- Local automated tests after these fixes: **258/258 passed**. Full browser CI rerun pending for this release.
+- Local automated tests after these fixes: **258/258 passed**. Full browser CI rerun passed: all 23 suites in four groups, including desktop/mobile coverage.
+
+## Final retest result
+
+- Tested application commit: `88961b6dbb0b25b696752031feb5bb38fefe442a` (application fixes in `1e4e587a18e733f65cfd0d01d0c2e9d9888b7ef2`).
+- Browser CI run `37821781076`: all four jobs passed, all 23 suites retained. Internal workspace verified 13 entity workflows at 1440px and 390px, ten bidirectional customer links, activity and opportunity dialogs, and nested Price Book → Inventory navigation without runtime errors.
+- Validation CI run `37821780842`: passed code checks and database-role/sales-target integration jobs.
+- Pages deployment run `37821780077`: success. Production browser loaded release `20261009-permission-retest`; Price Book → Products & Inventory opened successfully. Demo session was signed out after testing.
+- Final counts: 258 automated code tests; 33,075 live matrix assertions across 81 roles; 320 blocked-account table checks across 64 tables; seven live unauthenticated endpoints rejected with HTTP 401; 23 browser suites passed.
+- Live database fixtures were rolled back. Browser workflows used demo records; this report does not certify interactive login with each real employee account.
