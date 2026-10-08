@@ -44,7 +44,8 @@ export async function checkCustomerWorkflow(page,open,width) {
     const section=detail.getByRole('heading',{name:`${title} (1)`,exact:true}).locator('..');
     await section.getByRole('button').first().click();
     if(entity==='tickets'){await service.getByRole('button',{name:'Customer',exact:true}).click();await service.getByRole('button',{name:'เปิดบัญชีลูกค้า / Customer 360',exact:true}).click();await detail.getByRole('heading',{name:accountCode,exact:true}).waitFor();continue;}
-    const linkedDetail=page.locator(`[data-entity="${entity}"]`).getByRole('region',{name:'Record details'});
+    const linkedRoot=page.locator(`[data-entity="${entity}"]`);
+    const linkedDetail=['leads','contacts','opportunities'].includes(entity)?linkedRoot.getByRole('dialog',{name:{leads:'Lead Detail',contacts:'Contact Detail',opportunities:'Opportunity details'}[entity],exact:true}):linkedRoot.getByRole('region',{name:'Record details'});
     await linkedDetail.waitFor();
     await linkedDetail.getByRole('button',{name:'Open Account',exact:true}).click();
     await detail.getByRole('heading',{name:accountCode,exact:true}).waitFor();

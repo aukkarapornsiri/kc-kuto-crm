@@ -41,3 +41,6 @@ The full browser suite found three failures also present at baseline commit 50ba
 - Blocked-account live SQL: **320/320 table checks passed** across 64 tables and five states: inactive profile, removed profile, Auth ban, Auth deletion, incomplete onboarding. All changes rolled back.
 - Seven live Edge endpoints rejected unauthenticated requests with HTTP 401. Service-only actor, archive and invitation RPCs are not executable by anon/authenticated roles.
 - Full browser retest reached further into previously blocked suites. Updated remaining stale Opportunity close and access-management heading selectors; synchronized Stage assertions with React rendering. Split the same suite list into four CI groups so failures can be diagnosed independently.
+
+- Follow-up tests found and fixed Lead assignment visibility (requires Edit and Assign), restored permitted linked-account navigation, and gated cross-module create actions. Price Book now uses Inventory permissions consistent with database policies; removed an unrelated approval prerequisite and supplied the shared access hook to its Inventory view.
+- Local automated tests after these fixes: **258/258 passed**. Full browser CI rerun pending for this release.

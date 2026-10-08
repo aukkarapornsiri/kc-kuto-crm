@@ -17,7 +17,7 @@ test('Figma lead detail renders enterprise popup, 24 compact fields, notes and a
  const LeadDetail=createLeadDetailEnterprise({React});
  const tree=LeadDetail({
   record:{id:'1',code:'LD-2541',company_name:'บริษัท ทดสอบ',contact_name:'คุณ ทดสอบ',status:'new',priority:'medium',source:'Line',owner_name:'Sales Owner',note:'Long sales context',updated_at:'2026-10-07T10:00:00Z'},
-  lang:'th',canEdit:true,canConvert:true,onClose:()=>{},onEdit:()=>{},onConvert:()=>{},loadOwners:async()=>[],onAssign:async()=>{}
+  lang:'th',canEdit:true,canAssign:true,canConvert:true,onClose:()=>{},onEdit:()=>{},onConvert:()=>{},loadOwners:async()=>[],onAssign:async()=>{}
  });
  const nodes=walk(tree);
  const classes=nodes.map(n=>n.props?.className).filter(Boolean);
@@ -28,4 +28,13 @@ test('Figma lead detail renders enterprise popup, 24 compact fields, notes and a
  assert.equal(classes.filter(x=>x==='kc-lead-info-field').length,24);
  assert.ok(nodes.some(n=>n.type==='button'&&String(n.props?.className||'').includes('assign')));
  assert.ok(nodes.some(n=>n.type==='button'&&n.children.includes('แปลงเป็นลูกค้า')));
+});
+
+test('Lead Assign requires its own grant and linked-account navigation is retained',()=>{
+ const View=createLeadDetailEnterprise({React});
+ const denied=walk(View({record:{id:'test'},canEdit:true,canAssign:false}));
+ assert.ok(!denied.some(n=>n.props.className?.includes('assign')&&n.type==='button'));
+ let opened=false;const allowed=walk(View({record:{id:'test',customer_id:'customer'},canEdit:true,canAssign:true,lang:'en',onAccount:()=>{opened=true;}}));
+ assert.ok(allowed.some(n=>n.type==='button'&&n.props.className?.includes('assign')));
+ allowed.find(n=>n.type==='button'&&n.children.includes('Open Account')).props.onClick();assert.equal(opened,true);
 });

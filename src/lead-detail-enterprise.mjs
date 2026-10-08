@@ -2,7 +2,7 @@ export function createLeadDetailEnterprise({React}){
  const h=React.createElement;
  const clean=v=>v==null||v===''?'-':String(v);
  const initials=name=>String(name||'SA').trim().split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'SA';
- return function LeadDetailEnterprise({record,lang='th',busy=false,canEdit=false,canConvert=false,onClose,onEdit,onConvert,loadOwners,onAssign,onActivity,onOpportunity}){
+ return function LeadDetailEnterprise({record,lang='th',busy=false,canEdit=false,canAssign=false,canConvert=false,onAccount,onClose,onEdit,onConvert,loadOwners,onAssign,onActivity,onOpportunity}){
   const t=(th,en)=>lang==='th'?th:en;
   const [assignOpen,setAssignOpen]=React.useState(false);
   const [owners,setOwners]=React.useState([]);
@@ -36,7 +36,8 @@ export function createLeadDetailEnterprise({React}){
       h('span',{className:'kc-lead-chip'},t('แหล่งที่มา: ','Source: ')+clean(record.source)),
       h('span',{className:'kc-lead-owner-chip'},h('span',{className:'kc-lead-owner-avatar'},initials(ownerName)),h('span',{className:'kc-lead-owner-meta'},h('span',null,t('ผู้รับผิดชอบ','Assignee')),h('strong',null,ownerName))),
       h('span',{className:'kc-lead-detail-actions-spacer'}),
-      canEdit&&h('button',{type:'button',className:'kc-lead-action-btn assign',onClick:openAssign},h('span',{'aria-hidden':true},'＋'),t('Assign Lead','Assign Lead')),
+      canAssign&&h('button',{type:'button',className:'kc-lead-action-btn assign',onClick:openAssign},h('span',{'aria-hidden':true},'＋'),t('Assign Lead','Assign Lead')),
+      onAccount&&h('button',{type:'button',className:'kc-lead-action-btn',onClick:onAccount},t('เปิดลูกค้า','Open Account')),
       canEdit&&h('button',{type:'button',className:'kc-lead-action-btn',onClick:onEdit},t('แก้ไข','Edit')),
       canConvert&&h('button',{type:'button',className:'kc-lead-action-btn primary',onClick:onConvert,disabled:busy},t('แปลงเป็นลูกค้า','Convert to Customer')),
       h('button',{type:'button',className:'kc-lead-action-btn',onClick:onClose},t('ปิดรายละเอียด','Close Detail'))

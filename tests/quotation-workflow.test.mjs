@@ -10,7 +10,7 @@ test('quotation financial fields are approval-gated and contract handoff stays w
   assert.match(quotation,/canViewFinancials=false/);
   assert.match(quotation,/const showGP=!!canViewFinancials&&!!template\.show_gp/);
   assert.match(quotation,/showMargin=!!canViewFinancials&&!!template\.show_margin/);
-  assert.match(workspace,/entity==='prices'&&\['create','edit','delete'\]\.includes\(action\)/);
+  assert.match(workspace,/const can=action=>demoMode\|\|access\.can\(module,action\)/);
   assert.match(workspace,/entity==='prices'&&f\.key==='cost'&&!can\('approve'\)/);
   assert.match(workspace,/client\.rpc\('crm_price_catalog'\)/);
   assert.match(workspace,/สร้างสัญญาจากใบเสนอราคา/);

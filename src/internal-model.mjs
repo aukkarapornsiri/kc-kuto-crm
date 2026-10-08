@@ -3,7 +3,7 @@ import {OPTIONS} from './internal-options.mjs';
 import {fullPersonName} from './record-profile.mjs?v=20260930-accounts';
 export const ENTITIES={
  branches:{table:'crm_branches',module:'customers',title:['สาขาลูกค้า','Customer branches'],name:'name',fields:'name*,code,customer_id@,address~,phone,status',statuses:['active','inactive']},
- prices:{table:'crm_price_items',module:'quotations',title:['รายการสินค้าและราคา','Products and prices'],name:'name',fields:'name*,code*,category,unit,price#,cost#,description~,status',statuses:['active','inactive']},
+ prices:{table:'crm_price_items',module:'inventory',title:['รายการสินค้าและราคา','Products and prices'],name:'name',fields:'name*,code*,category,unit,price#,cost#,description~,status',statuses:['active','inactive']},
  templates:{table:'crm_templates',module:'documents',title:['แม่แบบเอกสาร','Document templates'],name:'name',fields:'name*,type,description~,header~,footer~,status',statuses:['active','inactive']},
  knowledge:{table:'crm_knowledge_articles',module:'tickets',title:['ฐานความรู้','Knowledge base'],name:'name',fields:'name*,category,description~,root_cause~,solution~,product_id@,model,error_code,tags,service_ticket_id@,status',statuses:['draft','published','archived']},
  documents:{title:['เอกสาร','Documents'],name:'name',fields:'name*,customer_id@,type,version,status,owner_id@',statuses:['draft','active','archived']},
