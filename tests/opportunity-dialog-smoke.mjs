@@ -75,6 +75,7 @@ try{
     assert.equal(await form.getByLabel('Description',{exact:true}).inputValue(),'Linked opportunity description');
     assert.equal(await form.getByLabel('Stage',{exact:true}).inputValue(),'Proposal');
     await form.getByLabel('Stage',{exact:true}).selectOption('Won');
+    await page.waitForFunction(()=>document.querySelector('form[aria-label="Opportunity form"] input[aria-label="Probability (%)"]')?.value==='100');
     assert.equal(await form.getByLabel('Probability (%)',{exact:true}).inputValue(),'100');
     assert.equal(await form.getByLabel('Forecast Category',{exact:true}).inputValue(),'Closed Won');
     await form.getByRole('button',{name:'Save',exact:true}).click();
@@ -83,6 +84,7 @@ try{
     assert.equal(saved[0].status,'won');assert.equal(saved[0].weighted_amount,120000.5);
     await root.getByRole('button',{name:'Edit',exact:true}).click();
     await form.getByLabel('Stage',{exact:true}).selectOption('Lost');
+    await page.waitForFunction(()=>document.querySelector('form[aria-label="Opportunity form"] input[aria-label="Probability (%)"]')?.value==='0');
     await form.getByRole('button',{name:'Save',exact:true}).click();
     assert.equal(await form.getByLabel('Lost Reason',{exact:true}).evaluate(el=>el.validity.valueMissing),true);
     await form.getByLabel('Lost Reason',{exact:true}).fill('Budget');

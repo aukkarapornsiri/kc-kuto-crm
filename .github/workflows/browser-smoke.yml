@@ -15,6 +15,18 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - group: regression
+            suites: internal-workspace-smoke opportunity-dialog-smoke settings-workspace-smoke
+          - group: customer-sales
+            suites: login-layout-smoke quick-create-smoke customer360-smoke customer360-create-smoke header-ai-chat-smoke quotation-layout-smoke quotation-details-smoke
+          - group: navigation-settings
+            suites: sales-targets-smoke sales-attainment-ring-smoke dashboard-layout-smoke navigation-smoke smoke settings-cards-smoke settings-smoke master-data-smoke
+          - group: operations
+            suites: workspace-theme-smoke executive-smoke marketing-map-smoke service-desk-smoke inventory-smoke
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,10 +43,12 @@ jobs:
           echo $! > /tmp/kuto-http.pid
           sleep 2
       - name: Run desktop and mobile smoke tests
+        env:
+          SMOKE_SUITES: ${{ matrix.suites }}
         run: |
           mkdir -p test-artifacts
           task_status=0
-          for suite in login-layout-smoke quick-create-smoke customer360-smoke customer360-create-smoke header-ai-chat-smoke quotation-layout-smoke quotation-details-smoke sales-targets-smoke sales-attainment-ring-smoke dashboard-layout-smoke internal-workspace-smoke opportunity-dialog-smoke navigation-smoke smoke settings-cards-smoke settings-smoke master-data-smoke settings-workspace-smoke workspace-theme-smoke executive-smoke marketing-map-smoke service-desk-smoke inventory-smoke; do
+          for suite in $SMOKE_SUITES; do
             # Default login is tested without demo; existing demo suites opt in explicitly.
             SITE_URL='http://127.0.0.1:4173/kc-kuto-crm/?demo=1' node tests/$suite.mjs > test-artifacts/$suite.log 2>&1 || task_status=1
             cat test-artifacts/$suite.log
@@ -44,6 +58,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kc-kuto-smoke-screenshots
+          name: kc-kuto-smoke-${{ matrix.group }}
           path: test-artifacts/
           if-no-files-found: ignore

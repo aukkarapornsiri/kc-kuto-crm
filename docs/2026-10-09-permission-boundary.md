@@ -37,3 +37,7 @@ The full browser suite found three failures also present at baseline commit 50ba
 - Added all-role frontend tests for isolated action grants, inactive/deleted/pending account denial, menu filtering and direct-page denial.
 - Corrected two stale browser selectors for the redesigned lead/contact details and the Roles tab. Fixed Opportunity Stage event handling to snapshot the selected value before React executes the queued update; regression test verifies Won stays at 100%.
 - Browser role simulation and database-role assertions are distinct from interactive login as real employees. No real employee credentials used.
+
+- Blocked-account live SQL: **320/320 table checks passed** across 64 tables and five states: inactive profile, removed profile, Auth ban, Auth deletion, incomplete onboarding. All changes rolled back.
+- Seven live Edge endpoints rejected unauthenticated requests with HTTP 401. Service-only actor, archive and invitation RPCs are not executable by anon/authenticated roles.
+- Full browser retest reached further into previously blocked suites. Updated remaining stale Opportunity close and access-management heading selectors; synchronized Stage assertions with React rendering. Split the same suite list into four CI groups so failures can be diagnosed independently.
