@@ -6,7 +6,7 @@ const baseURL = new URL(process.env.SITE_URL || 'http://127.0.0.1:4173/kc-kuto-c
 baseURL.searchParams.delete('demo');
 const base = baseURL.href;
 const browser = await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
-const viewports = [[1779,864],[1920,1080],[1736,800],[1440,900],[1440,720],[1366,768],[1280,650],[1024,650],[1024,768],[768,1024],[390,800],[320,568]];
+const viewports = [[1779,864],[1920,1200],[1536,960],[1920,1080],[1736,800],[1440,900],[1440,720],[1366,768],[1280,650],[1024,650],[1024,768],[768,1024],[390,800],[320,568]];
 fs.mkdirSync('test-artifacts',{recursive:true});
 const results = [];
 try {
@@ -39,8 +39,16 @@ try {
       await page.getByRole('heading',{name:lang==='th'?'ยินดีต้อนรับกลับ':'Welcome back',exact:true}).waitFor();
       const metrics=await page.evaluate(()=>{
         const box=s=>{const e=document.querySelector(s),r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,scrollH:e.scrollHeight,clientH:e.clientHeight}};
-        return {sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,shell:box('.kc-login-shell'),brand:box('.kc-login-brand'),access:box('.kc-login-access'),logo:box('.kc-login-logo'),badge:box('.kc-login-badge'),headline:box('.kc-login-story h1'),description:box('.kc-login-story>p'),cards:box('.kc-login-features'),footer:box('.kc-login-access>footer')};
+        return {sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,shell:box('.kc-login-shell'),brand:box('.kc-login-brand'),access:box('.kc-login-access'),logo:box('.kc-login-logo'),badge:box('.kc-login-badge'),headline:box('.kc-login-story h1'),description:box('.kc-login-story>p'),cards:box('.kc-login-features'),brandFooter:box('.kc-login-brand>footer'),footer:box('.kc-login-access>footer')};
       });
+      const upperSpace=metrics.logo.y-metrics.brand.y;
+      const lowerSpace=metrics.brandFooter.y-metrics.cards.y-metrics.cards.height;
+      results.push({width,height,lang,upperSpace,lowerSpace,...metrics});
+      fs.writeFileSync('test-artifacts/login-layout-geometry.json',JSON.stringify(results,null,2));
+      await page.screenshot({path:`test-artifacts/login-layout-${lang}-${width}x${height}.png`,fullPage:true});
+      assert.ok(Math.abs(upperSpace-lowerSpace)<=1,`Balanced brand spacing: ${upperSpace}px above logo / ${lowerSpace}px below cards (${width}x${height} ${lang})`);
+      assert.ok(upperSpace>=23&&lowerSpace>=23,'Minimum space above logo and before pinned footer');
+      assert.ok(metrics.brandFooter.y+metrics.brandFooter.height<=metrics.brand.y+metrics.brand.height,'Brand footer stays inside panel');
       assert.ok(metrics.sw<=width+1,'No horizontal overflow');
       assert.ok(Math.abs(metrics.shell.x+metrics.shell.width/2-width/2)<=1,'Centered frame');
       for(const key of ['badge','headline','description','cards']) assert.ok(Math.abs(metrics[key].x-metrics.logo.x)<=1,`${key} and visible artwork must share left edge`);
@@ -56,8 +64,7 @@ try {
       }else{
         assert.ok(metrics.access.y>=metrics.brand.y+metrics.brand.height-1,'Tablet/mobile stack');
       }
-      await page.screenshot({path:`test-artifacts/login-layout-${lang}-${width}x${height}.png`,fullPage:true});
-      results.push({width,height,lang,...metrics});
+
     }
     // Controlled values survive showing/hiding and switching languages.
     await page.locator('#login-email').fill('layout-check@example.invalid');
@@ -109,5 +116,5 @@ try {
   assert.equal(await demo.getByRole('button',{name:'เข้าใช้งานโหมดทดลอง',exact:true}).isVisible(),true);
   await demo.close();
   fs.writeFileSync('test-artifacts/login-layout-geometry.json',JSON.stringify(results,null,2));
-  console.log('PASS login 50/50: 12 viewports x Thai/English, borderless left-aligned artwork and text, exact reference copy, password toggle, native validation, intercepted password rejection, real Guest URL navigation, explicit demo only, tab branding; no live credentials/data submitted.');
+  console.log('PASS login 50/50: 14 viewports x Thai/English, equal space above logo and below cards, pinned footer, borderless left-aligned artwork and text, exact reference copy, password toggle, native validation, intercepted password rejection, real Guest URL navigation, explicit demo only, tab branding; no live credentials/data submitted.');
 } finally {await browser.close();}

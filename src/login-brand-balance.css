@@ -1,0 +1,13 @@
+/* Balance the logo/story/cards within the left panel above its footer.
+   Equal flexible rows preserve the existing 50/50 shell and right-side form.
+   Minimum breathing room keeps short screens readable without clipping. */
+.kc-login-brand{
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ grid-template-rows:minmax(24px,1fr) max-content max-content minmax(24px,1fr) max-content;
+ align-items:start;
+ padding-top:0;
+}
+.kc-login-brand>.kc-login-logo{grid-column:1;grid-row:2}
+.kc-login-brand>.kc-login-story{grid-column:1;grid-row:3}
+.kc-login-brand>footer{grid-column:1;grid-row:5;margin-top:0;padding-top:0}
